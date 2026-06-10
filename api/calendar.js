@@ -1,17 +1,68 @@
 const API_FOOTBALL_URL = "https://v3.football.api-sports.io/fixtures";
 const WORLD_CUP_LEAGUE_ID = "1";
 const WORLD_CUP_SEASON = "2026";
-const UPSTREAM_FEED_URL = "https://ics.fixtur.es/v2/es.ics";
+const FALLBACK_FEED_URL =
+  "https://ics.fixtur.es/v2/league/fifa-world-cup-2026.ics";
 const TOURNAMENT_START = Date.UTC(2026, 5, 11);
 const TOURNAMENT_END = Date.UTC(2026, 6, 20);
 const MATCH_DURATION_MS = 2 * 60 * 60 * 1000;
+const MAX_SELECTED_TEAMS = 8;
+const API_RETRY_DELAY_MS = 6 * 60 * 60 * 1000;
 
-const TEAM_NAMES_ES = new Map([
-  ["Spain", "España"],
-  ["Cape Verde", "Cabo Verde"],
-  ["Saudi Arabia", "Arabia Saudí"]
-]);
+let apiDisabledUntil = 0;
 
+const TEAMS = [
+  ["ALG", "Argelia", ["Algeria"]],
+  ["ARG", "Argentina", ["Argentina"]],
+  ["AUS", "Australia", ["Australia"]],
+  ["AUT", "Austria", ["Austria"]],
+  ["BEL", "Bélgica", ["Belgium"]],
+  ["BIH", "Bosnia y Herzegovina", ["Bosnia and Herzegovina"]],
+  ["BRA", "Brasil", ["Brazil"]],
+  ["CAN", "Canadá", ["Canada"]],
+  ["CPV", "Cabo Verde", ["Cape Verde"]],
+  ["COL", "Colombia", ["Colombia"]],
+  ["CRO", "Croacia", ["Croatia"]],
+  ["CUW", "Curazao", ["Curaçao", "Curacao"]],
+  ["CZE", "Chequia", ["Czech Republic", "Czechia"]],
+  ["COD", "RD Congo", ["DR Congo", "Congo DR"]],
+  ["ECU", "Ecuador", ["Ecuador"]],
+  ["EGY", "Egipto", ["Egypt"]],
+  ["ENG", "Inglaterra", ["England"]],
+  ["FRA", "Francia", ["France"]],
+  ["GER", "Alemania", ["Germany"]],
+  ["GHA", "Ghana", ["Ghana"]],
+  ["HAI", "Haití", ["Haiti"]],
+  ["IRN", "Irán", ["Iran"]],
+  ["IRQ", "Irak", ["Iraq"]],
+  ["CIV", "Costa de Marfil", ["Ivory Coast", "Côte d'Ivoire"]],
+  ["JPN", "Japón", ["Japan"]],
+  ["JOR", "Jordania", ["Jordan"]],
+  ["MEX", "México", ["Mexico"]],
+  ["MAR", "Marruecos", ["Morocco"]],
+  ["NED", "Países Bajos", ["Netherlands"]],
+  ["NZL", "Nueva Zelanda", ["New Zealand"]],
+  ["NOR", "Noruega", ["Norway"]],
+  ["PAN", "Panamá", ["Panama"]],
+  ["PAR", "Paraguay", ["Paraguay"]],
+  ["POR", "Portugal", ["Portugal"]],
+  ["QAT", "Catar", ["Qatar"]],
+  ["KSA", "Arabia Saudí", ["Saudi Arabia"]],
+  ["SCO", "Escocia", ["Scotland"]],
+  ["SEN", "Senegal", ["Senegal"]],
+  ["RSA", "Sudáfrica", ["South Africa"]],
+  ["KOR", "Corea del Sur", ["South Korea", "Korea Republic"]],
+  ["ESP", "España", ["Spain", "España"]],
+  ["SWE", "Suecia", ["Sweden"]],
+  ["SUI", "Suiza", ["Switzerland"]],
+  ["TUN", "Túnez", ["Tunisia"]],
+  ["TUR", "Turquía", ["Türkiye", "Turkey"]],
+  ["USA", "Estados Unidos", ["United States", "USA"]],
+  ["URU", "Uruguay", ["Uruguay"]],
+  ["UZB", "Uzbekistán", ["Uzbekistan"]]
+].map(([code, name, aliases]) => ({ code, name, aliases }));
+
+const TEAM_BY_CODE = new Map(TEAMS.map((team) => [team.code, team]));
 const MATCH_STATUS_ES = new Map([
   ["Not Started", "Por comenzar"],
   ["First Half", "Primera parte"],
@@ -26,6 +77,18 @@ const MATCH_STATUS_ES = new Map([
   ["Match Cancelled", "Cancelado"],
   ["Time to be defined", "Hora por confirmar"]
 ]);
+
+function normalize(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 function escapeIcsText(value) {
   return String(value || "")
@@ -42,13 +105,59 @@ function formatIcsDate(value) {
     .replace(/\.\d{3}Z$/, "Z");
 }
 
+function selectedTeamsFromRequest(request) {
+  const requestUrl = new URL(request.url || "/", "https://calendar.local");
+  const raw =
+    request.query?.teams ||
+    requestUrl.searchParams.get("teams") ||
+    "ESP";
+  const codes = String(raw)
+    .split(",")
+    .map((code) => code.trim().toUpperCase())
+    .filter((code, index, values) => TEAM_BY_CODE.has(code) && values.indexOf(code) === index)
+    .slice(0, MAX_SELECTED_TEAMS);
+
+  return (codes.length ? codes : ["ESP"]).map((code) => TEAM_BY_CODE.get(code));
+}
+
+function calendarName(selectedTeams) {
+  if (selectedTeams.length === 1) {
+    return `${selectedTeams[0].name} · Mundial 2026`;
+  }
+
+  if (selectedTeams.length <= 3) {
+    return `${selectedTeams.map((team) => team.name).join(", ")} · Mundial 2026`;
+  }
+
+  return `${selectedTeams.length} selecciones · Mundial 2026`;
+}
+
 function localizeTeamName(name) {
-  return TEAM_NAMES_ES.get(name) || name || "Por confirmar";
+  const normalizedName = normalize(name);
+  const team = TEAMS.find((candidate) =>
+    candidate.aliases.some((alias) => normalize(alias) === normalizedName)
+  );
+  return team?.name || name || "Por confirmar";
+}
+
+function localizeSummary(summary) {
+  let localized = String(summary || "");
+  const aliases = TEAMS.flatMap((team) =>
+    team.aliases.map((alias) => ({ alias, name: team.name }))
+  ).sort((a, b) => b.alias.length - a.alias.length);
+
+  for (const { alias, name } of aliases) {
+    localized = localized.replace(
+      new RegExp(`\\b${escapeRegExp(alias)}\\b`, "gi"),
+      name
+    );
+  }
+
+  return localized;
 }
 
 function translateRound(round) {
-  const normalized = String(round || "").toLowerCase();
-
+  const normalized = normalize(round);
   if (normalized.includes("group")) return "Fase de grupos";
   if (normalized.includes("round of 32")) return "Dieciseisavos de final";
   if (normalized.includes("round of 16")) return "Octavos de final";
@@ -56,15 +165,26 @@ function translateRound(round) {
   if (normalized.includes("semi")) return "Semifinal";
   if (normalized.includes("third")) return "Tercer puesto";
   if (normalized.includes("final")) return "Final";
-
   return round || "Copa Mundial de la FIFA 2026";
 }
 
-function isSpainTeam(team) {
-  return (
-    team?.code === "ESP" ||
-    String(team?.name || "").toLowerCase() === "spain" ||
-    String(team?.name || "").toLowerCase() === "españa"
+function phaseForDate(start) {
+  if (start < Date.UTC(2026, 5, 28, 19)) return "Fase de grupos";
+  if (start < Date.UTC(2026, 6, 4)) return "Dieciseisavos de final";
+  if (start < Date.UTC(2026, 6, 8)) return "Octavos de final";
+  if (start < Date.UTC(2026, 6, 12)) return "Cuartos de final";
+  if (start < Date.UTC(2026, 6, 16)) return "Semifinal";
+  if (start < Date.UTC(2026, 6, 19)) return "Tercer puesto";
+  return "Final";
+}
+
+function apiTeamMatches(team, selectedTeams) {
+  const teamCode = String(team?.code || "").toUpperCase();
+  const teamName = normalize(team?.name);
+  return selectedTeams.some(
+    (selected) =>
+      teamCode === selected.code ||
+      selected.aliases.some((alias) => normalize(alias) === teamName)
   );
 }
 
@@ -86,20 +206,19 @@ function fixtureSummary(fixture) {
 
 function fixtureToIcsEvent(fixture) {
   const start = Date.parse(fixture.fixture?.date);
-  if (!Number.isFinite(start)) {
-    return "";
-  }
+  if (!Number.isFinite(start)) return "";
 
   const venue = fixture.fixture?.venue || {};
   const location = [venue.name, venue.city].filter(Boolean).join(", ");
-  const phase = translateRound(fixture.league?.round);
-  const rawMatchStatus = fixture.fixture?.status?.long;
-  const matchStatus = MATCH_STATUS_ES.get(rawMatchStatus) || rawMatchStatus;
-  const description = [phase, "Copa Mundial de la FIFA 2026", matchStatus]
+  const rawStatus = fixture.fixture?.status?.long;
+  const status = MATCH_STATUS_ES.get(rawStatus) || rawStatus;
+  const description = [
+    translateRound(fixture.league?.round),
+    "Copa Mundial de la FIFA 2026",
+    status
+  ]
     .filter(Boolean)
     .join(" · ");
-  const calendarStatus =
-    fixture.fixture?.status?.short === "CANC" ? "CANCELLED" : "CONFIRMED";
 
   return [
     "BEGIN:VEVENT",
@@ -110,7 +229,7 @@ function fixtureToIcsEvent(fixture) {
     `SUMMARY:${escapeIcsText(fixtureSummary(fixture))}`,
     `DESCRIPTION:${escapeIcsText(description)}`,
     location ? `LOCATION:${escapeIcsText(location)}` : "",
-    `STATUS:${calendarStatus}`,
+    `STATUS:${fixture.fixture?.status?.short === "CANC" ? "CANCELLED" : "CONFIRMED"}`,
     "TRANSP:OPAQUE",
     "END:VEVENT"
   ]
@@ -118,37 +237,47 @@ function fixtureToIcsEvent(fixture) {
     .join("\r\n");
 }
 
-function fixturesToCalendar(fixtures) {
-  const spainFixtures = fixtures
+function createCalendar(events, selectedTeams, productId) {
+  if (events.length === 0) {
+    throw new Error("No hay partidos publicados para la selección elegida.");
+  }
+
+  const name = calendarName(selectedTeams);
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    `PRODID:${productId}`,
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    `X-WR-CALNAME:${escapeIcsText(name)}`,
+    `X-WR-CALDESC:${escapeIcsText(`Partidos de ${name}`)}`,
+    "X-PUBLISHED-TTL:PT1H",
+    ...events,
+    "END:VCALENDAR",
+    ""
+  ].join("\r\n");
+}
+
+function fixturesToCalendar(fixtures, selectedTeams) {
+  const filtered = fixtures
     .filter(
       (fixture) =>
-        isSpainTeam(fixture.teams?.home) || isSpainTeam(fixture.teams?.away)
+        apiTeamMatches(fixture.teams?.home, selectedTeams) ||
+        apiTeamMatches(fixture.teams?.away, selectedTeams)
     )
     .sort(
       (a, b) =>
         Date.parse(a.fixture?.date || 0) - Date.parse(b.fixture?.date || 0)
     );
 
-  if (spainFixtures.length === 0) {
-    throw new Error("API-Football no devolvió partidos de España.");
-  }
-
-  return [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Spain Mundial//API-Football//ES",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-    "X-WR-CALNAME:España · Mundial 2026",
-    "X-WR-CALDESC:Partidos de España en el Mundial 2026",
-    "X-PUBLISHED-TTL:PT1H",
-    ...spainFixtures.map(fixtureToIcsEvent).filter(Boolean),
-    "END:VCALENDAR",
-    ""
-  ].join("\r\n");
+  return createCalendar(
+    filtered.map(fixtureToIcsEvent).filter(Boolean),
+    selectedTeams,
+    "-//Mundial 2026 Dashboard//API-Football//ES"
+  );
 }
 
-async function fetchApiFootballCalendar(apiKey) {
+async function fetchApiFootballCalendar(apiKey, selectedTeams) {
   const url = new URL(API_FOOTBALL_URL);
   url.searchParams.set("league", WORLD_CUP_LEAGUE_ID);
   url.searchParams.set("season", WORLD_CUP_SEASON);
@@ -179,7 +308,7 @@ async function fetchApiFootballCalendar(apiKey) {
     throw new Error("La respuesta de API-Football no contiene partidos.");
   }
 
-  return fixturesToCalendar(payload.response);
+  return fixturesToCalendar(payload.response, selectedTeams);
 }
 
 function unfoldIcs(value) {
@@ -189,60 +318,27 @@ function unfoldIcs(value) {
 function readProperty(eventBlock, propertyName) {
   const unfolded = unfoldIcs(eventBlock);
   const pattern = new RegExp(`^${propertyName}(?:;[^:]*)?:(.*)$`, "mi");
-  const match = unfolded.match(pattern);
-  return match ? match[1].trim() : "";
+  return unfolded.match(pattern)?.[1]?.trim() || "";
 }
 
 function parseIcsDate(value) {
   const match = value.match(
     /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})?Z?)?$/
   );
-
-  if (!match) {
-    return NaN;
-  }
+  if (!match) return NaN;
 
   const [, year, month, day, hour = "00", minute = "00", second = "00"] = match;
-  return Date.UTC(
-    Number(year),
-    Number(month) - 1,
-    Number(day),
-    Number(hour),
-    Number(minute),
-    Number(second)
+  return Date.UTC(+year, +month - 1, +day, +hour, +minute, +second);
+}
+
+function summaryMatchesSelection(summary, selectedTeams) {
+  const normalizedSummary = normalize(summary);
+  return selectedTeams.some((team) =>
+    team.aliases.some((alias) => normalizedSummary.includes(normalize(alias)))
   );
 }
 
-function phaseForDate(start) {
-  if (start < Date.UTC(2026, 5, 28)) return "Fase de grupos";
-  if (start < Date.UTC(2026, 6, 4)) return "Dieciseisavos de final";
-  if (start < Date.UTC(2026, 6, 8)) return "Octavos de final";
-  if (start < Date.UTC(2026, 6, 12)) return "Cuartos de final";
-  if (start < Date.UTC(2026, 6, 16)) return "Semifinal";
-  if (start < Date.UTC(2026, 6, 19)) return "Tercer puesto";
-  return "Final";
-}
-
-function localizeSummary(summary) {
-  return summary
-    .replace(/\bSpain\b/gi, "España")
-    .replace(/\bCape Verde\b/gi, "Cabo Verde")
-    .replace(/\bSaudi Arabia\b/gi, "Arabia Saudí");
-}
-
-function isSpainWorldCupEvent(eventBlock) {
-  const summary = readProperty(eventBlock, "SUMMARY");
-  const start = parseIcsDate(readProperty(eventBlock, "DTSTART"));
-
-  return (
-    /\b(spain|españa)\b/i.test(summary) &&
-    Number.isFinite(start) &&
-    start >= TOURNAMENT_START &&
-    start < TOURNAMENT_END
-  );
-}
-
-function cleanEvent(eventBlock) {
+function cleanFallbackEvent(eventBlock) {
   const start = parseIcsDate(readProperty(eventBlock, "DTSTART"));
   const summary = localizeSummary(readProperty(eventBlock, "SUMMARY"));
   const description = `${phaseForDate(start)} · Copa Mundial de la FIFA 2026`;
@@ -263,38 +359,40 @@ function cleanEvent(eventBlock) {
     );
   }
 
-  return cleaned;
+  return cleaned.trim();
 }
 
-function filterWorldCupEvents(icsText) {
-  const eventPattern = /BEGIN:VEVENT[\s\S]*?END:VEVENT\r?\n?/gi;
-  const events = icsText.match(eventPattern) || [];
-  const firstEventIndex = icsText.search(/BEGIN:VEVENT/i);
+function filterFallbackCalendar(icsText, selectedTeams) {
+  const events = icsText.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT\r?\n?/gi) || [];
+  const filtered = events
+    .filter((eventBlock) => {
+      const start = parseIcsDate(readProperty(eventBlock, "DTSTART"));
+      return (
+        Number.isFinite(start) &&
+        start >= TOURNAMENT_START &&
+        start < TOURNAMENT_END &&
+        summaryMatchesSelection(readProperty(eventBlock, "SUMMARY"), selectedTeams)
+      );
+    })
+    .map(cleanFallbackEvent)
+    .sort(
+      (a, b) =>
+        parseIcsDate(readProperty(a, "DTSTART")) -
+        parseIcsDate(readProperty(b, "DTSTART"))
+    );
 
-  if (firstEventIndex < 0 || events.length === 0) {
-    throw new Error("El feed de origen no contiene eventos.");
-  }
-
-  const lastEvent = events.at(-1);
-  const lastEventIndex = icsText.lastIndexOf(lastEvent);
-  const header = icsText.slice(0, firstEventIndex);
-  const footer = icsText.slice(lastEventIndex + lastEvent.length);
-  const filteredEvents = events.filter(isSpainWorldCupEvent).map(cleanEvent);
-
-  return [
-    header
-      .replace(/^X-WR-CALNAME:.*$/im, "X-WR-CALNAME:España · Mundial 2026")
-      .replace(/^X-WR-CALDESC:.*$/im, "X-WR-CALDESC:Partidos de España en el Mundial 2026"),
-    ...filteredEvents,
-    footer
-  ].join("");
+  return createCalendar(
+    filtered,
+    selectedTeams,
+    "-//Mundial 2026 Dashboard//Fixtur.es//ES"
+  );
 }
 
-async function fetchFallbackCalendar() {
-  const upstreamResponse = await fetch(UPSTREAM_FEED_URL, {
+async function fetchFallbackCalendar(selectedTeams) {
+  const upstreamResponse = await fetch(FALLBACK_FEED_URL, {
     headers: {
       Accept: "text/calendar",
-      "User-Agent": "Spain-Mundial-Calendar/1.0"
+      "User-Agent": "Mundial-2026-Dashboard/2.0"
     }
   });
 
@@ -302,7 +400,7 @@ async function fetchFallbackCalendar() {
     throw new Error(`El proveedor ICS respondió con HTTP ${upstreamResponse.status}.`);
   }
 
-  return filterWorldCupEvents(await upstreamResponse.text());
+  return filterFallbackCalendar(await upstreamResponse.text(), selectedTeams);
 }
 
 module.exports = async function handler(request, response) {
@@ -311,31 +409,38 @@ module.exports = async function handler(request, response) {
     return response.status(405).send("Método no permitido");
   }
 
+  const selectedTeams = selectedTeamsFromRequest(request);
+
   try {
     let calendar;
     let source = "ics-fallback";
     const apiKey = process.env.API_FOOTBALL_KEY;
 
-    if (apiKey) {
+    if (apiKey && Date.now() >= apiDisabledUntil) {
       try {
-        calendar = await fetchApiFootballCalendar(apiKey);
+        calendar = await fetchApiFootballCalendar(apiKey, selectedTeams);
         source = "api-football";
       } catch (apiError) {
-        console.error("API-Football falló; se usará el respaldo ICS.", apiError);
+        apiDisabledUntil = Date.now() + API_RETRY_DELAY_MS;
+        console.warn("API-Football no está disponible; se usará el respaldo ICS.", apiError);
       }
     }
 
     if (!calendar) {
-      calendar = await fetchFallbackCalendar();
+      calendar = await fetchFallbackCalendar(selectedTeams);
     }
 
     response.setHeader("Content-Type", "text/calendar; charset=utf-8");
     response.setHeader(
       "Content-Disposition",
-      'inline; filename="espana-mundial-2026.ics"'
+      'inline; filename="mundial-2026.ics"'
     );
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("X-Calendar-Source", source);
+    response.setHeader(
+      "X-Selected-Teams",
+      selectedTeams.map((team) => team.code).join(",")
+    );
     response.setHeader(
       "Cache-Control",
       "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"
@@ -349,7 +454,7 @@ module.exports = async function handler(request, response) {
   } catch (error) {
     console.error("No se pudo generar el calendario.", error);
     return response.status(502).json({
-      error: "No se pudo actualizar el calendario de España."
+      error: "No se pudo actualizar el calendario del Mundial."
     });
   }
 };
