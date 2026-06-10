@@ -146,6 +146,41 @@
       box-shadow: inset 0 0 0 4px rgba(255,255,255,.05);
     }
 
+    .topbar__links {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .model-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(69, 213, 151, 0.45);
+      background: rgba(69, 213, 151, 0.10);
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: .3px;
+      text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    .model-link:hover {
+      transform: translateY(-1px);
+      background: rgba(69, 213, 151, 0.18);
+      box-shadow: 0 8px 22px rgba(69, 213, 151, 0.2);
+    }
+
+    .model-link__spark {
+      font-size: .62rem;
+      line-height: 1;
+      transform: translateY(-1px);
+    }
+
     .live-pill {
       display: inline-flex;
       align-items: center;
@@ -1406,7 +1441,13 @@
           <span class="brand__mark">26</span>
           <span>Centro de partidos</span>
         </div>
-        <span class="live-pill">Calendario en vivo</span>
+        <div class="topbar__links">
+          <a class="model-link" href="/predicciones.html">
+            <span class="model-link__spark" aria-hidden="true">▲</span>
+            Modelo de valor
+          </a>
+          <span class="live-pill">Calendario en vivo</span>
+        </div>
       </div>
 
       <div class="hero__grid">
