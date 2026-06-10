@@ -3,2790 +3,2000 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#090b12">
-  <meta name="description" content="Crea tu calendario personalizado de selecciones para el Mundial 2026.">
-  <title>Mi Mundial · Calendario 2026</title>
+  <meta name="theme-color" content="#0f1117">
+  <meta name="description" content="Calendario personalizado de selecciones para el Mundial 2026.">
+  <title>Mundial 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ── Material You dark design tokens (Stitch-inspired) ──────────── */
     :root {
       color-scheme: dark;
-      --bg: #090b12;
-      --bg-soft: #10131d;
-      --panel: #151925;
-      --panel-2: #1b202e;
-      --panel-glass: rgba(21, 25, 37, 0.82);
-      --line: rgba(255, 255, 255, 0.1);
-      --line-strong: rgba(255, 255, 255, 0.17);
-      --text: #f7f4ef;
-      --muted: #9da3b2;
-      --red: #ef3340;
-      --red-deep: #a91524;
-      --yellow: #ffd447;
-      --green: #45d597;
-      --blue: #60a5fa;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
-      --radius-xl: 30px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
+
+      /* Surfaces — 5-level tonal elevation */
+      --sur-0:  #090b12;
+      --sur-1:  #0f1117;
+      --sur-2:  #161922;
+      --sur-3:  #1c2030;
+      --sur-4:  #22273a;
+      --sur-5:  #272d42;
+
+      /* Primary — Spain red */
+      --pri:     #ef3340;
+      --pri-dim: rgba(239,51,64,.14);
+      --pri-on:  #fff;
+
+      /* Secondary — gold */
+      --sec:     #ffd447;
+      --sec-dim: rgba(255,212,71,.12);
+      --sec-on:  #1a1820;
+
+      /* Tertiary — green (alta_prob band) */
+      --ter:     #45d597;
+      --ter-dim: rgba(69,213,151,.12);
+
+      /* Accent — blue (media_prob band) */
+      --acc:     #60a5fa;
+      --acc-dim: rgba(96,165,250,.12);
+
+      /* Orange (baja_prob band) */
+      --orn:     #f97316;
+      --orn-dim: rgba(249,115,22,.12);
+
+      /* Text */
+      --txt:   #eceaf5;
+      --txt-2: #9ca3b4;
+      --txt-3: #5c6478;
+
+      /* Outline */
+      --line:   rgba(255,255,255,.10);
+      --line-2: rgba(255,255,255,.06);
+
+      /* Shape scale (Material You) */
+      --r-xs:   4px;
+      --r-sm:   8px;
+      --r-md:   12px;
+      --r-lg:   16px;
+      --r-xl:   24px;
+      --r-2xl:  32px;
+      --r-full: 9999px;
+
+      /* Layout */
+      --nav-h: 60px;
+      --btm-h: 64px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
-      min-width: 320px;
       margin: 0;
-      background:
-        radial-gradient(circle at 88% 3%, rgba(239, 51, 64, 0.15), transparent 26rem),
-        radial-gradient(circle at 5% 28%, rgba(96, 165, 250, 0.07), transparent 24rem),
-        var(--bg);
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100dvh;
+      background: var(--sur-0);
+      color: var(--txt);
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      font-size: 14px;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
     }
 
-    body.dialog-open {
-      overflow: hidden;
-    }
+    body.no-scroll { overflow: hidden; }
 
-    button,
-    input,
-    a {
-      font: inherit;
-      -webkit-tap-highlight-color: transparent;
-    }
+    button, input, a { font: inherit; -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
 
-    button,
-    a {
-      color: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .shell {
-      width: min(100% - 28px, 1180px);
-      margin-inline: auto;
-    }
-
-    .hero {
-      position: relative;
-      overflow: hidden;
-      padding: 18px 0 30px;
-      border-bottom: 1px solid var(--line);
-      background:
-        linear-gradient(130deg, rgba(126, 14, 29, 0.97), rgba(185, 25, 42, 0.93) 47%, rgba(239, 51, 64, 0.88)),
-        var(--red-deep);
-    }
-
-    .hero::before {
-      position: absolute;
-      width: 440px;
-      height: 440px;
-      top: -310px;
-      right: -80px;
-      content: "";
-      border: 60px solid rgba(255, 212, 71, 0.12);
-      border-radius: 50%;
-    }
-
-    .hero::after {
-      position: absolute;
-      inset: 0;
-      content: "";
-      opacity: 0.18;
-      background-image:
-        linear-gradient(rgba(255,255,255,.09) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.09) 1px, transparent 1px);
-      background-size: 42px 42px;
-      mask-image: linear-gradient(to right, transparent 10%, black 80%);
-      pointer-events: none;
-    }
-
-    .hero__inner {
-      position: relative;
-      z-index: 1;
-    }
-
-    .topbar {
+    /* ── App bar ──────────────────────────────────────────────────────── */
+    .app-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--nav-h);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 34px;
+      padding: 0 16px;
+      gap: 10px;
+      background: rgba(9,11,18,.90);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--line-2);
     }
 
     .brand {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 0.78rem;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .brand__mark {
-      display: grid;
-      width: 38px;
-      height: 38px;
-      place-items: center;
-      border: 1px solid rgba(255,255,255,.3);
-      border-radius: 12px;
-      background: rgba(10, 12, 19, 0.22);
-      color: var(--yellow);
-      font-size: 0.78rem;
-      box-shadow: inset 0 0 0 4px rgba(255,255,255,.05);
-    }
-
-    .topbar__links {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .model-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 13px;
-      border-radius: 999px;
-      border: 1px solid rgba(69, 213, 151, 0.45);
-      background: rgba(69, 213, 151, 0.10);
-      color: var(--green);
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: .3px;
+      gap: 9px;
+      margin-right: auto;
       text-decoration: none;
-      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
     }
 
-    .model-link:hover {
-      transform: translateY(-1px);
-      background: rgba(69, 213, 151, 0.18);
-      box-shadow: 0 8px 22px rgba(69, 213, 151, 0.2);
+    .brand__badge {
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      border-radius: var(--r-md);
+      background: var(--pri);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: -.03em;
+      flex-shrink: 0;
     }
 
-    .model-link__spark {
-      font-size: .62rem;
-      line-height: 1;
-      transform: translateY(-1px);
+    .brand__name {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--txt);
     }
 
-    .live-pill {
+    /* Desktop tabs */
+    .app-tabs {
+      display: none;
+      gap: 2px;
+    }
+
+    @media (min-width: 540px) { .app-tabs { display: flex; } }
+
+    .app-tab {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border: 1px solid rgba(255,255,255,.2);
-      border-radius: 999px;
-      background: rgba(15, 16, 24, 0.18);
-      color: rgba(255,255,255,.85);
-      font-size: 0.69rem;
-      font-weight: 800;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--r-full);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--txt-2);
+      transition: background 130ms, color 130ms;
+      position: relative;
     }
 
-    .live-pill::before {
-      width: 7px;
-      height: 7px;
-      content: "";
+    .app-tab[aria-selected="true"] {
+      background: var(--sur-4);
+      color: var(--txt);
+    }
+
+    .app-tab__pip {
+      width: 5px; height: 5px;
       border-radius: 50%;
-      background: var(--yellow);
-      box-shadow: 0 0 0 5px rgba(255, 212, 71, 0.13);
+      background: var(--sec);
+      display: none;
     }
 
-    .hero__grid {
-      display: grid;
-      gap: 24px;
-    }
+    .app-tab[aria-selected="true"] .app-tab__pip { display: block; }
 
-    .eyebrow {
-      margin: 0 0 9px;
-      color: var(--yellow);
-      font-size: 0.72rem;
-      font-weight: 900;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      max-width: 680px;
-      margin: 0;
-      font-size: clamp(2.45rem, 11vw, 5.6rem);
-      line-height: 0.93;
-      letter-spacing: -0.065em;
-    }
-
-    .hero__intro {
-      max-width: 610px;
-      margin: 16px 0 0;
-      color: rgba(255,255,255,.78);
-      font-size: clamp(0.92rem, 3vw, 1.05rem);
-    }
-
-    .radar {
-      padding: 18px;
-      border: 1px solid rgba(255,255,255,.2);
-      border-radius: var(--radius-lg);
-      background: rgba(8, 10, 16, 0.22);
-      box-shadow: 0 20px 42px rgba(75, 4, 14, 0.2);
-      backdrop-filter: blur(16px);
-    }
-
-    .radar__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 13px;
-    }
-
-    .radar__header p {
-      margin: 0;
-      color: rgba(255,255,255,.66);
-      font-size: 0.7rem;
-      font-weight: 850;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .edit-teams {
-      padding: 7px 10px;
-      border: 1px solid rgba(255,255,255,.23);
-      border-radius: 999px;
-      background: rgba(255,255,255,.09);
-      color: #fff;
-      font-size: 0.72rem;
-      font-weight: 850;
-    }
-
-    .selected-chips {
-      display: flex;
-      min-height: 40px;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
-
-    .team-chip {
+    .bar-btn {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 7px 10px;
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 999px;
-      background: rgba(255,255,255,.1);
-      font-size: 0.76rem;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: var(--r-full);
+      border: 1px solid var(--line);
+      background: var(--sur-3);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--txt);
+      transition: background 130ms;
+    }
+
+    .bar-btn:hover { background: var(--sur-4); }
+
+    /* ── Page shell ───────────────────────────────────────────────────── */
+    .page {
+      display: none;
+      max-width: 900px;
+      margin-inline: auto;
+      padding: 20px 16px calc(var(--btm-h) + 20px);
+    }
+
+    .page.active { display: block; }
+
+    @media (min-width: 540px) {
+      .page { padding-bottom: 40px; }
+    }
+
+    /* ── Section headings ─────────────────────────────────────────────── */
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 24px 0 12px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 11px;
       font-weight: 800;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--txt-2);
     }
 
-    .team-chip__flag {
-      font-size: 1.02rem;
-      line-height: 1;
+    .section-head span {
+      font-size: 11px;
+      color: var(--txt-3);
     }
 
-    .subscribe-label {
-      margin: 17px 0 8px;
-      color: rgba(255,255,255,.64);
-      font-size: 0.72rem;
-    }
-
-    .subscription-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 7px;
-    }
-
-    .calendar-button {
-      display: inline-flex;
-      min-width: 0;
-      min-height: 43px;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 8px 6px;
-      border-radius: 11px;
-      background: #fff;
-      color: #1a1820;
-      font-size: 0.76rem;
-      font-weight: 900;
-      text-decoration: none;
-      transition: transform 160ms ease, box-shadow 160ms ease;
-    }
-
-    .calendar-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 26px rgba(37, 5, 9, 0.23);
-    }
-
-    .calendar-button__mark {
-      display: grid;
-      width: 22px;
-      height: 22px;
-      flex: 0 0 22px;
-      place-items: center;
-      border-radius: 7px;
-      color: #fff;
-      font-size: 0.66rem;
-    }
-
-    .calendar-button--apple .calendar-button__mark { background: #242229; }
-    .calendar-button--google .calendar-button__mark { background: linear-gradient(135deg, #4285f4 50%, #34a853 50%); }
-    .calendar-button--outlook .calendar-button__mark { background: #087ad8; }
-
-    .radar__footer {
+    /* ── Chips row ────────────────────────────────────────────────────── */
+    .chips {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .radar__footer p {
-      margin: 0;
-      color: rgba(255,255,255,.57);
-      font-size: 0.65rem;
-    }
-
-    .copy-button {
-      flex: 0 0 auto;
-      padding: 6px 9px;
-      border: 0;
-      border-radius: 9px;
-      background: transparent;
-      color: #fff;
-      font-size: 0.68rem;
-      font-weight: 850;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    main {
-      padding: 20px 0 48px;
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 17px;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border-radius: var(--r-full);
+      background: var(--sur-3);
+      border: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    .chip__label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+    }
+
+    .chip__value {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -.03em;
+    }
+
+    .chip--accent {
+      background: var(--sec-dim);
+      border-color: rgba(255,212,71,.22);
+    }
+
+    .chip--accent .chip__value { color: var(--sec); }
+
+    /* ── Sync bar ─────────────────────────────────────────────────────── */
+    .sync-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 14px;
     }
 
     .sync-status {
       display: flex;
-      min-width: 0;
       align-items: center;
-      gap: 9px;
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.75rem;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--txt-2);
     }
 
-    .sync-status__dot {
-      width: 8px;
-      height: 8px;
-      flex: 0 0 8px;
+    .sync-dot {
+      width: 7px; height: 7px;
       border-radius: 50%;
-      background: #656b7a;
+      background: var(--txt-3);
+      flex-shrink: 0;
     }
 
-    .sync-status__dot--ok {
-      background: var(--green);
-      box-shadow: 0 0 0 5px rgba(69, 213, 151, 0.1);
+    .sync-dot--ok {
+      background: var(--ter);
+      box-shadow: 0 0 0 4px rgba(69,213,151,.12);
     }
 
-    .toolbar__actions {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .timezone-control {
-      position: relative;
-      display: flex;
-      min-width: 0;
-      flex: 1 1 auto;
-      align-items: center;
-      gap: 7px;
-      min-height: 40px;
-      padding: 0 10px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--panel);
-      color: var(--muted);
-    }
-
-    .timezone-control__icon {
-      flex: 0 0 auto;
-      font-size: .85rem;
-    }
-
-    .timezone-select {
-      width: 100%;
-      min-width: 0;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      font-size: .72rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .timezone-select option {
-      background: var(--panel);
-      color: var(--text);
-    }
-
-    .refresh-button {
+    .icon-btn {
       display: inline-flex;
-      flex: 0 0 auto;
-      min-height: 40px;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 8px 13px;
+      gap: 5px;
+      padding: 7px 11px;
+      border-radius: var(--r-md);
+      background: var(--sur-3);
       border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--panel);
-      color: var(--text);
-      font-size: 0.76rem;
-      font-weight: 850;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--txt);
+      transition: background 130ms;
     }
 
-    .refresh-button:disabled {
-      opacity: .56;
-      cursor: wait;
-    }
+    .icon-btn:hover { background: var(--sur-4); }
+    .icon-btn:disabled { opacity: .45; cursor: wait; }
 
-    .refresh-icon {
-      width: 16px;
-      height: 16px;
-    }
+    .spin-icon { width: 14px; height: 14px; }
+    .icon-btn.loading .spin-icon { animation: spin 750ms linear infinite; }
 
-    .refresh-button.is-loading .refresh-icon {
-      animation: spin 850ms linear infinite;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 9px;
-      margin-bottom: 18px;
-    }
-
-    .stat {
-      min-width: 0;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: linear-gradient(145deg, var(--panel), rgba(21,25,37,.7));
-    }
-
-    .stat__label {
-      display: block;
-      overflow: hidden;
-      color: var(--muted);
-      font-size: 0.63rem;
-      font-weight: 850;
-      letter-spacing: .08em;
-      text-overflow: ellipsis;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .stat__value {
-      display: block;
-      margin-top: 5px;
-      overflow: hidden;
-      font-size: clamp(1.25rem, 6vw, 1.9rem);
-      font-weight: 900;
-      letter-spacing: -.045em;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .stat--accent {
-      border-color: rgba(255, 212, 71, 0.25);
-      background: linear-gradient(145deg, rgba(255,212,71,.11), var(--panel));
-    }
-
-    .filter-bar {
+    /* ── Filter strip ─────────────────────────────────────────────────── */
+    .filter-strip {
       display: flex;
-      gap: 7px;
-      margin-bottom: 18px;
+      gap: 5px;
+      margin-bottom: 16px;
       overflow-x: auto;
       scrollbar-width: none;
     }
 
-    .filter-bar::-webkit-scrollbar {
-      display: none;
-    }
+    .filter-strip::-webkit-scrollbar { display: none; }
 
-    .filter-button {
-      flex: 0 0 auto;
-      padding: 8px 12px;
+    .filter-pill {
+      flex-shrink: 0;
+      padding: 6px 13px;
+      border-radius: var(--r-full);
       border: 1px solid var(--line);
-      border-radius: 999px;
       background: transparent;
-      color: var(--muted);
-      font-size: 0.73rem;
-      font-weight: 850;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--txt-2);
+      transition: background 120ms, color 120ms, border-color 120ms;
     }
 
-    .filter-button.is-active {
-      border-color: var(--text);
-      background: var(--text);
-      color: var(--bg);
+    .filter-pill.active {
+      background: var(--txt);
+      border-color: var(--txt);
+      color: var(--sur-0);
     }
 
-    .state {
-      display: grid;
-      min-height: 270px;
-      place-items: center;
-      padding: 28px 18px;
+    /* ── Subscribe row ────────────────────────────────────────────────── */
+    .subscribe-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--r-lg);
+      background: var(--sur-2);
+      border: 1px solid var(--line-2);
+      margin-bottom: 18px;
+    }
+
+    .subscribe-row p {
+      margin: 0;
+      font-size: 11px;
+      color: var(--txt-2);
+      font-weight: 500;
+    }
+
+    .cal-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+
+    .cal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: var(--r-md);
+      background: var(--sur-4);
       border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      background: var(--panel);
-      text-align: center;
-      box-shadow: var(--shadow);
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--txt);
+      transition: background 120ms;
     }
 
-    .state[hidden],
-    .dashboard[hidden],
-    .section[hidden],
-    .next-match[hidden],
-    .filtered-empty[hidden] {
-      display: none;
+    .cal-btn:hover { background: var(--sur-5); }
+
+    .cal-btn__ico {
+      width: 18px; height: 18px;
+      display: grid; place-items: center;
+      border-radius: 5px;
+      font-size: 9px;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .cal-btn--apple  .cal-btn__ico { background: #1c1b1e; color: #fff; }
+    .cal-btn--google .cal-btn__ico { background: linear-gradient(135deg, #4285f4 50%, #34a853 50%); color: #fff; }
+    .cal-btn--outlook .cal-btn__ico{ background: #0870c8; color: #fff; }
+
+    .copy-link {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--txt-2);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* ── States ───────────────────────────────────────────────────────── */
+    [hidden] { display: none !important; }
+
+    .state-card {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      text-align: center;
+      padding: 32px 20px;
+      border-radius: var(--r-xl);
+      background: var(--sur-2);
+      border: 1px solid var(--line-2);
     }
 
     .spinner {
-      width: 38px;
-      height: 38px;
+      width: 34px; height: 34px;
       margin: 0 auto 14px;
-      border: 4px solid rgba(255,255,255,.1);
-      border-top-color: var(--yellow);
+      border: 3px solid var(--line);
+      border-top-color: var(--sec);
       border-radius: 50%;
-      animation: spin 780ms linear infinite;
+      animation: spin 700ms linear infinite;
     }
 
-    .state__icon {
-      display: grid;
-      width: 48px;
-      height: 48px;
+    .state-icon {
+      width: 44px; height: 44px;
+      display: grid; place-items: center;
       margin: 0 auto 12px;
-      place-items: center;
-      border-radius: 15px;
-      background: rgba(239, 51, 64, .14);
-      color: var(--red);
-      font-size: 1.2rem;
+      border-radius: var(--r-lg);
+      background: var(--pri-dim);
+      color: var(--pri);
+      font-size: 18px;
       font-weight: 900;
     }
 
-    .state h2 {
-      margin: 0 0 6px;
-      font-size: 1.15rem;
-    }
+    .state-card h2 { margin: 0 0 6px; font-size: 17px; font-weight: 800; }
+    .state-card p  { margin: 0; color: var(--txt-2); font-size: 13px; max-width: 460px; }
+    .state-card p + p { margin-top: 5px; font-size: 11px; }
 
-    .state p {
-      max-width: 570px;
-      margin: 0;
-      color: var(--muted);
-      font-size: .85rem;
-    }
-
-    .state__detail {
-      margin-top: 9px !important;
-      font-size: .72rem !important;
-    }
-
-    .next-match {
+    /* ── Next match hero ──────────────────────────────────────────────── */
+    .hero-card {
       position: relative;
       overflow: hidden;
-      margin-bottom: 22px;
-      padding: 22px;
-      border: 1px solid rgba(255, 212, 71, .22);
-      border-radius: var(--radius-xl);
+      padding: 20px;
+      border-radius: var(--r-xl);
+      background: linear-gradient(135deg, var(--sur-3), var(--sur-4));
+      border: 1px solid rgba(255,212,71,.18);
+      margin-bottom: 18px;
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
       background:
-        radial-gradient(circle at 100% 100%, rgba(255,212,71,.14), transparent 15rem),
-        linear-gradient(135deg, #1c202d, #11141e);
-      box-shadow: var(--shadow);
+        radial-gradient(ellipse 200px 120px at 95% 5%, rgba(255,212,71,.09), transparent),
+        radial-gradient(ellipse 160px 100px at 5% 95%, rgba(239,51,64,.07), transparent);
+      pointer-events: none;
     }
 
-    .next-match::after {
-      position: absolute;
-      width: 190px;
-      height: 190px;
-      right: -92px;
-      bottom: -105px;
-      content: "";
-      border: 34px solid rgba(255,212,71,.07);
-      border-radius: 50%;
-    }
-
-    .next-match__top {
-      position: relative;
-      z-index: 1;
+    .hero-card__top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-    }
-
-    .next-match__label {
-      color: var(--yellow);
-      font-size: .67rem;
-      font-weight: 900;
-      letter-spacing: .11em;
-      text-transform: uppercase;
-    }
-
-    .next-match__flags {
-      font-size: 1.35rem;
-      letter-spacing: -.12em;
-    }
-
-    .next-match h2 {
-      position: relative;
-      z-index: 1;
-      max-width: 780px;
-      margin: 18px 0 0;
-      font-size: clamp(1.65rem, 8vw, 3.25rem);
-      line-height: 1.03;
-      letter-spacing: -.05em;
-    }
-
-    .next-match__date {
-      position: relative;
-      z-index: 1;
-      margin: 9px 0 0;
-      color: var(--muted);
-      font-size: .88rem;
-    }
-
-    .countdown {
-      position: relative;
-      z-index: 1;
-      display: inline-flex;
-      margin-top: 16px;
-      padding: 7px 11px;
-      border: 1px solid rgba(255,212,71,.24);
-      border-radius: 999px;
-      background: rgba(255,212,71,.08);
-      color: #ffe88d;
-      font-size: .75rem;
-      font-weight: 850;
-    }
-
-    .section {
-      margin-top: 25px;
-    }
-
-    .section__heading {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 11px;
-    }
-
-    .section__heading h2 {
-      margin: 0;
-      font-size: 1.08rem;
-      letter-spacing: -.02em;
-    }
-
-    .section__count {
-      color: var(--muted);
-      font-size: .71rem;
-    }
-
-    .match-list {
-      display: grid;
       gap: 10px;
-    }
-
-    .match-card {
-      position: relative;
-      display: grid;
-      grid-template-columns: 58px minmax(0, 1fr);
-      gap: 13px;
-      overflow: hidden;
-      padding: 15px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: var(--panel);
-      transition: transform 170ms ease, border-color 170ms ease, background 170ms ease;
-    }
-
-    .match-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--line-strong);
-      background: var(--panel-2);
-    }
-
-    .match-card::before {
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 3px;
-      content: "";
-      background: var(--red);
-    }
-
-    .match-card--knockout::before {
-      background: var(--yellow);
-    }
-
-    .match-card--past {
-      opacity: .68;
-    }
-
-    .match-date {
-      align-self: start;
-      padding: 8px 3px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: var(--bg-soft);
-      text-align: center;
-    }
-
-    .match-date__day {
-      display: block;
-      font-size: 1.4rem;
-      font-weight: 950;
-      line-height: 1;
-      letter-spacing: -.05em;
-    }
-
-    .match-date__month {
-      display: block;
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: .62rem;
-      font-weight: 850;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    .match-card__topline {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 7px;
+      margin-bottom: 14px;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      min-height: 21px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      background: rgba(239,51,64,.12);
-      color: #ff929b;
-      font-size: .58rem;
-      font-weight: 900;
-      letter-spacing: .05em;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: var(--r-full);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .07em;
       text-transform: uppercase;
     }
 
-    .badge--knockout {
-      background: rgba(255,212,71,.12);
-      color: var(--yellow);
+    .badge--next {
+      background: rgba(239,51,64,.16);
+      color: var(--pri);
     }
 
-    .badge--pending {
-      background: rgba(96,165,250,.12);
-      color: #9cc9ff;
+    .badge--next::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--pri);
+      animation: blink 1.4s ease infinite;
     }
 
-    .match-card__flags {
-      margin-left: auto;
-      font-size: 1rem;
-      letter-spacing: -.12em;
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .25; }
     }
 
-    .match-card h3 {
-      margin: 0;
-      font-size: 1.02rem;
-      line-height: 1.27;
-      letter-spacing: -.025em;
+    .badge--group    { background: rgba(239,51,64,.10); color: #ff929b; }
+    .badge--knockout { background: var(--sec-dim); color: var(--sec); }
+    .badge--pending  { background: var(--acc-dim); color: var(--acc); }
+
+    .hero-flags { font-size: 20px; letter-spacing: -.12em; }
+
+    .hero-card h2 {
+      position: relative;
+      margin: 0 0 5px;
+      font-size: clamp(21px, 6vw, 36px);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1.05;
     }
 
-    .match-card__time {
-      margin: 5px 0 0;
-      font-size: .79rem;
-      font-weight: 800;
+    .hero-meta {
+      position: relative;
+      color: var(--txt-2);
+      font-size: 13px;
+      font-weight: 500;
+      margin: 0 0 12px;
     }
 
-    .match-card__details {
+    .countdown-pill {
+      display: inline-flex;
+      padding: 5px 11px;
+      border-radius: var(--r-full);
+      background: var(--sec-dim);
+      border: 1px solid rgba(255,212,71,.2);
+      color: #ffe88d;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* ── Match grid ───────────────────────────────────────────────────── */
+    .match-grid {
       display: grid;
-      gap: 3px;
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: .72rem;
+      gap: 7px;
     }
 
-    .match-card__details p {
-      margin: 0;
+    @media (min-width: 600px) {
+      .match-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    .match-card__details strong {
-      color: var(--text);
+    .match-card {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 12px;
+      padding: 13px;
+      border-radius: var(--r-lg);
+      background: var(--sur-2);
+      border: 1px solid var(--line-2);
+      border-left: 3px solid var(--pri);
+      transition: background 120ms;
+    }
+
+    .match-card:hover { background: var(--sur-3); }
+    .match-card--knockout { border-left-color: var(--sec); }
+    .match-card--past { opacity: .58; }
+
+    .mdate {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 2px;
+      text-align: center;
+    }
+
+    .mdate__d {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+    }
+
+    .mdate__m {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+      margin-top: 2px;
+    }
+
+    .minfo__top {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .minfo__flags { margin-left: auto; font-size: 13px; letter-spacing: -.1em; }
+
+    .minfo h3 {
+      margin: 0 0 3px;
+      font-size: 14px;
       font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.3;
     }
 
-    .filtered-empty {
-      padding: 28px 16px;
-      border: 1px dashed var(--line-strong);
-      border-radius: var(--radius-md);
-      color: var(--muted);
+    .minfo__time {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--txt-2);
+    }
+
+    .minfo__detail {
+      margin-top: 5px;
+      font-size: 11px;
+      color: var(--txt-2);
+    }
+
+    .minfo__detail strong { color: var(--txt); font-weight: 700; }
+
+    .no-matches {
+      padding: 24px 16px;
       text-align: center;
-      font-size: .82rem;
+      font-size: 13px;
+      color: var(--txt-2);
+      border: 1px dashed var(--line);
+      border-radius: var(--r-lg);
     }
 
-    .footer {
-      padding: 0 0 30px;
-      color: var(--muted);
-      font-size: .69rem;
-      text-align: center;
+    /* ── Bottom nav (mobile only) ─────────────────────────────────────── */
+    .btm-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 100;
+      height: var(--btm-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 24px env(safe-area-inset-bottom);
+      background: rgba(9,11,18,.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--line-2);
     }
 
+    @media (min-width: 540px) { .btm-nav { display: none; } }
+
+    .btm-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      flex: 1;
+      padding: 8px 0 4px;
+      border-radius: var(--r-lg);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: var(--txt-2);
+      transition: background 120ms, color 120ms;
+    }
+
+    .btm-btn[aria-selected="true"] {
+      background: var(--sur-4);
+      color: var(--txt);
+    }
+
+    .btm-btn__ico { font-size: 17px; line-height: 1; }
+
+    /* ── Toast ────────────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: calc(var(--btm-h) + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      z-index: 999;
+      padding: 9px 17px;
+      border-radius: var(--r-full);
+      background: var(--sur-5);
+      border: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 200ms, transform 200ms;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (min-width: 540px) { .toast { bottom: 18px; } }
+
+    /* ── Team picker dialog ───────────────────────────────────────────── */
     dialog {
-      width: min(100% - 24px, 860px);
-      max-height: min(86vh, 760px);
       padding: 0;
-      overflow: hidden;
-      border: 1px solid var(--line-strong);
-      border-radius: 26px;
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: 0 32px 100px rgba(0,0,0,.65);
+      border: 1px solid var(--line);
+      border-radius: var(--r-2xl);
+      background: var(--sur-2);
+      color: var(--txt);
+      box-shadow: 0 32px 80px rgba(0,0,0,.65);
     }
 
     dialog::backdrop {
-      background: rgba(3, 4, 8, .78);
+      background: rgba(0,0,0,.72);
       backdrop-filter: blur(8px);
+    }
+
+    #team-dialog {
+      width: min(100% - 24px, 820px);
+      max-height: min(88dvh, 700px);
+      overflow: hidden;
     }
 
     .picker {
       display: grid;
-      max-height: min(86vh, 760px);
-      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      grid-template-rows: auto auto 1fr auto;
+      max-height: min(88dvh, 700px);
     }
 
-    .picker__header {
+    .picker__head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 16px;
-      padding: 20px 20px 14px;
+      gap: 12px;
+      padding: 20px 20px 12px;
     }
 
-    .picker__header h2 {
-      margin: 0;
-      font-size: 1.35rem;
-      letter-spacing: -.035em;
-    }
+    .picker__head h2 { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.03em; }
+    .picker__head p  { margin: 4px 0 0; color: var(--txt-2); font-size: 12px; }
 
-    .picker__header p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: .78rem;
-    }
-
-    .dialog-close {
+    .close-btn {
       display: grid;
-      width: 36px;
-      height: 36px;
-      flex: 0 0 36px;
       place-items: center;
-      border: 1px solid var(--line);
+      width: 32px; height: 32px;
       border-radius: 50%;
-      background: var(--bg-soft);
-      color: var(--text);
-      font-size: 1.1rem;
-    }
-
-    .team-search {
-      width: calc(100% - 40px);
-      min-height: 44px;
-      margin: 0 20px 14px;
-      padding: 10px 14px;
       border: 1px solid var(--line);
-      border-radius: 13px;
-      outline: none;
-      background: var(--bg-soft);
-      color: var(--text);
+      background: var(--sur-3);
+      font-size: 15px;
+      color: var(--txt);
+      flex-shrink: 0;
     }
 
-    .team-search:focus {
-      border-color: var(--yellow);
-      box-shadow: 0 0 0 3px rgba(255,212,71,.09);
+    .search-input {
+      display: block;
+      width: calc(100% - 40px);
+      margin: 0 20px 12px;
+      min-height: 38px;
+      padding: 8px 12px;
+      border-radius: var(--r-md);
+      border: 1px solid var(--line);
+      background: var(--sur-3);
+      color: var(--txt);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--sec);
+      box-shadow: 0 0 0 3px var(--sec-dim);
     }
 
     .team-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 7px;
-      padding: 0 20px 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+      padding: 0 20px 18px;
       overflow-y: auto;
     }
 
-    .team-option {
+    @media (min-width: 460px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 680px) { .team-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .team-opt {
       display: grid;
-      min-width: 0;
-      grid-template-columns: 28px minmax(0, 1fr) auto;
+      grid-template-columns: 24px 1fr auto;
       align-items: center;
+      gap: 7px;
+      min-height: 44px;
+      padding: 7px 9px;
+      border-radius: var(--r-md);
+      border: 1px solid var(--line-2);
+      background: var(--sur-3);
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--txt);
+      transition: background 120ms, border-color 120ms;
+    }
+
+    .team-opt:hover { background: var(--sur-4); }
+
+    .team-opt.sel {
+      background: var(--pri-dim);
+      border-color: rgba(239,51,64,.3);
+    }
+
+    .team-opt.sel .team-check { display: block; }
+
+    .team-flag  { font-size: 16px; line-height: 1; }
+    .team-name  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .team-check { display: none; font-size: 12px; color: var(--pri); }
+
+    .picker__foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 20px;
+      border-top: 1px solid var(--line-2);
+    }
+
+    .picker__count { font-size: 12px; color: var(--txt-2); font-weight: 600; }
+
+    .picker__actions { display: flex; gap: 7px; }
+
+    .btn {
+      padding: 8px 15px;
+      border-radius: var(--r-md);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .btn--ghost   { background: var(--sur-4); color: var(--txt-2); }
+    .btn--primary { background: var(--pri); color: #fff; }
+
+    /* ── Pro / Analysis tab ───────────────────────────────────────────── */
+    .auth-gate {
+      display: grid;
+      place-items: center;
+      min-height: 320px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .auth-gate__icon { font-size: 40px; margin-bottom: 16px; line-height: 1; }
+
+    .auth-gate h2 {
+      margin: 0 0 8px;
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: -.03em;
+    }
+
+    .auth-gate p {
+      margin: 0 0 22px;
+      color: var(--txt-2);
+      font-size: 13px;
+      max-width: 340px;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
       gap: 9px;
-      min-height: 52px;
-      padding: 8px 10px;
+      width: 100%;
+      max-width: 290px;
+    }
+
+    .auth-input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: var(--r-lg);
       border: 1px solid var(--line);
-      border-radius: 13px;
-      background: var(--bg-soft);
-      color: var(--text);
+      background: var(--sur-3);
+      color: var(--txt);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .auth-input:focus {
+      border-color: var(--sec);
+      box-shadow: 0 0 0 3px var(--sec-dim);
+    }
+
+    .auth-error {
+      font-size: 12px;
+      color: var(--pri);
+      min-height: 1.2em;
       text-align: left;
     }
 
-    .team-option[hidden] {
-      display: none;
+    .auth-submit {
+      min-height: 44px;
+      border-radius: var(--r-lg);
+      background: var(--sec);
+      color: var(--sec-on);
+      font-size: 14px;
+      font-weight: 800;
     }
 
-    .team-option.is-selected {
-      border-color: rgba(255,212,71,.48);
-      background: rgba(255,212,71,.09);
+    .auth-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--txt-3);
     }
 
-    .team-option__flag {
-      font-size: 1.3rem;
-      text-align: center;
-    }
-
-    .team-option__name {
-      min-width: 0;
-      overflow: hidden;
-      font-size: .76rem;
-      font-weight: 820;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .team-option__code {
-      color: var(--muted);
-      font-size: .59rem;
-      font-weight: 900;
-    }
-
-    .team-option.is-selected .team-option__code {
-      color: var(--yellow);
-    }
-
-    .picker__footer {
+    /* Pro panel */
+    .pro-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding: 14px 20px;
-      border-top: 1px solid var(--line);
-      background: rgba(9,11,18,.78);
+      margin-bottom: 18px;
     }
 
-    .picker-count {
-      color: var(--muted);
-      font-size: .72rem;
-    }
+    .pro-head__left { display: flex; align-items: center; gap: 8px; }
 
-    .picker-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .picker-button {
-      min-height: 40px;
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      background: transparent;
-      color: var(--text);
-      font-size: .73rem;
-      font-weight: 850;
-    }
-
-    .picker-button--primary {
-      border-color: var(--yellow);
-      background: var(--yellow);
-      color: #17140a;
-    }
-
-    .toast {
-      position: fixed;
-      z-index: 20;
-      right: 14px;
-      bottom: 14px;
-      left: 14px;
-      max-width: 430px;
-      margin-inline: auto;
-      padding: 11px 14px;
-      border: 1px solid var(--line-strong);
-      border-radius: 12px;
-      background: #f4f1eb;
-      color: #15131a;
-      box-shadow: 0 18px 50px rgba(0,0,0,.42);
-      font-size: .78rem;
-      font-weight: 850;
-      text-align: center;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(12px);
-      transition: opacity 180ms ease, transform 180ms ease;
-    }
-
-    .toast.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    :focus-visible {
-      outline: 3px solid var(--yellow);
-      outline-offset: 3px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    @media (min-width: 620px) {
-      .shell {
-        width: min(100% - 48px, 1180px);
-      }
-
-      .hero {
-        padding-bottom: 42px;
-      }
-
-      .toolbar {
-        flex-wrap: nowrap;
-      }
-
-      .toolbar__actions {
-        width: auto;
-      }
-
-      .timezone-control {
-        width: 225px;
-        flex: 0 0 225px;
-      }
-
-      .hero__grid {
-        gap: 30px;
-      }
-
-      .radar {
-        padding: 22px;
-      }
-
-      .stats {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-
-      .match-card {
-        grid-template-columns: 66px minmax(0, 1fr);
-        padding: 18px;
-      }
-
-      .team-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    @media (min-width: 900px) {
-      .hero {
-        padding: 20px 0 54px;
-      }
-
-      .topbar {
-        margin-bottom: 54px;
-      }
-
-      .hero__grid {
-        grid-template-columns: minmax(0, 1.12fr) minmax(390px, .88fr);
-        align-items: end;
-        gap: 64px;
-      }
-
-      main {
-        padding-top: 28px;
-      }
-
-      .match-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .next-match {
-        padding: 30px;
-      }
-
-      .team-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        transition-duration: .01ms !important;
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-      }
-    }
-
-    /* ── Pro Mode Panel ─────────────────────────────────────────────── */
-
-    .pro-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 900;
-      background: rgba(3, 4, 8, .82);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .pro-backdrop[hidden] { display: none; }
-
-    .pro-panel {
-      position: relative;
-      width: min(100%, 860px);
-      max-height: 88vh;
-      overflow-y: auto;
-      border: 1px solid var(--line-strong);
-      border-radius: 26px 26px 20px 20px;
-      background: var(--panel);
-      box-shadow: 0 -20px 80px rgba(0,0,0,.65), 0 0 0 1px rgba(255,212,71,.07);
-      scrollbar-width: thin;
-    }
-
-    .pro-panel__header {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px 20px 14px;
-      border-bottom: 1px solid var(--line);
-      background: var(--panel-glass);
-      backdrop-filter: blur(14px);
-    }
-
-    .pro-panel__title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: .82rem;
+    .pro-head h2 {
+      margin: 0;
+      font-size: 17px;
       font-weight: 900;
-      letter-spacing: .07em;
+      letter-spacing: -.03em;
+    }
+
+    .pro-badge {
+      padding: 3px 7px;
+      border-radius: var(--r-full);
+      background: var(--sec-dim);
+      border: 1px solid rgba(255,212,71,.22);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .09em;
       text-transform: uppercase;
-      color: var(--yellow);
+      color: var(--sec);
     }
 
-    .pro-panel__badge {
-      display: inline-flex;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(255,212,71,.12);
-      font-size: .58rem;
-      font-weight: 900;
-      letter-spacing: .06em;
+    .pro-ts {
+      font-size: 11px;
+      color: var(--txt-2);
+      margin: -12px 0 16px;
     }
 
-    .pro-panel__close {
+    /* Picks grid */
+    .picks-grid {
       display: grid;
-      width: 34px;
-      height: 34px;
-      place-items: center;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      background: var(--bg-soft);
-      color: var(--text);
-      font-size: 1.05rem;
+      gap: 9px;
+      margin-bottom: 24px;
     }
 
-    .pro-panel__body { padding: 20px; }
-
-    .pro-panel__refresh {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 13px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--panel);
-      color: var(--text);
-      font-size: .74rem;
-      font-weight: 850;
-      margin-bottom: 20px;
-    }
-
-    .pro-panel__refresh:disabled { opacity: .5; cursor: wait; }
-    .pro-panel__refresh.is-loading .refresh-icon { animation: spin 850ms linear infinite; }
-
-    .pro-generated {
-      margin: -8px 0 16px;
-      color: var(--muted);
-      font-size: .68rem;
-    }
-
-    .picks-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    @media (min-width: 580px) { .picks-grid { grid-template-columns: repeat(3, 1fr); } }
 
     .pick-card {
-      padding: 16px 18px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: linear-gradient(145deg, var(--panel), rgba(21,25,37,.7));
+      padding: 15px;
+      border-radius: var(--r-xl);
+      background: var(--sur-2);
+      border: 1px solid var(--line-2);
+      border-top: 3px solid transparent;
     }
 
-    .pick-card--A { border-left: 3px solid #f97316; }
-    .pick-card--B { border-left: 3px solid var(--blue); }
-    .pick-card--C { border-left: 3px solid var(--green); }
+    .pick-card--C {
+      border-top-color: var(--ter);
+      background: linear-gradient(160deg, rgba(69,213,151,.06) 0%, var(--sur-2) 50%);
+    }
 
-    .pick-card__band {
-      display: inline-flex;
+    .pick-card--B {
+      border-top-color: var(--acc);
+      background: linear-gradient(160deg, rgba(96,165,250,.06) 0%, var(--sur-2) 50%);
+    }
+
+    .pick-card--A {
+      border-top-color: var(--orn);
+      background: linear-gradient(160deg, rgba(249,115,22,.06) 0%, var(--sur-2) 50%);
+    }
+
+    .pick-band {
+      display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 10px;
-      font-size: .61rem;
-      font-weight: 900;
-      letter-spacing: .08em;
+      margin-bottom: 11px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .09em;
       text-transform: uppercase;
     }
 
-    .pick-card__band-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex: 0 0 8px;
+    .pick-band__dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .pick-card--C .pick-band { color: var(--ter); }
+    .pick-card--B .pick-band { color: var(--acc); }
+    .pick-card--A .pick-band { color: var(--orn); }
+    .pick-card--C .pick-band__dot { background: var(--ter); }
+    .pick-card--B .pick-band__dot { background: var(--acc); }
+    .pick-card--A .pick-band__dot { background: var(--orn); }
+
+    .pick-match {
+      margin: 0 0 3px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -.025em;
+      line-height: 1.3;
     }
 
-    .pick-card--A .pick-card__band-dot { background: #f97316; }
-    .pick-card--B .pick-card__band-dot { background: var(--blue); }
-    .pick-card--C .pick-card__band-dot { background: var(--green); }
+    .pick-market { font-size: 12px; color: var(--txt-2); margin: 0 0 12px; }
 
-    .pick-card__match {
-      font-size: 1.05rem; font-weight: 900; letter-spacing: -.025em;
-      margin: 0 0 4px;
+    /* prob bar */
+    .prob-track {
+      height: 4px;
+      border-radius: 99px;
+      background: var(--sur-4);
+      overflow: hidden;
+      margin-bottom: 12px;
     }
 
-    .pick-card__market { font-size: .8rem; color: var(--muted); margin: 0 0 14px; }
-
-    .pick-metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(98px, 1fr));
-      gap: 8px;
-    }
-
-    .pick-metric {
-      padding: 9px 10px;
-      border-radius: 11px;
-      background: var(--bg-soft);
-    }
-
-    .pick-metric__label {
-      display: block;
-      color: var(--muted);
-      font-size: .58rem; font-weight: 850;
-      letter-spacing: .07em; text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .pick-metric__value {
-      display: block;
-      font-size: 1.05rem; font-weight: 900; letter-spacing: -.03em;
-    }
-
-    .pick-metric__value--pos { color: var(--green); }
-    .pick-metric__value--neg { color: var(--red); }
-
-    .pick-card__ci {
-      margin-top: 10px;
-      font-size: .68rem; color: var(--muted);
-    }
-
-    .pick-card__stake {
-      margin-top: 10px; padding-top: 10px;
-      border-top: 1px solid var(--line);
-      display: flex; gap: 14px; flex-wrap: wrap;
-    }
-
-    .stake-item { font-size: .72rem; color: var(--muted); }
-    .stake-item strong { display: block; color: var(--text); font-size: .9rem; font-weight: 900; }
-
-    .analytics-section { margin-top: 4px; }
-
-    .analytics-section h3 {
-      margin: 0 0 12px;
-      font-size: .82rem; font-weight: 900;
-      letter-spacing: .07em; text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .overround-list { display: grid; gap: 8px; }
-
-    .overround-row { display: flex; align-items: center; gap: 10px; }
-
-    .overround-row__name {
-      width: 110px; flex: 0 0 110px;
-      font-size: .75rem; font-weight: 800;
-    }
-
-    .overround-bar-wrap {
-      flex: 1; height: 6px; border-radius: 99px;
-      background: var(--bg-soft); overflow: hidden;
-    }
-
-    .overround-bar {
-      height: 100%; border-radius: 99px;
-      background: var(--red);
+    .prob-fill {
+      height: 100%;
+      border-radius: 99px;
       transition: width 600ms ease;
     }
 
-    .overround-bar--best { background: var(--green); }
+    .pick-card--C .prob-fill { background: var(--ter); }
+    .pick-card--B .prob-fill { background: var(--acc); }
+    .pick-card--A .prob-fill { background: var(--orn); }
 
-    .overround-row__pct {
-      width: 44px; text-align: right;
-      font-size: .72rem; font-weight: 850; color: var(--muted);
+    /* metrics */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      margin-bottom: 10px;
     }
 
+    .metric {
+      padding: 7px 8px;
+      border-radius: var(--r-md);
+      background: var(--sur-3);
+    }
+
+    .metric__l {
+      display: block;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+      margin-bottom: 3px;
+    }
+
+    .metric__v {
+      display: block;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+    }
+
+    .metric__v--pos { color: var(--ter); }
+    .metric__v--neg { color: var(--pri); }
+
+    .pick-ci {
+      font-size: 11px;
+      color: var(--txt-2);
+      margin-bottom: 10px;
+    }
+
+    .pick-ci strong { color: var(--txt); font-weight: 700; }
+
+    .pick-stake {
+      display: flex;
+      gap: 12px;
+      padding-top: 9px;
+      border-top: 1px solid var(--line-2);
+      font-size: 11px;
+      color: var(--txt-2);
+    }
+
+    .pick-stake strong { display: block; font-size: 13px; font-weight: 800; color: var(--txt); }
+
+    /* empty pick card */
+    .pick-card--empty { opacity: .55; }
+    .pick-card--empty .pick-match { font-size: 13px; color: var(--txt-2); font-weight: 600; }
+
+    /* ── Market analytics card ────────────────────────────────────────── */
+    .analytics-card {
+      padding: 15px 17px;
+      border-radius: var(--r-xl);
+      background: var(--sur-2);
+      border: 1px solid var(--line-2);
+      margin-bottom: 20px;
+    }
+
+    .analytics-card h3 {
+      margin: 0 0 12px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+    }
+
+    .ov-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 4px 0;
+    }
+
+    .ov-name {
+      width: 96px;
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .ov-track {
+      flex: 1;
+      height: 4px;
+      border-radius: 99px;
+      background: var(--sur-4);
+      overflow: hidden;
+    }
+
+    .ov-fill          { height: 100%; border-radius: 99px; background: var(--pri); transition: width 600ms ease; }
+    .ov-fill--best    { background: var(--ter); }
+    .ov-pct           { width: 38px; text-align: right; font-size: 11px; font-weight: 700; color: var(--txt-2); }
+
+    /* ── Responsible gambling notice ──────────────────────────────────── */
     .rg-notice {
-      margin-top: 22px;
-      padding: 14px 16px;
-      border: 1px solid rgba(255,212,71,.15);
-      border-radius: var(--radius-sm);
-      background: rgba(255,212,71,.05);
-      font-size: .72rem; color: var(--muted); line-height: 1.6;
+      padding: 13px 15px;
+      border-radius: var(--r-lg);
+      background: var(--sec-dim);
+      border: 1px solid rgba(255,212,71,.14);
+      font-size: 12px;
+      color: var(--txt-2);
+      line-height: 1.6;
+      margin-bottom: 14px;
     }
 
-    .rg-notice a { color: var(--yellow); text-decoration: underline; text-underline-offset: 2px; }
+    .rg-notice strong { color: var(--txt); }
+    .rg-notice a { color: var(--sec); text-decoration: underline; text-underline-offset: 2px; }
 
-    .passphrase-dialog {
-      width: min(100% - 32px, 400px);
-      padding: 28px 24px;
-      border: 1px solid var(--line-strong);
-      border-radius: 22px;
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: 0 32px 100px rgba(0,0,0,.65);
+    /* ── Footer ───────────────────────────────────────────────────────── */
+    footer {
+      padding-bottom: 20px;
+      font-size: 11px;
+      color: var(--txt-3);
+      text-align: center;
     }
 
-    .passphrase-dialog::backdrop {
-      background: rgba(3, 4, 8, .8);
-      backdrop-filter: blur(8px);
-    }
+    /* ── Accessibility ────────────────────────────────────────────────── */
+    :focus-visible { outline: 2px solid var(--sec); outline-offset: 2px; }
 
-    .passphrase-dialog h2 { margin: 0 0 6px; font-size: 1.2rem; letter-spacing: -.03em; }
-    .passphrase-dialog p { margin: 0 0 18px; color: var(--muted); font-size: .8rem; }
-
-    .passphrase-dialog input {
-      display: block; width: 100%;
-      min-height: 44px; padding: 10px 14px; margin-bottom: 8px;
-      border: 1px solid var(--line); border-radius: 12px;
-      background: var(--bg-soft); color: var(--text); font-size: .9rem;
-      font-family: inherit;
-    }
-
-    .passphrase-dialog input:focus {
-      outline: none; border-color: var(--yellow);
-      box-shadow: 0 0 0 3px rgba(255,212,71,.1);
-    }
-
-    .passphrase-dialog__error {
-      display: block; margin-bottom: 10px;
-      color: var(--red); font-size: .74rem; min-height: 1.1em;
-    }
-
-    .passphrase-dialog__actions { display: flex; gap: 8px; justify-content: flex-end; }
-
-    .passphrase-dialog__cancel {
-      padding: 9px 14px; border: 1px solid var(--line);
-      border-radius: 11px; background: transparent;
-      color: var(--muted); font-size: .78rem; font-weight: 850;
-    }
-
-    .passphrase-dialog__confirm {
-      padding: 9px 18px; border: none;
-      border-radius: 11px; background: var(--yellow);
-      color: #1a1820; font-size: .78rem; font-weight: 900;
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="hero">
-    <div class="shell hero__inner">
-      <div class="topbar">
-        <div class="brand">
-          <span class="brand__mark">26</span>
-          <span>Centro de partidos</span>
-        </div>
-        <div class="topbar__links">
-          <a class="model-link" href="/predicciones.html">
-            <span class="model-link__spark" aria-hidden="true">▲</span>
-            Modelo de valor
-          </a>
-          <span class="live-pill">Calendario en vivo</span>
-        </div>
-      </div>
 
-      <div class="hero__grid">
-        <div>
-          <p class="eyebrow">Tu Mundial, a tu manera</p>
-          <h1 id="hero-title">Sigue a tus selecciones.</h1>
-          <p class="hero__intro">
-            Elige los equipos que te importan y crea un calendario único.
-            Los horarios, resultados y cruces se actualizan sin que tengas que hacer nada.
-          </p>
-        </div>
-
-        <section class="radar" aria-labelledby="radar-title">
-          <div class="radar__header">
-            <p id="radar-title">Tu radar de selecciones</p>
-            <button id="edit-teams" class="edit-teams" type="button">Editar equipos</button>
-          </div>
-          <div id="selected-chips" class="selected-chips" aria-live="polite"></div>
-
-          <p class="subscribe-label">Suscribe esta selección personalizada</p>
-          <nav class="subscription-grid" aria-label="Suscribirse al calendario">
-            <a id="apple-link" class="calendar-button calendar-button--apple" href="#" target="_blank" rel="noopener">
-              <span class="calendar-button__mark" aria-hidden="true">A</span>
-              <span>Apple</span>
-            </a>
-            <a id="google-link" class="calendar-button calendar-button--google" href="#" target="_blank" rel="noopener">
-              <span class="calendar-button__mark" aria-hidden="true">G</span>
-              <span>Google</span>
-            </a>
-            <a id="outlook-link" class="calendar-button calendar-button--outlook" href="#" target="_blank" rel="noopener">
-              <span class="calendar-button__mark" aria-hidden="true">O</span>
-              <span>Outlook</span>
-            </a>
-          </nav>
-          <div class="radar__footer">
-            <p>Suscripción dinámica, no una descarga puntual.</p>
-            <button id="copy-feed" class="copy-button" type="button">Copiar feed</button>
-          </div>
-        </section>
-      </div>
-    </div>
-  </header>
-
-  <main class="shell">
-    <div class="toolbar">
-      <p class="sync-status" aria-live="polite">
-        <span id="sync-dot" class="sync-status__dot" aria-hidden="true"></span>
-        <span id="sync-text">Preparando tu Mundial…</span>
-      </p>
-      <div class="toolbar__actions">
-        <label class="timezone-control" for="timezone-select">
-          <span class="timezone-control__icon" aria-hidden="true">◷</span>
-          <select id="timezone-select" class="timezone-select" aria-label="Zona horaria"></select>
-        </label>
-        <button id="refresh-button" class="refresh-button" type="button">
-          <svg class="refresh-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
-          </svg>
-          <span>Actualizar</span>
-        </button>
-      </div>
-    </div>
-
-    <section id="stats" class="stats" aria-label="Resumen del calendario">
-      <article class="stat stat--accent">
-        <span class="stat__label">Selecciones</span>
-        <strong id="stat-teams" class="stat__value">1</strong>
-      </article>
-      <article class="stat">
-        <span class="stat__label">Partidos</span>
-        <strong id="stat-matches" class="stat__value">—</strong>
-      </article>
-      <article class="stat">
-        <span class="stat__label">Próximo</span>
-        <strong id="stat-next" class="stat__value">—</strong>
-      </article>
-      <article class="stat">
-        <span class="stat__label">Eliminatorias</span>
-        <strong id="stat-knockout" class="stat__value">—</strong>
-      </article>
-    </section>
-
-    <nav class="filter-bar" aria-label="Filtrar partidos">
-      <button class="filter-button is-active" type="button" data-filter="all">Todos</button>
-      <button class="filter-button" type="button" data-filter="group">Fase de grupos</button>
-      <button class="filter-button" type="button" data-filter="knockout">Eliminatorias</button>
-    </nav>
-
-    <section id="loading-state" class="state" aria-live="polite">
-      <div>
-        <div class="spinner" aria-hidden="true"></div>
-        <h2>Montando tu calendario</h2>
-        <p>Buscando los partidos de tus selecciones…</p>
-      </div>
-    </section>
-
-    <section id="error-state" class="state" hidden aria-live="assertive">
-      <div>
-        <div class="state__icon" aria-hidden="true">!</div>
-        <h2>No pudimos actualizar el Mundial</h2>
-        <p id="error-message">El feed no está respondiendo. Inténtalo de nuevo en unos segundos.</p>
-        <p id="error-detail" class="state__detail"></p>
-      </div>
-    </section>
-
-    <section id="empty-state" class="state" hidden>
-      <div>
-        <div class="state__icon" aria-hidden="true">0</div>
-        <h2>Aún no hay partidos publicados</h2>
-        <p>Prueba con otra selección o vuelve a actualizar cuando se confirme el calendario.</p>
-      </div>
-    </section>
-
-    <div id="dashboard" class="dashboard" hidden>
-      <article id="next-match" class="next-match" hidden>
-        <div class="next-match__top">
-          <span class="next-match__label">Tu próximo partido</span>
-          <span id="next-flags" class="next-match__flags" aria-hidden="true"></span>
-        </div>
-        <h2 id="next-title"></h2>
-        <p id="next-date" class="next-match__date"></p>
-        <span id="countdown" class="countdown"></span>
-      </article>
-
-      <div id="filtered-empty" class="filtered-empty" hidden>
-        No hay partidos en esta fase para las selecciones elegidas.
-      </div>
-
-      <section id="upcoming-section" class="section" aria-labelledby="upcoming-heading">
-        <div class="section__heading">
-          <h2 id="upcoming-heading">Próximos partidos</h2>
-          <span id="upcoming-count" class="section__count"></span>
-        </div>
-        <div id="upcoming-list" class="match-list"></div>
-      </section>
-
-      <section id="past-section" class="section" aria-labelledby="past-heading">
-        <div class="section__heading">
-          <h2 id="past-heading">Resultados</h2>
-          <span id="past-count" class="section__count"></span>
-        </div>
-        <div id="past-list" class="match-list"></div>
-      </section>
-    </div>
-  </main>
-
-  <footer id="page-footer" class="shell footer">
-    Horarios en tu zona local · Máximo 8 selecciones por calendario.
-  </footer>
-
-  <dialog id="team-dialog" aria-labelledby="picker-title">
-    <div class="picker">
-      <header class="picker__header">
-        <div>
-          <h2 id="picker-title">Elige tus selecciones</h2>
-          <p>Combina hasta 8 equipos en un único calendario autoactualizable.</p>
-        </div>
-        <button id="dialog-close" class="dialog-close" type="button" aria-label="Cerrar">×</button>
-      </header>
-      <input id="team-search" class="team-search" type="search" placeholder="Buscar selección…" autocomplete="off">
-      <div id="team-grid" class="team-grid"></div>
-      <footer class="picker__footer">
-        <span id="picker-count" class="picker-count">1 de 8 seleccionadas</span>
-        <div class="picker-actions">
-          <button id="reset-teams" class="picker-button" type="button">Solo España</button>
-          <button id="apply-teams" class="picker-button picker-button--primary" type="button">Ver calendario</button>
-        </div>
-      </footer>
-    </div>
-  </dialog>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <!-- ── Pro Mode: Passphrase dialog ───────────────────────────────────── -->
-  <!--
-    NOTA DE SEGURIDAD: este panel es ofuscación de UI, NO seguridad real.
-    No hay secretos en el cliente. La lógica del modelo vive en el backend.
-    La passphrase está en el código fuente; no la uses para datos sensibles.
-  -->
-  <dialog id="passphrase-dialog" class="passphrase-dialog" aria-labelledby="pp-title">
-    <h2 id="pp-title">Modo Análisis Pro</h2>
-    <p>Introduce la clave de acceso para ver los picks del modelo y la analítica de mercado.</p>
-    <input id="pp-input" type="password" placeholder="Clave de acceso…" autocomplete="off">
-    <span id="pp-error" class="passphrase-dialog__error" role="alert"></span>
-    <div class="passphrase-dialog__actions">
-      <button id="pp-cancel" class="passphrase-dialog__cancel" type="button">Cancelar</button>
-      <button id="pp-confirm" class="passphrase-dialog__confirm" type="button">Acceder</button>
-    </div>
-  </dialog>
-
-  <!-- ── Pro Mode: Panel overlay ───────────────────────────────────────── -->
-  <div id="pro-backdrop" class="pro-backdrop" hidden aria-label="Panel de análisis pro">
-    <section class="pro-panel" role="region" aria-labelledby="pro-panel-title">
-      <div class="pro-panel__header">
-        <div class="pro-panel__title">
-          <span>Análisis de mercado</span>
-          <span class="pro-panel__badge">PRO</span>
-        </div>
-        <button id="pro-close" class="pro-panel__close" type="button" aria-label="Cerrar panel">×</button>
-      </div>
-
-      <div class="pro-panel__body">
-        <button id="pro-refresh" class="pro-panel__refresh" type="button">
-          <svg class="refresh-icon" viewBox="0 0 24 24" aria-hidden="true" width="15" height="15">
-            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
-          </svg>
-          Actualizar picks
-        </button>
-        <p id="pro-generated" class="pro-generated"></p>
-
-        <div id="picks-grid" class="picks-grid"></div>
-
-        <div class="analytics-section">
-          <h3>Analítica de mercado · Overround por casa</h3>
-          <div id="overround-list" class="overround-list"></div>
-        </div>
-
-        <div class="rg-notice">
-          <strong>Juego responsable</strong> · Solo mayores de 18 años.
-          Esto no es consejo financiero. Las probabilidades estimadas son resultados de un modelo estadístico
-          y <strong>no garantizan resultados</strong>. El juego puede causar adicción.
-          Si necesitas ayuda: <a href="https://www.jugarbien.es" target="_blank" rel="noopener">jugarbien.es</a>
-          · <a href="https://www.fejar.org" target="_blank" rel="noopener">fejar.org</a>.
-        </div>
-      </div>
-    </section>
+<!-- ── App bar ──────────────────────────────────────────────────────────── -->
+<header class="app-bar">
+  <div class="brand">
+    <span class="brand__badge" aria-hidden="true">26</span>
+    <span class="brand__name">Mundial</span>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
-  <script>
-    // ================================================================
-    // CONFIGURACIÓN
-    // ================================================================
-    const FEED_PATH = "/api/calendar";
-    const MAX_SELECTED_TEAMS = 8;
-    const REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000;
-    const STORAGE_KEY = "mundial-2026-selected-teams";
-    const TIMEZONE_STORAGE_KEY = "mundial-2026-timezone";
+  <nav class="app-tabs" role="tablist" aria-label="Secciones">
+    <button class="app-tab" role="tab" id="tab-cal" aria-selected="true" aria-controls="page-cal">
+      <span class="app-tab__pip" aria-hidden="true"></span>Partidos
+    </button>
+    <button class="app-tab" role="tab" id="tab-pro" aria-selected="false" aria-controls="page-pro">
+      <span class="app-tab__pip" aria-hidden="true"></span>Análisis
+    </button>
+  </nav>
 
-    const TIMEZONES = [
-      ["Europe/Madrid", "Madrid · Europa Central"],
-      ["Europe/London", "Londres"],
-      ["America/New_York", "Nueva York · Este"],
-      ["America/Chicago", "Chicago · Centro"],
-      ["America/Denver", "Denver · Montaña"],
-      ["America/Los_Angeles", "Los Ángeles · Pacífico"],
-      ["America/Toronto", "Toronto"],
-      ["America/Vancouver", "Vancouver"],
-      ["America/Mexico_City", "Ciudad de México"],
-      ["America/Bogota", "Bogotá"],
-      ["America/Lima", "Lima"],
-      ["America/Santiago", "Santiago"],
-      ["America/Argentina/Buenos_Aires", "Buenos Aires"],
-      ["America/Sao_Paulo", "São Paulo"],
-      ["Asia/Tokyo", "Tokio"],
-      ["Asia/Seoul", "Seúl"],
-      ["Australia/Sydney", "Sídney"],
-      ["UTC", "UTC"]
-    ];
+  <button class="bar-btn" id="edit-teams" type="button" aria-label="Cambiar selecciones">
+    <span id="bar-flags" aria-hidden="true"></span> Selecciones
+  </button>
+</header>
 
-    const TEAMS = [
-      ["ALG", "Argelia", "🇩🇿", "África"],
-      ["ARG", "Argentina", "🇦🇷", "América"],
-      ["AUS", "Australia", "🇦🇺", "Oceanía"],
-      ["AUT", "Austria", "🇦🇹", "Europa"],
-      ["BEL", "Bélgica", "🇧🇪", "Europa"],
-      ["BIH", "Bosnia y Herzegovina", "🇧🇦", "Europa"],
-      ["BRA", "Brasil", "🇧🇷", "América"],
-      ["CAN", "Canadá", "🇨🇦", "América"],
-      ["CPV", "Cabo Verde", "🇨🇻", "África"],
-      ["COL", "Colombia", "🇨🇴", "América"],
-      ["CRO", "Croacia", "🇭🇷", "Europa"],
-      ["CUW", "Curazao", "🇨🇼", "América"],
-      ["CZE", "Chequia", "🇨🇿", "Europa"],
-      ["COD", "RD Congo", "🇨🇩", "África"],
-      ["ECU", "Ecuador", "🇪🇨", "América"],
-      ["EGY", "Egipto", "🇪🇬", "África"],
-      ["ENG", "Inglaterra", "🏴", "Europa"],
-      ["FRA", "Francia", "🇫🇷", "Europa"],
-      ["GER", "Alemania", "🇩🇪", "Europa"],
-      ["GHA", "Ghana", "🇬🇭", "África"],
-      ["HAI", "Haití", "🇭🇹", "América"],
-      ["IRN", "Irán", "🇮🇷", "Asia"],
-      ["IRQ", "Irak", "🇮🇶", "Asia"],
-      ["CIV", "Costa de Marfil", "🇨🇮", "África"],
-      ["JPN", "Japón", "🇯🇵", "Asia"],
-      ["JOR", "Jordania", "🇯🇴", "Asia"],
-      ["MEX", "México", "🇲🇽", "América"],
-      ["MAR", "Marruecos", "🇲🇦", "África"],
-      ["NED", "Países Bajos", "🇳🇱", "Europa"],
-      ["NZL", "Nueva Zelanda", "🇳🇿", "Oceanía"],
-      ["NOR", "Noruega", "🇳🇴", "Europa"],
-      ["PAN", "Panamá", "🇵🇦", "América"],
-      ["PAR", "Paraguay", "🇵🇾", "América"],
-      ["POR", "Portugal", "🇵🇹", "Europa"],
-      ["QAT", "Catar", "🇶🇦", "Asia"],
-      ["KSA", "Arabia Saudí", "🇸🇦", "Asia"],
-      ["SCO", "Escocia", "🏴", "Europa"],
-      ["SEN", "Senegal", "🇸🇳", "África"],
-      ["RSA", "Sudáfrica", "🇿🇦", "África"],
-      ["KOR", "Corea del Sur", "🇰🇷", "Asia"],
-      ["ESP", "España", "🇪🇸", "Europa"],
-      ["SWE", "Suecia", "🇸🇪", "Europa"],
-      ["SUI", "Suiza", "🇨🇭", "Europa"],
-      ["TUN", "Túnez", "🇹🇳", "África"],
-      ["TUR", "Turquía", "🇹🇷", "Europa"],
-      ["USA", "Estados Unidos", "🇺🇸", "América"],
-      ["URU", "Uruguay", "🇺🇾", "América"],
-      ["UZB", "Uzbekistán", "🇺🇿", "Asia"]
-    ].map(([code, name, flag, region]) => ({ code, name, flag, region }));
+<!-- ── Calendar page ─────────────────────────────────────────────────────── -->
+<main class="page active" id="page-cal" role="tabpanel" aria-labelledby="tab-cal">
 
-    const TEAM_BY_CODE = new Map(TEAMS.map((team) => [team.code, team]));
+  <div class="sync-bar">
+    <p class="sync-status" aria-live="polite">
+      <span class="sync-dot" id="sync-dot" aria-hidden="true"></span>
+      <span id="sync-text">Preparando el Mundial…</span>
+    </p>
+    <button class="icon-btn" id="refresh-btn" type="button">
+      <svg class="spin-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+      </svg>
+      Actualizar
+    </button>
+  </div>
 
-    const els = {
-      heroTitle: document.querySelector("#hero-title"),
-      selectedChips: document.querySelector("#selected-chips"),
-      editTeams: document.querySelector("#edit-teams"),
-      appleLink: document.querySelector("#apple-link"),
-      googleLink: document.querySelector("#google-link"),
-      outlookLink: document.querySelector("#outlook-link"),
-      copyFeed: document.querySelector("#copy-feed"),
-      refreshButton: document.querySelector("#refresh-button"),
-      timezoneSelect: document.querySelector("#timezone-select"),
-      syncDot: document.querySelector("#sync-dot"),
-      syncText: document.querySelector("#sync-text"),
-      stats: document.querySelector("#stats"),
-      statTeams: document.querySelector("#stat-teams"),
-      statMatches: document.querySelector("#stat-matches"),
-      statNext: document.querySelector("#stat-next"),
-      statKnockout: document.querySelector("#stat-knockout"),
-      filterButtons: [...document.querySelectorAll(".filter-button")],
-      loading: document.querySelector("#loading-state"),
-      error: document.querySelector("#error-state"),
-      errorMessage: document.querySelector("#error-message"),
-      errorDetail: document.querySelector("#error-detail"),
-      empty: document.querySelector("#empty-state"),
-      dashboard: document.querySelector("#dashboard"),
-      filteredEmpty: document.querySelector("#filtered-empty"),
-      nextMatch: document.querySelector("#next-match"),
-      nextFlags: document.querySelector("#next-flags"),
-      nextTitle: document.querySelector("#next-title"),
-      nextDate: document.querySelector("#next-date"),
-      countdown: document.querySelector("#countdown"),
-      upcomingSection: document.querySelector("#upcoming-section"),
-      upcomingCount: document.querySelector("#upcoming-count"),
-      upcomingList: document.querySelector("#upcoming-list"),
-      pastSection: document.querySelector("#past-section"),
-      pastCount: document.querySelector("#past-count"),
-      pastList: document.querySelector("#past-list"),
-      dialog: document.querySelector("#team-dialog"),
-      dialogClose: document.querySelector("#dialog-close"),
-      teamSearch: document.querySelector("#team-search"),
-      teamGrid: document.querySelector("#team-grid"),
-      pickerCount: document.querySelector("#picker-count"),
-      resetTeams: document.querySelector("#reset-teams"),
-      applyTeams: document.querySelector("#apply-teams"),
-      pageFooter: document.querySelector("#page-footer"),
-      toast: document.querySelector("#toast")
+  <div class="chips" id="stat-chips">
+    <div class="chip chip--accent">
+      <span class="chip__label">Equipos</span>
+      <span class="chip__value" id="stat-teams">1</span>
+    </div>
+    <div class="chip">
+      <span class="chip__label">Partidos</span>
+      <span class="chip__value" id="stat-matches">—</span>
+    </div>
+    <div class="chip">
+      <span class="chip__label">Próximo</span>
+      <span class="chip__value" id="stat-next">—</span>
+    </div>
+    <div class="chip">
+      <span class="chip__label">Eliminatorias</span>
+      <span class="chip__value" id="stat-ko">—</span>
+    </div>
+  </div>
+
+  <div class="subscribe-row">
+    <p>Se actualiza automáticamente</p>
+    <div class="cal-btns">
+      <a id="apple-link"   class="cal-btn cal-btn--apple"   href="#" target="_blank" rel="noopener"><span class="cal-btn__ico">A</span>Apple</a>
+      <a id="google-link"  class="cal-btn cal-btn--google"  href="#" target="_blank" rel="noopener"><span class="cal-btn__ico">G</span>Google</a>
+      <a id="outlook-link" class="cal-btn cal-btn--outlook" href="#" target="_blank" rel="noopener"><span class="cal-btn__ico">O</span>Outlook</a>
+      <button id="copy-feed" class="copy-link" type="button">Copiar feed</button>
+    </div>
+  </div>
+
+  <!-- States -->
+  <section class="state-card" id="loading-state" aria-live="polite">
+    <div>
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>Cargando tu Mundial</h2>
+      <p>Buscando partidos de las selecciones elegidas…</p>
+    </div>
+  </section>
+
+  <section class="state-card" id="error-state" hidden aria-live="assertive">
+    <div>
+      <div class="state-icon" aria-hidden="true">!</div>
+      <h2>Sin conexión</h2>
+      <p id="error-msg">No se pudo cargar el calendario.</p>
+      <p id="error-detail"></p>
+    </div>
+  </section>
+
+  <section class="state-card" id="empty-state" hidden>
+    <div>
+      <div class="state-icon" aria-hidden="true">0</div>
+      <h2>Sin partidos</h2>
+      <p>Prueba con otra selección o vuelve más adelante.</p>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <div id="dashboard" hidden>
+
+    <article class="hero-card" id="hero-card" hidden>
+      <div class="hero-card__top">
+        <span class="badge badge--next">Próximo partido</span>
+        <span class="hero-flags" id="hero-flags" aria-hidden="true"></span>
+      </div>
+      <h2 id="hero-title"></h2>
+      <p class="hero-meta" id="hero-date"></p>
+      <span class="countdown-pill" id="countdown"></span>
+    </article>
+
+    <nav class="filter-strip" aria-label="Filtrar partidos">
+      <button class="filter-pill active" type="button" data-filter="all">Todos</button>
+      <button class="filter-pill" type="button" data-filter="group">Grupos</button>
+      <button class="filter-pill" type="button" data-filter="knockout">Eliminatorias</button>
+    </nav>
+
+    <div id="no-filter" class="no-matches" hidden>Sin partidos en esta fase.</div>
+
+    <section id="upcoming-section" hidden aria-labelledby="upcoming-h">
+      <div class="section-head">
+        <h2 id="upcoming-h">Próximos partidos</h2>
+        <span id="upcoming-count"></span>
+      </div>
+      <div id="upcoming-list" class="match-grid"></div>
+    </section>
+
+    <section id="past-section" hidden aria-labelledby="past-h">
+      <div class="section-head">
+        <h2 id="past-h">Resultados</h2>
+        <span id="past-count"></span>
+      </div>
+      <div id="past-list" class="match-grid"></div>
+    </section>
+
+  </div>
+
+  <footer>Horarios en Europe/Madrid · Máximo 8 selecciones por calendario.</footer>
+</main>
+
+<!-- ── Analysis / Pro page ────────────────────────────────────────────────── -->
+<main class="page" id="page-pro" role="tabpanel" aria-labelledby="tab-pro" hidden>
+
+  <!-- Auth gate -->
+  <div class="auth-gate" id="auth-gate">
+    <div class="auth-gate__icon" aria-hidden="true">📊</div>
+    <h2>Análisis de Mercado</h2>
+    <p>Introduce la clave para ver los picks del modelo y la analítica de cuotas en tiempo real.</p>
+    <div class="auth-form">
+      <input class="auth-input" id="auth-input" type="password" placeholder="Clave de acceso…" autocomplete="off">
+      <span class="auth-error" id="auth-error" role="alert"></span>
+      <button class="auth-submit" id="auth-submit" type="button">Acceder</button>
+    </div>
+    <p class="auth-hint">También puedes activarlo con el código Konami: ↑↑↓↓←→←→BA</p>
+  </div>
+
+  <!-- Picks content -->
+  <div id="picks-content" hidden>
+
+    <div class="pro-head">
+      <div class="pro-head__left">
+        <h2>Picks del día</h2>
+        <span class="pro-badge">PRO</span>
+      </div>
+      <button class="icon-btn" id="pro-refresh" type="button">
+        <svg class="spin-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+        </svg>
+        Actualizar
+      </button>
+    </div>
+
+    <p class="pro-ts" id="pro-ts"></p>
+    <div id="picks-grid" class="picks-grid"></div>
+
+    <div class="analytics-card">
+      <h3>Overround por casa · Margen sobre cuotas justas</h3>
+      <div id="ov-list"></div>
+    </div>
+
+    <div class="rg-notice">
+      <strong>Juego responsable</strong> · Solo mayores de 18 años.
+      Estimaciones estadísticas, <strong>no garantías</strong>. El juego puede crear adicción.
+      Ayuda: <a href="https://www.jugarbien.es" target="_blank" rel="noopener">jugarbien.es</a>
+      · <a href="https://www.fejar.org" target="_blank" rel="noopener">fejar.org</a>
+    </div>
+
+  </div>
+</main>
+
+<!-- ── Bottom nav (mobile) ───────────────────────────────────────────────── -->
+<nav class="btm-nav" aria-label="Navegación">
+  <button class="btm-btn" id="btm-cal" type="button" aria-selected="true">
+    <span class="btm-btn__ico" aria-hidden="true">📅</span>Partidos
+  </button>
+  <button class="btm-btn" id="btm-pro" type="button" aria-selected="false">
+    <span class="btm-btn__ico" aria-hidden="true">📊</span>Análisis
+  </button>
+</nav>
+
+<!-- ── Team picker dialog ─────────────────────────────────────────────────── -->
+<dialog id="team-dialog" aria-labelledby="picker-h">
+  <div class="picker">
+    <header class="picker__head">
+      <div>
+        <h2 id="picker-h">Elige tus selecciones</h2>
+        <p>Hasta 8 equipos en un solo calendario dinámico.</p>
+      </div>
+      <button class="close-btn" id="dlg-close" type="button" aria-label="Cerrar">×</button>
+    </header>
+    <input class="search-input" id="team-search" type="search" placeholder="Buscar…" autocomplete="off">
+    <div id="team-grid" class="team-grid"></div>
+    <footer class="picker__foot">
+      <span id="picker-count" class="picker__count">1 de 8</span>
+      <div class="picker__actions">
+        <button class="btn btn--ghost" id="reset-teams" type="button">Solo España</button>
+        <button class="btn btn--primary" id="apply-teams" type="button">Ver calendario</button>
+      </div>
+    </footer>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
+<script>
+"use strict";
+
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const FEED_PATH       = "/api/calendar";
+const TIMEZONE        = "Europe/Madrid";
+const MAX_TEAMS       = 8;
+const REFRESH_MS      = 6 * 60 * 60 * 1000;
+const STORAGE_KEY     = "mundial-2026-teams";
+const PRO_SESSION_KEY = "pro_unlocked_v1";
+const PRO_HASH        = btoa("pro2026"); // UI-only gating, not real security
+
+const TEAMS = [
+  ["ALG","Argelia","🇩🇿"],["ARG","Argentina","🇦🇷"],["AUS","Australia","🇦🇺"],
+  ["AUT","Austria","🇦🇹"],["BEL","Bélgica","🇧🇪"],["BIH","Bosnia-Herzegovina","🇧🇦"],
+  ["BRA","Brasil","🇧🇷"],["CAN","Canadá","🇨🇦"],["CPV","Cabo Verde","🇨🇻"],
+  ["COL","Colombia","🇨🇴"],["CRO","Croacia","🇭🇷"],["CUW","Curazao","🇨🇼"],
+  ["CZE","Chequia","🇨🇿"],["COD","RD Congo","🇨🇩"],["ECU","Ecuador","🇪🇨"],
+  ["EGY","Egipto","🇪🇬"],["ENG","Inglaterra","🏴"],["ESP","España","🇪🇸"],
+  ["FRA","Francia","🇫🇷"],["GER","Alemania","🇩🇪"],["GHA","Ghana","🇬🇭"],
+  ["HAI","Haití","🇭🇹"],["IRN","Irán","🇮🇷"],["IRQ","Irak","🇮🇶"],
+  ["CIV","Costa de Marfil","🇨🇮"],["JPN","Japón","🇯🇵"],["JOR","Jordania","🇯🇴"],
+  ["MEX","México","🇲🇽"],["MAR","Marruecos","🇲🇦"],["NED","Países Bajos","🇳🇱"],
+  ["NZL","Nueva Zelanda","🇳🇿"],["NOR","Noruega","🇳🇴"],["PAN","Panamá","🇵🇦"],
+  ["PAR","Paraguay","🇵🇾"],["POR","Portugal","🇵🇹"],["QAT","Catar","🇶🇦"],
+  ["KSA","Arabia Saudí","🇸🇦"],["SCO","Escocia","🏴"],["SEN","Senegal","🇸🇳"],
+  ["RSA","Sudáfrica","🇿🇦"],["KOR","Corea del Sur","🇰🇷"],["SWE","Suecia","🇸🇪"],
+  ["SUI","Suiza","🇨🇭"],["TUN","Túnez","🇹🇳"],["TUR","Turquía","🇹🇷"],
+  ["USA","Estados Unidos","🇺🇸"],["URU","Uruguay","🇺🇾"],["UZB","Uzbekistán","🇺🇿"],
+].map(([code,name,flag]) => ({ code, name, flag }));
+
+const TEAM_MAP = new Map(TEAMS.map(t => [t.code, t]));
+
+// ── FORMATTERS ──────────────────────────────────────────────────────────────
+const fmtFull = new Intl.DateTimeFormat("es-ES", {
+  timeZone: TIMEZONE, weekday:"long", day:"numeric", month:"long",
+  hour:"2-digit", minute:"2-digit", hour12: false,
+});
+const fmtShort = new Intl.DateTimeFormat("es-ES", {
+  timeZone: TIMEZONE, weekday:"short", day:"numeric", month:"short",
+});
+const fmtDay   = new Intl.DateTimeFormat("es-ES", { timeZone: TIMEZONE, day:"2-digit" });
+const fmtMon   = new Intl.DateTimeFormat("es-ES", { timeZone: TIMEZONE, month:"short" });
+const fmtTime  = new Intl.DateTimeFormat("es-ES", { timeZone: TIMEZONE, hour:"2-digit", minute:"2-digit" });
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let selectedCodes = loadSelection();
+let draftCodes    = new Set(selectedCodes);
+let allMatches    = [];
+let currentFilter = "all";
+let calSource     = "";
+let lastRefresh   = 0;
+let proData       = null;
+let countdownTimer = null;
+let toastTimer    = null;
+
+// ── ELEMENT CACHE ───────────────────────────────────────────────────────────
+const G = id => document.getElementById(id);
+const E = {
+  barFlags:       G("bar-flags"),
+  editTeams:      G("edit-teams"),
+  refreshBtn:     G("refresh-btn"),
+  syncDot:        G("sync-dot"),
+  syncText:       G("sync-text"),
+  statTeams:      G("stat-teams"),
+  statMatches:    G("stat-matches"),
+  statNext:       G("stat-next"),
+  statKo:         G("stat-ko"),
+  appleLink:      G("apple-link"),
+  googleLink:     G("google-link"),
+  outlookLink:    G("outlook-link"),
+  copyFeed:       G("copy-feed"),
+  loadingState:   G("loading-state"),
+  errorState:     G("error-state"),
+  errorMsg:       G("error-msg"),
+  errorDetail:    G("error-detail"),
+  emptyState:     G("empty-state"),
+  dashboard:      G("dashboard"),
+  heroCard:       G("hero-card"),
+  heroFlags:      G("hero-flags"),
+  heroTitle:      G("hero-title"),
+  heroDate:       G("hero-date"),
+  countdown:      G("countdown"),
+  noFilter:       G("no-filter"),
+  upcomingSection:G("upcoming-section"),
+  upcomingCount:  G("upcoming-count"),
+  upcomingList:   G("upcoming-list"),
+  pastSection:    G("past-section"),
+  pastCount:      G("past-count"),
+  pastList:       G("past-list"),
+  toast:          G("toast"),
+  tabCal:         G("tab-cal"),
+  tabPro:         G("tab-pro"),
+  pageCal:        G("page-cal"),
+  pagePro:        G("page-pro"),
+  btmCal:         G("btm-cal"),
+  btmPro:         G("btm-pro"),
+  authGate:       G("auth-gate"),
+  authInput:      G("auth-input"),
+  authError:      G("auth-error"),
+  authSubmit:     G("auth-submit"),
+  picksContent:   G("picks-content"),
+  proRefresh:     G("pro-refresh"),
+  proTs:          G("pro-ts"),
+  picksGrid:      G("picks-grid"),
+  ovList:         G("ov-list"),
+  dialog:         G("team-dialog"),
+  dlgClose:       G("dlg-close"),
+  teamSearch:     G("team-search"),
+  teamGrid:       G("team-grid"),
+  pickerCount:    G("picker-count"),
+  resetTeams:     G("reset-teams"),
+  applyTeams:     G("apply-teams"),
+};
+
+// ── SELECTION ───────────────────────────────────────────────────────────────
+function loadSelection() {
+  const fromUrl     = new URLSearchParams(window.location.search).get("teams");
+  const fromStorage = localStorage.getItem(STORAGE_KEY);
+  const raw         = fromUrl || fromStorage || "ESP";
+  const codes = raw.split(",").map(c => c.trim().toUpperCase())
+    .filter((c, i, a) => TEAM_MAP.has(c) && a.indexOf(c) === i)
+    .slice(0, MAX_TEAMS);
+  return codes.length ? codes : ["ESP"];
+}
+
+function saveSelection() {
+  localStorage.setItem(STORAGE_KEY, selectedCodes.join(","));
+  const url = new URL(window.location);
+  url.searchParams.set("teams", selectedCodes.join(","));
+  history.replaceState(null, "", url);
+}
+
+function feedUrl(codes) {
+  return `${location.origin}${FEED_PATH}?teams=${codes.join(",")}`;
+}
+
+function updateCalLinks() {
+  const url = feedUrl(selectedCodes);
+  E.appleLink.href   = url.replace(/^https?:\/\//, "webcal://");
+  E.googleLink.href  = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(url)}`;
+  E.outlookLink.href = `https://outlook.live.com/calendar/0/addcalendar?url=${encodeURIComponent(url)}`;
+}
+
+function updateBarFlags() {
+  E.barFlags.textContent = selectedCodes.map(c => TEAM_MAP.get(c)?.flag || "").join("") + " ";
+  E.statTeams.textContent = selectedCodes.length;
+}
+
+// ── ICS PARSING ─────────────────────────────────────────────────────────────
+async function fetchIcs() {
+  const res = await fetch(feedUrl(selectedCodes));
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  calSource = res.headers.get("X-Calendar-Source") || "";
+  return res.text();
+}
+
+function stageOf(desc) {
+  const p = (desc.split("\n")[0] || "").toLowerCase();
+  if (p.includes("grupo") || p.includes("group"))        return { type:"group",    label:"Fase de grupos" };
+  if (p.includes("dieciseisavo") || p.includes("32"))    return { type:"knockout", label:"Dieciseisavos" };
+  if (p.includes("octavo") || p.includes("16"))          return { type:"knockout", label:"Octavos de final" };
+  if (p.includes("cuarto") || p.includes("quarter"))     return { type:"knockout", label:"Cuartos de final" };
+  if (p.includes("semi"))                                 return { type:"knockout", label:"Semifinal" };
+  if (p.includes("tercer") || p.includes("third"))       return { type:"knockout", label:"Tercer puesto" };
+  if (p.includes("final"))                               return { type:"knockout", label:"Final" };
+  return { type:"group", label: desc.split("\n")[0].trim() || "Copa Mundial 2026" };
+}
+
+function parseIcs(icsText) {
+  const vcal = new ICAL.Component(ICAL.parse(icsText));
+  return vcal.getAllSubcomponents("vevent").map(e => {
+    const ev    = new ICAL.Event(e);
+    const start = ev.startDate.toJSDate().getTime();
+    const desc  = ev.description || "";
+    return {
+      start,
+      title:       ev.summary || "",
+      description: desc,
+      location:    ev.location || "",
+      allDay:      ev.startDate.isDate,
+      stage:       stageOf(desc),
+      pending:     desc.includes("Por confirmar"),
     };
+  }).sort((a, b) => a.start - b.start);
+}
 
-    let currentTimezone = readInitialTimezone();
-    let dateTimeFormatter;
-    let fullDateTimeFormatter;
-    let dayFormatter;
-    let monthFormatter;
-    let shortDateFormatter;
-    let lastUpdateFormatter;
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function showState(name) {
+  E.loadingState.hidden = name !== "loading";
+  E.errorState.hidden   = name !== "error";
+  E.emptyState.hidden   = name !== "empty";
+  E.dashboard.hidden    = name !== "dashboard";
+}
 
-    configureDateFormatters();
+function setRefreshing(on) {
+  E.refreshBtn.disabled = on;
+  E.refreshBtn.classList.toggle("loading", on);
+}
 
-    let selectedCodes = readInitialSelection();
-    let draftCodes = new Set(selectedCodes);
-    let matches = [];
-    let nextMatch = null;
-    let currentFilter = "all";
-    let calendarSource = "";
-    let lastSuccessfulRefresh = 0;
-    let countdownTimer = null;
-    let toastTimer = null;
+function renderSchedule() {
+  const now      = Date.now();
+  const upcoming = allMatches.filter(m => m.start >= now);
+  const past     = allMatches.filter(m => m.start < now);
+  const next     = upcoming[0] || null;
 
-    function isValidTimezone(value) {
-      try {
-        new Intl.DateTimeFormat("es-ES", { timeZone: value }).format();
-        return true;
-      } catch (error) {
-        return false;
-      }
+  if (next) {
+    E.heroCard.hidden   = false;
+    E.heroFlags.textContent = "";
+    E.heroTitle.textContent = next.title;
+    E.heroDate.textContent  = cap(fmtFull.format(next.start).replace(",", " ·")) + " h";
+    startCountdown(next.start);
+  } else {
+    E.heroCard.hidden = true;
+  }
+
+  const ko = allMatches.filter(m => m.stage.type === "knockout").length;
+  E.statMatches.textContent = allMatches.length;
+  E.statNext.textContent    = next ? shortDate(next.start) : "—";
+  E.statKo.textContent      = ko || "—";
+
+  applyFilter();
+  showState("dashboard");
+}
+
+function shortDate(ts) {
+  const p = Object.fromEntries(
+    fmtShort.formatToParts(ts).filter(x => x.type !== "literal").map(x => [x.type, x.value.replace(".", "")])
+  );
+  return `${p.day} ${p.month}`;
+}
+
+function applyFilter() {
+  let filtered = allMatches;
+  if (currentFilter === "group")    filtered = allMatches.filter(m => m.stage.type === "group");
+  if (currentFilter === "knockout") filtered = allMatches.filter(m => m.stage.type === "knockout");
+
+  const now      = Date.now();
+  const upcoming = filtered.filter(m => m.start >= now);
+  const past     = filtered.filter(m => m.start < now);
+  const has      = upcoming.length + past.length > 0;
+
+  E.noFilter.hidden        = has || allMatches.length === 0;
+  E.upcomingSection.hidden = upcoming.length === 0;
+  E.pastSection.hidden     = past.length === 0;
+  E.upcomingCount.textContent = `${upcoming.length} partido${upcoming.length !== 1 ? "s" : ""}`;
+  E.pastCount.textContent     = `${past.length} partido${past.length !== 1 ? "s" : ""}`;
+
+  E.upcomingList.innerHTML = "";
+  E.pastList.innerHTML     = "";
+  upcoming.forEach(m => E.upcomingList.appendChild(matchCard(m, false)));
+  past.forEach(m    => E.pastList.appendChild(matchCard(m, true)));
+}
+
+function matchCard(match, isPast) {
+  const el = document.createElement("article");
+  el.className = `match-card match-card--${match.stage.type}${isPast ? " match-card--past" : ""}`;
+
+  const dateEl = document.createElement("div");
+  dateEl.className = "mdate";
+  dateEl.setAttribute("aria-hidden", "true");
+  dateEl.innerHTML = `<span class="mdate__d">${fmtDay.format(match.start)}</span><span class="mdate__m">${fmtMon.format(match.start).replace(".", "")}</span>`;
+
+  const info = document.createElement("div");
+  info.className = "minfo";
+
+  const topBadges = `<span class="badge badge--${match.stage.type === "knockout" ? "knockout" : "group"}">${match.stage.label}</span>${match.pending ? '<span class="badge badge--pending">Por confirmar</span>' : ""}`;
+  const timeStr   = match.allDay ? shortDate(match.start) : fmtTime.format(match.start) + " h";
+
+  info.innerHTML = `
+    <div class="minfo__top">${topBadges}</div>
+    <h3>${match.title}</h3>
+    <p class="minfo__time">${cap(fmtShort.format(match.start).replace(",", ""))} · ${timeStr}</p>`;
+
+  const phase    = match.description.split("\n")[0].trim();
+  if (phase || match.location) {
+    const det = document.createElement("div");
+    det.className = "minfo__detail";
+    if (phase)        det.innerHTML += `<p><strong>Torneo:</strong> ${phase}</p>`;
+    if (match.location) det.innerHTML += `<p><strong>Sede:</strong> ${match.location}</p>`;
+    info.appendChild(det);
+  }
+
+  el.append(dateEl, info);
+  return el;
+}
+
+// ── COUNTDOWN ────────────────────────────────────────────────────────────────
+function startCountdown(ts) {
+  if (countdownTimer) clearInterval(countdownTimer);
+  tick(ts);
+  countdownTimer = setInterval(() => tick(ts), 30000);
+}
+
+function tick(ts) {
+  const ms = ts - Date.now();
+  if (ms <= 0) { E.countdown.textContent = "En juego"; return; }
+  const d = Math.floor(ms / 86400000);
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  if (d >= 1)      E.countdown.textContent = `Faltan ${d} día${d > 1 ? "s" : ""}`;
+  else if (h >= 1) E.countdown.textContent = `Faltan ${h}h ${m}min`;
+  else             E.countdown.textContent = `Faltan ${m} min`;
+}
+
+// ── LOAD CALENDAR ────────────────────────────────────────────────────────────
+async function loadCalendar({ initial = false } = {}) {
+  setRefreshing(true);
+  E.syncDot.classList.remove("sync-dot--ok");
+  E.syncText.textContent = "Actualizando…";
+  if (initial) showState("loading");
+
+  try {
+    allMatches  = parseIcs(await fetchIcs());
+    lastRefresh = Date.now();
+    if (!allMatches.length) {
+      showState("empty");
+    } else {
+      renderSchedule();
     }
-
-    function readInitialTimezone() {
-      const detected = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-      const stored = localStorage.getItem(TIMEZONE_STORAGE_KEY);
-      return stored && isValidTimezone(stored) ? stored : detected;
+    E.syncDot.classList.add("sync-dot--ok");
+    const src = calSource === "api-football" ? " · API-Football" :
+                calSource === "ics-fallback"  ? " · directo" : "";
+    E.syncText.textContent = `Actualizado ${fmtTime.format(lastRefresh)}${src}`;
+  } catch (err) {
+    console.error(err);
+    if (allMatches.length) {
+      showToast("Sin conexión — mostrando datos anteriores");
+      E.syncText.textContent = "Sin conexión";
+    } else {
+      E.errorMsg.textContent    = "No se pudo cargar el calendario.";
+      E.errorDetail.textContent = err.message || "";
+      E.syncText.textContent = "Error al conectar";
+      showState("error");
     }
-
-    function configureDateFormatters() {
-      dateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
-        timeZone: currentTimezone,
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-      });
-      fullDateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
-        timeZone: currentTimezone,
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-      });
-      dayFormatter = new Intl.DateTimeFormat("es-ES", {
-        timeZone: currentTimezone,
-        day: "2-digit"
-      });
-      monthFormatter = new Intl.DateTimeFormat("es-ES", {
-        timeZone: currentTimezone,
-        month: "short"
-      });
-      shortDateFormatter = new Intl.DateTimeFormat("es-ES", {
-        timeZone: currentTimezone,
-        day: "numeric",
-        month: "short"
-      });
-      lastUpdateFormatter = new Intl.DateTimeFormat("es-ES", {
-        timeZone: currentTimezone,
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-    }
-
-    function timezoneLabel(value) {
-      const configured = TIMEZONES.find(([timezone]) => timezone === value);
-      return configured
-        ? configured[1]
-        : value.replace(/_/g, " ").replace("/", " · ");
-    }
-
-    function createTimezoneSelector() {
-      const detected = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-      const zones = [[detected, `Mi zona · ${timezoneLabel(detected)}`]];
-
-      for (const timezone of TIMEZONES) {
-        if (timezone[0] !== detected) zones.push(timezone);
-      }
-
-      if (!zones.some(([timezone]) => timezone === currentTimezone)) {
-        zones.unshift([currentTimezone, timezoneLabel(currentTimezone)]);
-      }
-
-      els.timezoneSelect.replaceChildren(
-        ...zones.map(([value, label]) => {
-          const option = document.createElement("option");
-          option.value = value;
-          option.textContent = label;
-          return option;
-        })
-      );
-      els.timezoneSelect.value = currentTimezone;
-      updateTimezoneUi();
-    }
-
-    function updateTimezoneUi() {
-      els.pageFooter.textContent =
-        `Horarios en ${timezoneLabel(currentTimezone)} (${currentTimezone}) · ` +
-        "Máximo 8 selecciones por calendario.";
-    }
-
-    function updateSyncText() {
-      if (!lastSuccessfulRefresh) return;
-      const source =
-        calendarSource === "api-football"
-          ? " · API-Football"
-          : calendarSource === "ics-fallback"
-            ? " · datos en vivo"
-            : "";
-      els.syncText.textContent =
-        `Actualizado a las ${lastUpdateFormatter.format(lastSuccessfulRefresh)}${source}`;
-    }
-
-    function changeTimezone(value) {
-      if (!isValidTimezone(value)) return;
-      currentTimezone = value;
-      localStorage.setItem(TIMEZONE_STORAGE_KEY, value);
-      configureDateFormatters();
-      updateTimezoneUi();
-      updateSyncText();
-      if (matches.length) renderSchedule();
-      showToast(`Horarios en ${timezoneLabel(value)}`);
-    }
-
-    function readInitialSelection() {
-      const fromUrl = new URLSearchParams(window.location.search).get("teams");
-      const fromStorage = localStorage.getItem(STORAGE_KEY);
-      const raw = fromUrl || fromStorage || "ESP";
-      const codes = raw
-        .split(",")
-        .map((code) => code.trim().toUpperCase())
-        .filter((code, index, values) =>
-          TEAM_BY_CODE.has(code) && values.indexOf(code) === index
-        )
-        .slice(0, MAX_SELECTED_TEAMS);
-      return codes.length ? codes : ["ESP"];
-    }
-
-    function selectedTeams() {
-      return selectedCodes.map((code) => TEAM_BY_CODE.get(code)).filter(Boolean);
-    }
-
-    function calendarName() {
-      const teams = selectedTeams();
-      if (teams.length === 1) return `${teams[0].name} · Mundial 2026`;
-      if (teams.length <= 3) return `${teams.map((team) => team.name).join(", ")} · Mundial 2026`;
-      return `${teams.length} selecciones · Mundial 2026`;
-    }
-
-    function buildFeedUrl() {
-      const url = new URL(FEED_PATH, window.location.origin);
-      url.searchParams.set("teams", selectedCodes.join(","));
-      return url.toString();
-    }
-
-    function configureSubscriptionLinks() {
-      const httpsUrl = buildFeedUrl();
-      const webcalUrl = httpsUrl.replace(/^https?:\/\//, "webcal://");
-      const name = calendarName();
-
-      els.appleLink.href = webcalUrl;
-      els.googleLink.href =
-        "https://calendar.google.com/calendar/r?cid=" + encodeURIComponent(webcalUrl);
-      els.outlookLink.href =
-        "https://outlook.live.com/calendar/0/addfromweb?url=" +
-        encodeURIComponent(httpsUrl) +
-        "&name=" +
-        encodeURIComponent(name);
-      document.title = name;
-    }
-
-    function renderSelection() {
-      const teams = selectedTeams();
-      els.selectedChips.replaceChildren(
-        ...teams.map((team) => {
-          const chip = document.createElement("span");
-          chip.className = "team-chip";
-          const flag = document.createElement("span");
-          flag.className = "team-chip__flag";
-          flag.textContent = team.flag;
-          const name = document.createElement("span");
-          name.textContent = team.name;
-          chip.append(flag, name);
-          return chip;
-        })
-      );
-      els.statTeams.textContent = teams.length;
-      els.heroTitle.textContent =
-        teams.length === 1
-          ? `${teams[0].name}, partido a partido.`
-          : `${teams.length} caminos. Un solo Mundial.`;
-      configureSubscriptionLinks();
-    }
-
-    function createTeamPicker() {
-      els.teamGrid.replaceChildren(
-        ...TEAMS.map((team) => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "team-option";
-          button.dataset.code = team.code;
-          button.dataset.search = normalizeText(`${team.name} ${team.code} ${team.region}`);
-          button.setAttribute("aria-pressed", "false");
-
-          const flag = document.createElement("span");
-          flag.className = "team-option__flag";
-          flag.textContent = team.flag;
-          const name = document.createElement("span");
-          name.className = "team-option__name";
-          name.textContent = team.name;
-          const code = document.createElement("span");
-          code.className = "team-option__code";
-          code.textContent = team.code;
-          button.append(flag, name, code);
-          button.addEventListener("click", () => toggleDraftTeam(team.code));
-          return button;
-        })
-      );
-    }
-
-    function openTeamPicker() {
-      draftCodes = new Set(selectedCodes);
-      els.teamSearch.value = "";
-      filterTeamOptions("");
-      updatePicker();
-      document.body.classList.add("dialog-open");
-      if (typeof els.dialog.showModal === "function") {
-        els.dialog.showModal();
-      } else {
-        els.dialog.setAttribute("open", "");
-      }
-      window.setTimeout(() => els.teamSearch.focus(), 50);
-    }
-
-    function closeTeamPicker() {
-      if (typeof els.dialog.close === "function") {
-        els.dialog.close();
-      } else {
-        els.dialog.removeAttribute("open");
-      }
-      document.body.classList.remove("dialog-open");
-    }
-
-    function toggleDraftTeam(code) {
-      if (draftCodes.has(code)) {
-        if (draftCodes.size === 1) {
-          showToast("Elige al menos una selección");
-          return;
-        }
-        draftCodes.delete(code);
-      } else {
-        if (draftCodes.size >= MAX_SELECTED_TEAMS) {
-          showToast(`Puedes combinar hasta ${MAX_SELECTED_TEAMS} selecciones`);
-          return;
-        }
-        draftCodes.add(code);
-      }
-      updatePicker();
-    }
-
-    function updatePicker() {
-      for (const option of els.teamGrid.querySelectorAll(".team-option")) {
-        const selected = draftCodes.has(option.dataset.code);
-        option.classList.toggle("is-selected", selected);
-        option.setAttribute("aria-pressed", String(selected));
-      }
-      els.pickerCount.textContent =
-        `${draftCodes.size} de ${MAX_SELECTED_TEAMS} seleccionadas`;
-    }
-
-    function filterTeamOptions(value) {
-      const query = normalizeText(value);
-      for (const option of els.teamGrid.querySelectorAll(".team-option")) {
-        option.hidden = Boolean(query) && !option.dataset.search.includes(query);
-      }
-    }
-
-    function applyTeamSelection() {
-      selectedCodes = TEAMS
-        .map((team) => team.code)
-        .filter((code) => draftCodes.has(code));
-      localStorage.setItem(STORAGE_KEY, selectedCodes.join(","));
-      const url = new URL(window.location.href);
-      url.searchParams.set("teams", selectedCodes.join(","));
-      history.replaceState({}, "", url);
-      closeTeamPicker();
-      renderSelection();
-      loadCalendar({ initial: true });
-    }
-
-    function normalizeText(value) {
-      return String(value)
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
-    }
-
-    function showToast(message) {
-      window.clearTimeout(toastTimer);
-      els.toast.textContent = message;
-      els.toast.classList.add("is-visible");
-      toastTimer = window.setTimeout(() => {
-        els.toast.classList.remove("is-visible");
-      }, 2400);
-    }
-
-    async function copyFeedUrl() {
-      const webcalUrl = buildFeedUrl().replace(/^https?:\/\//, "webcal://");
-      try {
-        await navigator.clipboard.writeText(webcalUrl);
-        showToast("Feed personalizado copiado");
-      } catch (error) {
-        const helper = document.createElement("textarea");
-        helper.value = webcalUrl;
-        helper.style.position = "fixed";
-        helper.style.opacity = "0";
-        document.body.appendChild(helper);
-        helper.select();
-        document.execCommand("copy");
-        helper.remove();
-        showToast("Feed personalizado copiado");
-      }
-    }
-
-    function setLoading(isLoading) {
-      els.refreshButton.disabled = isLoading;
-      els.refreshButton.classList.toggle("is-loading", isLoading);
-      els.refreshButton.setAttribute("aria-busy", String(isLoading));
-    }
-
-    function showState(state) {
-      els.loading.hidden = state !== "loading";
-      els.error.hidden = state !== "error";
-      els.empty.hidden = state !== "empty";
-      els.dashboard.hidden = state !== "dashboard";
-    }
-
-    async function fetchIcs() {
-      const response = await fetch(buildFeedUrl(), {
-        cache: "no-store",
-        headers: { Accept: "text/calendar, text/plain;q=0.9, */*;q=0.1" }
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const text = await response.text();
-      if (!/BEGIN:VCALENDAR/i.test(text)) {
-        throw new Error("La respuesta no parece un calendario ICS");
-      }
-      calendarSource = response.headers.get("X-Calendar-Source") || "";
-      return text;
-    }
-
-    function registerTimezones(calendarComponent) {
-      for (const timezoneComponent of calendarComponent.getAllSubcomponents("vtimezone")) {
-        try {
-          const timezone = new ICAL.Timezone(timezoneComponent);
-          ICAL.TimezoneService.register(timezone.tzid, timezone);
-        } catch (error) {
-          console.warn("No se pudo registrar una zona horaria.", error);
-        }
-      }
-    }
-
-    function parseMatches(icsText) {
-      if (!window.ICAL) throw new Error("ICAL.js no está disponible");
-      let parsed;
-      try {
-        parsed = ICAL.parse(icsText);
-      } catch (error) {
-        throw new Error("El contenido recibido no es un ICS válido");
-      }
-      const calendarComponent = new ICAL.Component(parsed);
-      registerTimezones(calendarComponent);
-      return calendarComponent
-        .getAllSubcomponents("vevent")
-        .map(eventToMatch)
-        .filter(Boolean)
-        .sort((a, b) => a.start - b.start);
-    }
-
-    function eventToMatch(component) {
-      const event = new ICAL.Event(component);
-      const status = String(component.getFirstPropertyValue("status") || "").toUpperCase();
-      if (status === "CANCELLED" || !event.startDate) return null;
-
-      const start = safeJsDate(event.startDate);
-      if (!start) return null;
-      const end = safeJsDate(event.endDate) || new Date(start.getTime() + 2 * 60 * 60 * 1000);
-      const title = cleanText(event.summary || "Partido del Mundial");
-      const description = cleanText(event.description || "");
-      const location = cleanText(event.location || "");
-      const combined = `${title}\n${description}`;
-      return {
-        uid: event.uid || `${start.toISOString()}-${title}`,
-        title,
-        description,
-        location,
-        start,
-        end,
-        allDay: Boolean(event.startDate.isDate),
-        stage: detectStage(combined, start),
-        pending: isPendingOpponent(combined),
-        teams: teamsInText(title)
-      };
-    }
-
-    function safeJsDate(icalTime) {
-      try {
-        const date = icalTime?.toJSDate();
-        return date && !Number.isNaN(date.getTime()) ? date : null;
-      } catch (error) {
-        return null;
-      }
-    }
-
-    function cleanText(value) {
-      return String(value)
-        .replace(/\\n/gi, "\n")
-        .replace(/\r/g, "")
-        .replace(/[ \t]+\n/g, "\n")
-        .replace(/\n{3,}/g, "\n\n")
-        .trim();
-    }
-
-    function detectStage(value, start) {
-      const text = normalizeText(value);
-      const knockoutPatterns = [
-        [/\b(semifinal|semi-final)\b/, "Semifinal"],
-        [/\b(cuartos|quarter[- ]?final)\b/, "Cuartos"],
-        [/\b(octavos|round of 16)\b/, "Octavos"],
-        [/\b(dieciseisavos|round of 32)\b/, "Dieciseisavos"],
-        [/\b(tercer puesto|third-place)\b/, "Tercer puesto"],
-        [/(^|[\n·:;-])\s*final\b|\bworld cup final\b/, "Final"]
-      ];
-      for (const [pattern, label] of knockoutPatterns) {
-        if (pattern.test(text)) return { type: "knockout", label };
-      }
-      if (
-        /\b(fase de grupos?|group stage|grupo [a-l])\b/.test(text) ||
-        start < new Date("2026-06-28T19:00:00Z")
-      ) {
-        return { type: "group", label: "Fase de grupos" };
-      }
-      return { type: "knockout", label: "Eliminatorias" };
-    }
-
-    function isPendingOpponent(value) {
-      return /\b(tbd|tbc|por confirmar|pendiente|ganador|winner|mejor tercero|best third)\b/.test(
-        normalizeText(value)
-      );
-    }
-
-    function teamsInText(value) {
-      const normalized = normalizeText(value);
-      return TEAMS.filter((team) => normalized.includes(normalizeText(team.name)));
-    }
-
-    function matchesCurrentFilter(match) {
-      return currentFilter === "all" || match.stage.type === currentFilter;
-    }
-
-    function renderSchedule() {
-      const now = Date.now();
-      const filtered = matches.filter(matchesCurrentFilter);
-      const upcoming = filtered.filter((match) => match.end.getTime() >= now);
-      const past = filtered
-        .filter((match) => match.end.getTime() < now)
-        .sort((a, b) => b.start - a.start);
-
-      nextMatch = upcoming[0] || null;
-      els.upcomingList.replaceChildren(...upcoming.map((match) => createMatchCard(match, false)));
-      els.pastList.replaceChildren(...past.map((match) => createMatchCard(match, true)));
-      els.upcomingSection.hidden = upcoming.length === 0;
-      els.pastSection.hidden = past.length === 0;
-      els.filteredEmpty.hidden = filtered.length !== 0;
-      els.upcomingCount.textContent = formatMatchCount(upcoming.length);
-      els.pastCount.textContent = formatMatchCount(past.length);
-
-      renderStats();
-      renderNextMatch();
-      showState("dashboard");
-    }
-
-    function renderStats() {
-      const now = Date.now();
-      const next = matches.find((match) => match.end.getTime() >= now);
-      els.statTeams.textContent = selectedCodes.length;
-      els.statMatches.textContent = matches.length;
-      els.statNext.textContent = next
-        ? shortDateFormatter.format(next.start).replace(".", "").toUpperCase()
-        : "FIN";
-      els.statKnockout.textContent = matches.filter((match) => match.stage.type === "knockout").length;
-    }
-
-    function renderNextMatch() {
-      window.clearInterval(countdownTimer);
-      if (!nextMatch) {
-        els.nextMatch.hidden = true;
-        return;
-      }
-      els.nextFlags.textContent = nextMatch.teams.map((team) => team.flag).join(" ");
-      els.nextTitle.textContent = nextMatch.title;
-      els.nextDate.textContent = formatFullDate(nextMatch);
-      els.nextMatch.hidden = false;
-      updateCountdown();
-      countdownTimer = window.setInterval(updateCountdown, 60 * 1000);
-    }
-
-    function updateCountdown() {
-      if (!nextMatch) return;
-      const now = Date.now();
-      const start = nextMatch.start.getTime();
-      const end = nextMatch.end.getTime();
-      if (now >= start && now <= end) {
-        els.countdown.textContent = "En juego";
-        return;
-      }
-      if (now > end) {
-        renderSchedule();
-        return;
-      }
-      const totalMinutes = Math.max(1, Math.ceil((start - now) / 60000));
-      const days = Math.floor(totalMinutes / 1440);
-      const hours = Math.floor((totalMinutes % 1440) / 60);
-      const minutes = totalMinutes % 60;
-      if (days > 0) {
-        els.countdown.textContent =
-          `Faltan ${days} ${days === 1 ? "día" : "días"}` + (hours ? ` y ${hours} h` : "");
-      } else if (hours > 0) {
-        els.countdown.textContent = `Faltan ${hours} h ${minutes} min`;
-      } else {
-        els.countdown.textContent = `Faltan ${minutes} min`;
-      }
-    }
-
-    function createMatchCard(match, isPast) {
-      const card = document.createElement("article");
-      card.className =
-        `match-card match-card--${match.stage.type}` + (isPast ? " match-card--past" : "");
-
-      const dateBlock = document.createElement("div");
-      dateBlock.className = "match-date";
-      dateBlock.setAttribute("aria-hidden", "true");
-      const day = document.createElement("span");
-      day.className = "match-date__day";
-      day.textContent = dayFormatter.format(match.start);
-      const month = document.createElement("span");
-      month.className = "match-date__month";
-      month.textContent = monthFormatter.format(match.start).replace(".", "");
-      dateBlock.append(day, month);
-
-      const content = document.createElement("div");
-      const topline = document.createElement("div");
-      topline.className = "match-card__topline";
-      const stage = document.createElement("span");
-      stage.className = "badge" + (match.stage.type === "knockout" ? " badge--knockout" : "");
-      stage.textContent = match.stage.label;
-      topline.appendChild(stage);
-
-      if (match.pending) {
-        const pending = document.createElement("span");
-        pending.className = "badge badge--pending";
-        pending.textContent = "Por confirmar";
-        topline.appendChild(pending);
-      }
-
-      const flags = document.createElement("span");
-      flags.className = "match-card__flags";
-      flags.textContent = match.teams.map((team) => team.flag).join(" ");
-      topline.appendChild(flags);
-
-      const title = document.createElement("h3");
-      title.textContent = match.title;
-      const time = document.createElement("p");
-      time.className = "match-card__time";
-      time.textContent = match.allDay ? formatCompactDate(match) : `${formatCompactDate(match)} h`;
-      content.append(topline, title, time);
-
-      const competition = extractCompetition(match.description);
-      if (competition || match.location) {
-        const details = document.createElement("div");
-        details.className = "match-card__details";
-        if (competition) {
-          const phase = document.createElement("p");
-          const label = document.createElement("strong");
-          label.textContent = "Torneo: ";
-          phase.append(label, competition);
-          details.appendChild(phase);
-        }
-        if (match.location) {
-          const venue = document.createElement("p");
-          const label = document.createElement("strong");
-          label.textContent = "Sede: ";
-          venue.append(label, match.location);
-          details.appendChild(venue);
-        }
-        content.appendChild(details);
-      }
-
-      card.append(dateBlock, content);
-      return card;
-    }
-
-    function extractCompetition(description) {
-      return description
-        .split("\n")
-        .map((line) => line.trim())
-        .find(Boolean) || "";
-    }
-
-    function formatCompactDate(match) {
-      const parts = Object.fromEntries(
-        dateTimeFormatter
-          .formatToParts(match.start)
-          .filter((part) => part.type !== "literal")
-          .map((part) => [part.type, part.value.replace(".", "")])
-      );
-      const date = `${capitalizeFirst(parts.weekday)} ${parts.day} ${parts.month}`;
-      return match.allDay ? date : `${date} · ${parts.hour}:${parts.minute}`;
-    }
-
-    function formatFullDate(match) {
-      return `${capitalizeFirst(fullDateTimeFormatter.format(match.start).replace(",", " ·"))} h`;
-    }
-
-    function capitalizeFirst(value) {
-      return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
-    }
-
-    function formatMatchCount(count) {
-      return `${count} ${count === 1 ? "partido" : "partidos"}`;
-    }
-
-    async function loadCalendar({ initial = false } = {}) {
-      setLoading(true);
-      els.syncDot.classList.remove("sync-status__dot--ok");
-      els.syncText.textContent = "Actualizando tu calendario…";
-      if (initial) showState("loading");
-
-      try {
-        matches = parseMatches(await fetchIcs());
-        lastSuccessfulRefresh = Date.now();
-        if (matches.length === 0) {
-          showState("empty");
-        } else {
-          renderSchedule();
-        }
-        els.syncDot.classList.add("sync-status__dot--ok");
-        updateSyncText();
-      } catch (error) {
-        console.error(error);
-        if (matches.length > 0) {
-          els.syncText.textContent = "Sin conexión; mostrando los últimos datos";
-          showToast("No se pudo actualizar el calendario");
-        } else {
-          els.errorDetail.textContent = error.message || "Error desconocido";
-          els.syncText.textContent = "Error al conectar con el calendario";
-          showState("error");
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    function bindEvents() {
-      els.editTeams.addEventListener("click", openTeamPicker);
-      els.dialogClose.addEventListener("click", closeTeamPicker);
-      els.dialog.addEventListener("close", () => document.body.classList.remove("dialog-open"));
-      els.dialog.addEventListener("click", (event) => {
-        if (event.target === els.dialog) closeTeamPicker();
-      });
-      els.teamSearch.addEventListener("input", (event) => filterTeamOptions(event.target.value));
-      els.resetTeams.addEventListener("click", () => {
-        draftCodes = new Set(["ESP"]);
-        updatePicker();
-      });
-      els.applyTeams.addEventListener("click", applyTeamSelection);
-      els.copyFeed.addEventListener("click", copyFeedUrl);
-      els.refreshButton.addEventListener("click", () => loadCalendar());
-      els.timezoneSelect.addEventListener("change", (event) => {
-        changeTimezone(event.target.value);
-      });
-      for (const button of els.filterButtons) {
-        button.addEventListener("click", () => {
-          currentFilter = button.dataset.filter;
-          for (const item of els.filterButtons) {
-            item.classList.toggle("is-active", item === button);
-          }
-          if (matches.length) renderSchedule();
-        });
-      }
-    }
-
-    function startAutoRefresh() {
-      window.setInterval(() => loadCalendar(), REFRESH_INTERVAL_MS);
-      document.addEventListener("visibilitychange", () => {
-        const stale = Date.now() - lastSuccessfulRefresh >= REFRESH_INTERVAL_MS;
-        if (document.visibilityState === "visible" && stale && !els.refreshButton.disabled) {
-          loadCalendar();
-        }
-      });
-    }
-
-    createTimezoneSelector();
-    createTeamPicker();
-    renderSelection();
-    bindEvents();
-    loadCalendar({ initial: true });
-    startAutoRefresh();
-
-    // ================================================================
-    // PRO MODE — Análisis de cuotas y picks del modelo
-    // NOTA: esto es ofuscación de UI, no seguridad real. No guarda
-    // secretos sensibles. La lógica del modelo vive en el backend.
-    // ================================================================
-
-    const PRO_SESSION_KEY = "pro_unlocked_v1";
-    // Passphrase por defecto: "pro2026" (cámbiala si despliegas en producción)
-    const PRO_HASH = btoa("pro2026");
-
-    const proBackdrop = document.querySelector("#pro-backdrop");
-    const proClose = document.querySelector("#pro-close");
-    const proRefresh = document.querySelector("#pro-refresh");
-    const proGenerated = document.querySelector("#pro-generated");
-    const picksGrid = document.querySelector("#picks-grid");
-    const overroundList = document.querySelector("#overround-list");
-    const ppDialog = document.querySelector("#passphrase-dialog");
-    const ppInput = document.querySelector("#pp-input");
-    const ppError = document.querySelector("#pp-error");
-    const ppCancel = document.querySelector("#pp-cancel");
-    const ppConfirm = document.querySelector("#pp-confirm");
-
-    let proData = null;
-
-    function isProUnlocked() {
-      return sessionStorage.getItem(PRO_SESSION_KEY) === "1";
-    }
-
-    function unlockPro() {
-      sessionStorage.setItem(PRO_SESSION_KEY, "1");
-      ppDialog.close();
-      openProPanel();
-    }
-
-    function checkPassphrase(value) {
-      return btoa(value.trim()) === PRO_HASH;
-    }
-
-    function openPassphraseDialog() {
-      ppInput.value = "";
-      ppError.textContent = "";
-      ppDialog.showModal();
-      ppInput.focus();
-    }
-
-    function openProPanel() {
-      proBackdrop.hidden = false;
-      document.body.style.overflow = "hidden";
-      if (!proData) {
-        loadPicks();
-      }
-    }
-
-    function closeProPanel() {
-      proBackdrop.hidden = true;
-      document.body.style.overflow = "";
-    }
-
-    function tryOpenPro() {
-      if (isProUnlocked()) {
-        openProPanel();
-      } else {
-        openPassphraseDialog();
-      }
-    }
-
-    // ── Fetch picks ───────────────────────────────────────────────────
-
-    async function loadPicks() {
-      proRefresh.disabled = true;
-      proRefresh.classList.add("is-loading");
-      picksGrid.innerHTML = '<p style="color:var(--muted);font-size:.8rem">Cargando análisis…</p>';
-
-      try {
-        const res = await fetch("/api/picks");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        proData = await res.json();
-        renderProPanel(proData);
-      } catch (err) {
-        picksGrid.innerHTML = `<p style="color:var(--red);font-size:.8rem">Error al cargar picks: ${err.message}</p>`;
-      } finally {
-        proRefresh.disabled = false;
-        proRefresh.classList.remove("is-loading");
-      }
-    }
-
-    // ── Render ────────────────────────────────────────────────────────
-
-    const BAND_META = {
-      "alta_prob_75": { letter: "C", label: "Banda C · ~75% prob. estimada", color: "C" },
-      "media_prob_55": { letter: "B", label: "Banda B · ~55% prob. estimada", color: "B" },
-      "baja_prob_30": { letter: "A", label: "Banda A · ~30% prob. estimada", color: "A" },
-    };
-
-    function renderProPanel(data) {
-      // Header
-      const ts = data.generated_at ? new Date(data.generated_at) : null;
-      proGenerated.textContent = ts
-        ? `Generado: ${ts.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}${data.is_demo ? " · modo demo" : ""}`
-        : "";
-
-      // Picks
-      picksGrid.innerHTML = "";
-      const picks = data.picks || [];
-      if (!picks.length) {
-        picksGrid.innerHTML = '<p style="color:var(--muted);font-size:.82rem">No hay picks disponibles hoy.</p>';
-      }
-
-      for (const pick of picks) {
-        picksGrid.appendChild(renderPickCard(pick));
-      }
-
-      // Market analytics
-      overroundList.innerHTML = "";
-      const ov = data.analitica_mercado?.overround_por_casa || {};
-      const best = data.analitica_mercado?.mejor_casa_precio;
-      const maxOv = Math.max(...Object.values(ov), 0.10);
-
-      for (const [bk, margin] of Object.entries(ov)) {
-        const row = document.createElement("div");
-        row.className = "overround-row";
-        const isBest = bk === best;
-        const pct = ((margin * 100)).toFixed(1);
-        row.innerHTML = `
-          <span class="overround-row__name">${bk}${isBest ? " ★" : ""}</span>
-          <div class="overround-bar-wrap">
-            <div class="overround-bar${isBest ? " overround-bar--best" : ""}"
-                 style="width:${Math.min((margin / maxOv) * 100, 100).toFixed(1)}%"></div>
-          </div>
-          <span class="overround-row__pct">${pct}%</span>
-        `;
-        overroundList.appendChild(row);
-      }
-    }
-
-    function renderPickCard(pick) {
-      const card = document.createElement("article");
-      const meta = BAND_META[pick.banda] || { letter: "?", label: pick.banda, color: "B" };
-      card.className = `pick-card pick-card--${meta.color}`;
-
-      if (pick.sin_valor) {
-        card.innerHTML = `
-          <div class="pick-card__band">
-            <span class="pick-card__band-dot"></span>
-            ${meta.label}
-          </div>
-          <p class="pick-card__market" style="margin:0">${pick.mensaje || "Sin picks con valor hoy."}</p>
-        `;
-        return card;
-      }
-
-      const edgeClass = pick.edge_pp >= 0 ? "pos" : "neg";
-      const evClass = pick.ev >= 0 ? "pos" : "neg";
-      const ciStr = pick.banda_confianza
-        ? `[${(pick.banda_confianza[0] * 100).toFixed(0)}%–${(pick.banda_confianza[1] * 100).toFixed(0)}%]`
-        : "";
-
-      card.innerHTML = `
-        <div class="pick-card__band">
-          <span class="pick-card__band-dot"></span>
-          ${meta.label}
-        </div>
-        <h3 class="pick-card__match">${pick.partido}</h3>
-        <p class="pick-card__market">${pick.mercado} · ${pick.fecha || ""}</p>
-        <div class="pick-metrics">
-          <div class="pick-metric">
-            <span class="pick-metric__label">Mejor cuota</span>
-            <span class="pick-metric__value">${pick.mejor_cuota?.toFixed(2) ?? "—"}</span>
-          </div>
-          <div class="pick-metric">
-            <span class="pick-metric__label">Casa</span>
-            <span class="pick-metric__value" style="font-size:.82rem">${pick.casa ?? "—"}</span>
-          </div>
-          <div class="pick-metric">
-            <span class="pick-metric__label">Prob. modelo</span>
-            <span class="pick-metric__value">${((pick.prob_modelo ?? 0) * 100).toFixed(0)}%</span>
-          </div>
-          <div class="pick-metric">
-            <span class="pick-metric__label">Prob. impl.</span>
-            <span class="pick-metric__value">${((pick.prob_implicita_justa ?? 0) * 100).toFixed(0)}%</span>
-          </div>
-          <div class="pick-metric">
-            <span class="pick-metric__label">Edge</span>
-            <span class="pick-metric__value pick-metric__value--${edgeClass}">${pick.edge_pp != null ? (pick.edge_pp >= 0 ? "+" : "") + pick.edge_pp.toFixed(1) + "pp" : "—"}</span>
-          </div>
-          <div class="pick-metric">
-            <span class="pick-metric__label">EV</span>
-            <span class="pick-metric__value pick-metric__value--${evClass}">${pick.ev != null ? (pick.ev >= 0 ? "+" : "") + pick.ev.toFixed(3) : "—"}</span>
-          </div>
-        </div>
-        ${ciStr ? `<p class="pick-card__ci">IC 95% prob.: <strong>${ciStr}</strong></p>` : ""}
-        <div class="pick-card__stake">
-          <div class="stake-item">
-            <span>Stake plano</span>
-            <strong>${pick.stake_plano_eur?.toFixed(0) ?? 10}€</strong>
-          </div>
-          <div class="stake-item">
-            <span>Kelly ¼ (${((pick.kelly_frac ?? 0) * 100).toFixed(1)}%)</span>
-            <strong>${pick.stake_kelly_eur?.toFixed(0) ?? "—"}€</strong>
-          </div>
-        </div>
-      `;
-      return card;
-    }
-
-    // ── Konami code ───────────────────────────────────────────────────
-    // Secuencia: ↑↑↓↓←→←→ba (bonus trigger)
-    const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
-    let konamiIdx = 0;
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === KONAMI[konamiIdx]) {
-        konamiIdx++;
-        if (konamiIdx === KONAMI.length) {
-          konamiIdx = 0;
-          tryOpenPro();
-        }
-      } else {
-        konamiIdx = e.key === KONAMI[0] ? 1 : 0;
-      }
+  } finally {
+    setRefreshing(false);
+  }
+}
+
+// ── TEAM PICKER ──────────────────────────────────────────────────────────────
+function buildTeamGrid() {
+  E.teamGrid.innerHTML = "";
+  for (const team of TEAMS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.dataset.code = team.code;
+    btn.className = `team-opt${draftCodes.has(team.code) ? " sel" : ""}`;
+    btn.setAttribute("aria-pressed", String(draftCodes.has(team.code)));
+    btn.innerHTML = `<span class="team-flag" aria-hidden="true">${team.flag}</span><span class="team-name">${team.name}</span><span class="team-check" aria-hidden="true">✓</span>`;
+    btn.addEventListener("click", () => toggleTeam(team.code, btn));
+    E.teamGrid.appendChild(btn);
+  }
+  updatePickerCount();
+}
+
+function toggleTeam(code, btn) {
+  if (draftCodes.has(code)) {
+    draftCodes.delete(code);
+    btn.classList.remove("sel");
+    btn.setAttribute("aria-pressed", "false");
+  } else {
+    if (draftCodes.size >= MAX_TEAMS) { showToast(`Máximo ${MAX_TEAMS} equipos`); return; }
+    draftCodes.add(code);
+    btn.classList.add("sel");
+    btn.setAttribute("aria-pressed", "true");
+  }
+  updatePickerCount();
+}
+
+function updatePickerCount() {
+  const n = draftCodes.size;
+  E.pickerCount.textContent = `${n} de ${MAX_TEAMS} seleccionada${n !== 1 ? "s" : ""}`;
+}
+
+function filterTeams(q) {
+  const norm = q.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  E.teamGrid.querySelectorAll(".team-opt").forEach(btn => {
+    const name = btn.querySelector(".team-name").textContent
+      .normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    btn.hidden = !!(norm && !name.includes(norm));
+  });
+}
+
+function openPicker() {
+  draftCodes = new Set(selectedCodes);
+  buildTeamGrid();
+  E.teamSearch.value = "";
+  filterTeams("");
+  E.dialog.showModal();
+  document.body.classList.add("no-scroll");
+}
+
+function closePicker() {
+  E.dialog.close();
+  document.body.classList.remove("no-scroll");
+}
+
+function applyPicker() {
+  if (!draftCodes.size) { showToast("Elige al menos 1 equipo"); return; }
+  selectedCodes = [...draftCodes];
+  saveSelection();
+  updateBarFlags();
+  updateCalLinks();
+  closePicker();
+  loadCalendar({ initial: true });
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  if (toastTimer) clearTimeout(toastTimer);
+  E.toast.textContent = msg;
+  E.toast.classList.add("show");
+  toastTimer = setTimeout(() => E.toast.classList.remove("show"), 2800);
+}
+
+// ── COPY FEED ────────────────────────────────────────────────────────────────
+async function copyFeedUrl() {
+  try {
+    await navigator.clipboard.writeText(feedUrl(selectedCodes));
+    showToast("Feed copiado al portapapeles");
+  } catch { showToast("No se pudo copiar"); }
+}
+
+// ── TAB NAVIGATION ───────────────────────────────────────────────────────────
+function switchTab(name) {
+  const isCal = name === "cal";
+
+  E.pageCal.classList.toggle("active", isCal);
+  E.pagePro.classList.toggle("active", !isCal);
+  E.pageCal.hidden = !isCal;
+  E.pagePro.hidden = isCal;
+
+  E.tabCal.setAttribute("aria-selected", String(isCal));
+  E.tabPro.setAttribute("aria-selected", String(!isCal));
+  E.btmCal.setAttribute("aria-selected", String(isCal));
+  E.btmPro.setAttribute("aria-selected", String(!isCal));
+
+  if (!isCal && isProUnlocked() && !proData) loadPicks();
+}
+
+// ── PRO MODE ─────────────────────────────────────────────────────────────────
+function isProUnlocked() {
+  return sessionStorage.getItem(PRO_SESSION_KEY) === "1";
+}
+
+function unlockPro() {
+  sessionStorage.setItem(PRO_SESSION_KEY, "1");
+  E.authGate.hidden     = true;
+  E.picksContent.hidden = false;
+  loadPicks();
+}
+
+function checkPassphrase(v) {
+  try { return btoa(v.trim()) === PRO_HASH; } catch { return false; }
+}
+
+function initProGate() {
+  if (isProUnlocked()) {
+    E.authGate.hidden     = true;
+    E.picksContent.hidden = false;
+  }
+}
+
+// ── FETCH PICKS ──────────────────────────────────────────────────────────────
+async function loadPicks() {
+  E.proRefresh.disabled = true;
+  E.proRefresh.classList.add("loading");
+  E.picksGrid.innerHTML = `<p style="color:var(--txt-2);font-size:13px">Cargando análisis…</p>`;
+
+  try {
+    const res = await fetch("/api/picks");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    proData = await res.json();
+    renderPicks(proData);
+  } catch (err) {
+    E.picksGrid.innerHTML = `<p style="color:var(--pri);font-size:13px">Error al cargar: ${err.message}</p>`;
+  } finally {
+    E.proRefresh.disabled = false;
+    E.proRefresh.classList.remove("loading");
+  }
+}
+
+const BAND_META = {
+  alta_prob_75:  { code: "C", label: "Banda C · ~75%" },
+  media_prob_55: { code: "B", label: "Banda B · ~55%" },
+  baja_prob_30:  { code: "A", label: "Banda A · ~30%" },
+};
+
+function renderPicks(data) {
+  const ts = data.generated_at ? new Date(data.generated_at) : null;
+  E.proTs.textContent = ts
+    ? `Generado ${ts.toLocaleString("es-ES", { dateStyle:"short", timeStyle:"short" })}${data.is_demo ? " · demo" : ""}`
+    : "";
+
+  E.picksGrid.innerHTML = "";
+  for (const pick of (data.picks || [])) {
+    E.picksGrid.appendChild(buildPickCard(pick));
+  }
+
+  // Overround bars
+  E.ovList.innerHTML = "";
+  const ov   = data.analitica_mercado?.overround_por_casa || {};
+  const best = data.analitica_mercado?.mejor_casa_precio;
+  const max  = Math.max(...Object.values(ov).map(Number), 0.08);
+
+  for (const [bk, margin] of Object.entries(ov)) {
+    const isBest = bk === best;
+    const row = document.createElement("div");
+    row.className = "ov-row";
+    row.innerHTML = `
+      <span class="ov-name">${bk}${isBest ? " ★" : ""}</span>
+      <div class="ov-track"><div class="ov-fill${isBest ? " ov-fill--best" : ""}" style="width:${Math.min((margin/max)*100,100).toFixed(1)}%"></div></div>
+      <span class="ov-pct">${(margin*100).toFixed(1)}%</span>`;
+    E.ovList.appendChild(row);
+  }
+}
+
+function buildPickCard(pick) {
+  const meta = BAND_META[pick.banda] || { code: "B", label: pick.banda };
+  const card = document.createElement("article");
+  card.className = `pick-card pick-card--${meta.code}`;
+
+  if (pick.sin_valor) {
+    card.classList.add("pick-card--empty");
+    card.innerHTML = `
+      <div class="pick-band"><span class="pick-band__dot"></span>${meta.label}</div>
+      <p class="pick-match">${pick.mensaje || "Sin picks con valor hoy."}</p>`;
+    return card;
+  }
+
+  const prob    = (pick.prob_modelo || 0) * 100;
+  const edgeCls = (pick.edge_pp || 0) >= 0 ? "pos" : "neg";
+  const evCls   = (pick.ev || 0) >= 0 ? "pos" : "neg";
+  const ciStr   = pick.banda_confianza
+    ? `[${(pick.banda_confianza[0]*100).toFixed(0)}%–${(pick.banda_confianza[1]*100).toFixed(0)}%]` : "";
+
+  card.innerHTML = `
+    <div class="pick-band"><span class="pick-band__dot"></span>${meta.label}</div>
+    <h3 class="pick-match">${pick.partido}</h3>
+    <p class="pick-market">${pick.mercado} · ${pick.fecha || ""}</p>
+    <div class="prob-track"><div class="prob-fill" style="width:${Math.min(prob,100).toFixed(1)}%"></div></div>
+    <div class="metrics">
+      <div class="metric"><span class="metric__l">Cuota</span><span class="metric__v">${(pick.mejor_cuota||0).toFixed(2)}</span></div>
+      <div class="metric"><span class="metric__l">Prob.</span><span class="metric__v">${prob.toFixed(0)}%</span></div>
+      <div class="metric"><span class="metric__l">Edge</span><span class="metric__v metric__v--${edgeCls}">${(pick.edge_pp||0)>=0?"+":""}${(pick.edge_pp||0).toFixed(1)}pp</span></div>
+      <div class="metric"><span class="metric__l">Impl.</span><span class="metric__v">${((pick.prob_implicita_justa||0)*100).toFixed(0)}%</span></div>
+      <div class="metric"><span class="metric__l">EV</span><span class="metric__v metric__v--${evCls}">${(pick.ev||0)>=0?"+":""}${(pick.ev||0).toFixed(3)}</span></div>
+      <div class="metric"><span class="metric__l">Casa</span><span class="metric__v" style="font-size:11px;letter-spacing:0">${pick.casa||"—"}</span></div>
+    </div>
+    ${ciStr ? `<p class="pick-ci">IC 95%: <strong>${ciStr}</strong></p>` : ""}
+    <div class="pick-stake">
+      <div><span>Plano</span><strong>${(pick.stake_plano_eur||10).toFixed(0)}€</strong></div>
+      <div><span>Kelly ¼ (${((pick.kelly_frac||0)*100).toFixed(1)}%)</span><strong>${(pick.stake_kelly_eur||0).toFixed(0)}€</strong></div>
+    </div>`;
+  return card;
+}
+
+// ── KONAMI CODE ───────────────────────────────────────────────────────────────
+const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+let ki = 0;
+document.addEventListener("keydown", e => {
+  ki = e.key === KONAMI[ki] ? ki + 1 : (e.key === KONAMI[0] ? 1 : 0);
+  if (ki === KONAMI.length) { ki = 0; switchTab("pro"); unlockPro(); }
+});
+
+// ── BIND EVENTS ───────────────────────────────────────────────────────────────
+function bindEvents() {
+  E.editTeams.addEventListener("click", openPicker);
+  E.refreshBtn.addEventListener("click", () => loadCalendar());
+  E.copyFeed.addEventListener("click", copyFeedUrl);
+
+  document.querySelectorAll(".filter-pill").forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentFilter = btn.dataset.filter;
+      document.querySelectorAll(".filter-pill").forEach(b => b.classList.toggle("active", b === btn));
+      if (allMatches.length) applyFilter();
     });
+  });
 
-    // ── URL param detection (?mode=pro) ───────────────────────────────
-    if (new URLSearchParams(window.location.search).get("mode") === "pro") {
-      tryOpenPro();
+  E.tabCal.addEventListener("click", () => switchTab("cal"));
+  E.tabPro.addEventListener("click", () => switchTab("pro"));
+  E.btmCal.addEventListener("click", () => switchTab("cal"));
+  E.btmPro.addEventListener("click", () => switchTab("pro"));
+
+  E.dlgClose.addEventListener("click", closePicker);
+  E.dialog.addEventListener("close", () => document.body.classList.remove("no-scroll"));
+  E.dialog.addEventListener("click", e => { if (e.target === E.dialog) closePicker(); });
+  E.teamSearch.addEventListener("input", e => filterTeams(e.target.value));
+  E.resetTeams.addEventListener("click", () => { draftCodes = new Set(["ESP"]); buildTeamGrid(); });
+  E.applyTeams.addEventListener("click", applyPicker);
+
+  E.authSubmit.addEventListener("click", () => {
+    if (checkPassphrase(E.authInput.value)) {
+      E.authError.textContent = "";
+      unlockPro();
+    } else {
+      E.authError.textContent = "Clave incorrecta.";
+      E.authInput.focus();
     }
+  });
+  E.authInput.addEventListener("keydown", e => { if (e.key === "Enter") E.authSubmit.click(); });
 
-    // ── Event bindings ────────────────────────────────────────────────
+  E.proRefresh.addEventListener("click", () => { proData = null; loadPicks(); });
+}
 
-    proClose.addEventListener("click", closeProPanel);
-    proBackdrop.addEventListener("click", (e) => {
-      if (e.target === proBackdrop) closeProPanel();
-    });
-    proRefresh.addEventListener("click", () => {
-      proData = null;
-      loadPicks();
-    });
+// ── AUTO REFRESH ──────────────────────────────────────────────────────────────
+function startAutoRefresh() {
+  setInterval(() => loadCalendar(), REFRESH_MS);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && Date.now() - lastRefresh >= REFRESH_MS) {
+      loadCalendar();
+    }
+  });
+}
 
-    ppConfirm.addEventListener("click", () => {
-      if (checkPassphrase(ppInput.value)) {
-        ppError.textContent = "";
-        unlockPro();
-      } else {
-        ppError.textContent = "Clave incorrecta. Inténtalo de nuevo.";
-        ppInput.focus();
-      }
-    });
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
-    ppInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") ppConfirm.click();
-      if (e.key === "Escape") ppDialog.close();
-    });
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+updateBarFlags();
+updateCalLinks();
+bindEvents();
+initProGate();
+loadCalendar({ initial: true });
+startAutoRefresh();
 
-    ppCancel.addEventListener("click", () => ppDialog.close());
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !proBackdrop.hidden) closeProPanel();
-    });
-  </script>
+if (new URLSearchParams(location.search).get("mode") === "pro") {
+  switchTab("pro");
+}
+</script>
 </body>
 </html>
