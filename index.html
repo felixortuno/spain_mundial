@@ -341,6 +341,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 12px;
       margin-bottom: 17px;
     }
@@ -368,8 +369,53 @@
       box-shadow: 0 0 0 5px rgba(69, 213, 151, 0.1);
     }
 
+    .toolbar__actions {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timezone-control {
+      position: relative;
+      display: flex;
+      min-width: 0;
+      flex: 1 1 auto;
+      align-items: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      color: var(--muted);
+    }
+
+    .timezone-control__icon {
+      flex: 0 0 auto;
+      font-size: .85rem;
+    }
+
+    .timezone-select {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: .72rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .timezone-select option {
+      background: var(--panel);
+      color: var(--text);
+    }
+
     .refresh-button {
       display: inline-flex;
+      flex: 0 0 auto;
       min-height: 40px;
       align-items: center;
       justify-content: center;
@@ -993,6 +1039,19 @@
         padding-bottom: 42px;
       }
 
+      .toolbar {
+        flex-wrap: nowrap;
+      }
+
+      .toolbar__actions {
+        width: auto;
+      }
+
+      .timezone-control {
+        width: 225px;
+        flex: 0 0 225px;
+      }
+
       .hero__grid {
         gap: 30px;
       }
@@ -1117,13 +1176,19 @@
         <span id="sync-dot" class="sync-status__dot" aria-hidden="true"></span>
         <span id="sync-text">Preparando tu Mundial…</span>
       </p>
-      <button id="refresh-button" class="refresh-button" type="button">
-        <svg class="refresh-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
-        </svg>
-        <span>Actualizar</span>
-      </button>
+      <div class="toolbar__actions">
+        <label class="timezone-control" for="timezone-select">
+          <span class="timezone-control__icon" aria-hidden="true">◷</span>
+          <select id="timezone-select" class="timezone-select" aria-label="Zona horaria"></select>
+        </label>
+        <button id="refresh-button" class="refresh-button" type="button">
+          <svg class="refresh-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+          </svg>
+          <span>Actualizar</span>
+        </button>
+      </div>
     </div>
 
     <section id="stats" class="stats" aria-label="Resumen del calendario">
@@ -1209,8 +1274,8 @@
     </div>
   </main>
 
-  <footer class="shell footer">
-    Horarios en Europe/Madrid · Máximo 8 selecciones por calendario.
+  <footer id="page-footer" class="shell footer">
+    Horarios en tu zona local · Máximo 8 selecciones por calendario.
   </footer>
 
   <dialog id="team-dialog" aria-labelledby="picker-title">
@@ -1242,10 +1307,31 @@
     // CONFIGURACIÓN
     // ================================================================
     const FEED_PATH = "/api/calendar";
-    const TIMEZONE = "Europe/Madrid";
     const MAX_SELECTED_TEAMS = 8;
     const REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000;
     const STORAGE_KEY = "mundial-2026-selected-teams";
+    const TIMEZONE_STORAGE_KEY = "mundial-2026-timezone";
+
+    const TIMEZONES = [
+      ["Europe/Madrid", "Madrid · Europa Central"],
+      ["Europe/London", "Londres"],
+      ["America/New_York", "Nueva York · Este"],
+      ["America/Chicago", "Chicago · Centro"],
+      ["America/Denver", "Denver · Montaña"],
+      ["America/Los_Angeles", "Los Ángeles · Pacífico"],
+      ["America/Toronto", "Toronto"],
+      ["America/Vancouver", "Vancouver"],
+      ["America/Mexico_City", "Ciudad de México"],
+      ["America/Bogota", "Bogotá"],
+      ["America/Lima", "Lima"],
+      ["America/Santiago", "Santiago"],
+      ["America/Argentina/Buenos_Aires", "Buenos Aires"],
+      ["America/Sao_Paulo", "São Paulo"],
+      ["Asia/Tokyo", "Tokio"],
+      ["Asia/Seoul", "Seúl"],
+      ["Australia/Sydney", "Sídney"],
+      ["UTC", "UTC"]
+    ];
 
     const TEAMS = [
       ["ALG", "Argelia", "🇩🇿", "África"],
@@ -1309,6 +1395,7 @@
       outlookLink: document.querySelector("#outlook-link"),
       copyFeed: document.querySelector("#copy-feed"),
       refreshButton: document.querySelector("#refresh-button"),
+      timezoneSelect: document.querySelector("#timezone-select"),
       syncDot: document.querySelector("#sync-dot"),
       syncText: document.querySelector("#sync-text"),
       stats: document.querySelector("#stats"),
@@ -1342,45 +1429,19 @@
       pickerCount: document.querySelector("#picker-count"),
       resetTeams: document.querySelector("#reset-teams"),
       applyTeams: document.querySelector("#apply-teams"),
+      pageFooter: document.querySelector("#page-footer"),
       toast: document.querySelector("#toast")
     };
 
-    const dateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
-      timeZone: TIMEZONE,
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    });
-    const fullDateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
-      timeZone: TIMEZONE,
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    });
-    const dayFormatter = new Intl.DateTimeFormat("es-ES", {
-      timeZone: TIMEZONE,
-      day: "2-digit"
-    });
-    const monthFormatter = new Intl.DateTimeFormat("es-ES", {
-      timeZone: TIMEZONE,
-      month: "short"
-    });
-    const shortDateFormatter = new Intl.DateTimeFormat("es-ES", {
-      timeZone: TIMEZONE,
-      day: "numeric",
-      month: "short"
-    });
-    const lastUpdateFormatter = new Intl.DateTimeFormat("es-ES", {
-      timeZone: TIMEZONE,
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    let currentTimezone = readInitialTimezone();
+    let dateTimeFormatter;
+    let fullDateTimeFormatter;
+    let dayFormatter;
+    let monthFormatter;
+    let shortDateFormatter;
+    let lastUpdateFormatter;
+
+    configureDateFormatters();
 
     let selectedCodes = readInitialSelection();
     let draftCodes = new Set(selectedCodes);
@@ -1391,6 +1452,120 @@
     let lastSuccessfulRefresh = 0;
     let countdownTimer = null;
     let toastTimer = null;
+
+    function isValidTimezone(value) {
+      try {
+        new Intl.DateTimeFormat("es-ES", { timeZone: value }).format();
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function readInitialTimezone() {
+      const detected = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+      const stored = localStorage.getItem(TIMEZONE_STORAGE_KEY);
+      return stored && isValidTimezone(stored) ? stored : detected;
+    }
+
+    function configureDateFormatters() {
+      dateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
+        timeZone: currentTimezone,
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      });
+      fullDateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
+        timeZone: currentTimezone,
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      });
+      dayFormatter = new Intl.DateTimeFormat("es-ES", {
+        timeZone: currentTimezone,
+        day: "2-digit"
+      });
+      monthFormatter = new Intl.DateTimeFormat("es-ES", {
+        timeZone: currentTimezone,
+        month: "short"
+      });
+      shortDateFormatter = new Intl.DateTimeFormat("es-ES", {
+        timeZone: currentTimezone,
+        day: "numeric",
+        month: "short"
+      });
+      lastUpdateFormatter = new Intl.DateTimeFormat("es-ES", {
+        timeZone: currentTimezone,
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function timezoneLabel(value) {
+      const configured = TIMEZONES.find(([timezone]) => timezone === value);
+      return configured
+        ? configured[1]
+        : value.replace(/_/g, " ").replace("/", " · ");
+    }
+
+    function createTimezoneSelector() {
+      const detected = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+      const zones = [[detected, `Mi zona · ${timezoneLabel(detected)}`]];
+
+      for (const timezone of TIMEZONES) {
+        if (timezone[0] !== detected) zones.push(timezone);
+      }
+
+      if (!zones.some(([timezone]) => timezone === currentTimezone)) {
+        zones.unshift([currentTimezone, timezoneLabel(currentTimezone)]);
+      }
+
+      els.timezoneSelect.replaceChildren(
+        ...zones.map(([value, label]) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = label;
+          return option;
+        })
+      );
+      els.timezoneSelect.value = currentTimezone;
+      updateTimezoneUi();
+    }
+
+    function updateTimezoneUi() {
+      els.pageFooter.textContent =
+        `Horarios en ${timezoneLabel(currentTimezone)} (${currentTimezone}) · ` +
+        "Máximo 8 selecciones por calendario.";
+    }
+
+    function updateSyncText() {
+      if (!lastSuccessfulRefresh) return;
+      const source =
+        calendarSource === "api-football"
+          ? " · API-Football"
+          : calendarSource === "ics-fallback"
+            ? " · datos en vivo"
+            : "";
+      els.syncText.textContent =
+        `Actualizado a las ${lastUpdateFormatter.format(lastSuccessfulRefresh)}${source}`;
+    }
+
+    function changeTimezone(value) {
+      if (!isValidTimezone(value)) return;
+      currentTimezone = value;
+      localStorage.setItem(TIMEZONE_STORAGE_KEY, value);
+      configureDateFormatters();
+      updateTimezoneUi();
+      updateSyncText();
+      if (matches.length) renderSchedule();
+      showToast(`Horarios en ${timezoneLabel(value)}`);
+    }
 
     function readInitialSelection() {
       const fromUrl = new URLSearchParams(window.location.search).get("teams");
@@ -1915,14 +2090,7 @@
           renderSchedule();
         }
         els.syncDot.classList.add("sync-status__dot--ok");
-        const source =
-          calendarSource === "api-football"
-            ? " · API-Football"
-            : calendarSource === "ics-fallback"
-              ? " · datos en vivo"
-              : "";
-        els.syncText.textContent =
-          `Actualizado a las ${lastUpdateFormatter.format(lastSuccessfulRefresh)}${source}`;
+        updateSyncText();
       } catch (error) {
         console.error(error);
         if (matches.length > 0) {
@@ -1953,6 +2121,9 @@
       els.applyTeams.addEventListener("click", applyTeamSelection);
       els.copyFeed.addEventListener("click", copyFeedUrl);
       els.refreshButton.addEventListener("click", () => loadCalendar());
+      els.timezoneSelect.addEventListener("change", (event) => {
+        changeTimezone(event.target.value);
+      });
       for (const button of els.filterButtons) {
         button.addEventListener("click", () => {
           currentFilter = button.dataset.filter;
@@ -1974,6 +2145,7 @@
       });
     }
 
+    createTimezoneSelector();
     createTeamPicker();
     renderSelection();
     bindEvents();
