@@ -886,13 +886,12 @@
     // CONFIGURACIÓN: personaliza estas constantes antes de publicar.
     // ================================================================
 
-    // URL del feed ICS auto-actualizable de la selección española.
-    // Sustituir por un feed real por equipo (p.ej. de un servicio de fixtures
-    // filtrado a "Spain", o un feed propio alojado en GitHub Pages).
-    const FEED_URL = "https://EJEMPLO.com/spain-world-cup-2026.ics";
+    // URL pública del feed ICS auto-actualizable de la selección española.
+    // En Vercel, /api/calendar consulta el proveedor y filtra el Mundial 2026.
+    const FEED_URL = "https://spain-mundial.vercel.app/api/calendar";
 
     // Proxy CORS opcional (necesario si el feed no envía cabeceras CORS).
-    // Dejar "" para intentar fetch directo primero.
+    // Este feed ya se sirve desde Vercel con CORS habilitado.
     const CORS_PROXY = ""; // p.ej. "https://corsproxy.io/?url="
 
     const CALENDAR_NAME = "España · Mundial 2026";
@@ -1163,7 +1162,7 @@
       const description = cleanText(event.description || "");
       const location = cleanText(event.location || "");
       const combinedText = `${summary}\n${description}`;
-      const stage = detectStage(combinedText);
+      const stage = detectStage(combinedText, start);
 
       return {
         uid: event.uid || `${start.toISOString()}-${summary}`,
@@ -1207,7 +1206,7 @@
         .toLowerCase();
     }
 
-    function detectStage(value) {
+    function detectStage(value, start) {
       const text = normalizeText(value);
 
       const knockoutPatterns = [
@@ -1226,6 +1225,10 @@
       }
 
       if (/\b(fase de grupos?|group stage|grupo [a-l])\b/.test(text)) {
+        return { type: "group", label: "Fase de grupos" };
+      }
+
+      if (start instanceof Date && start < new Date("2026-06-28T00:00:00Z")) {
         return { type: "group", label: "Fase de grupos" };
       }
 
