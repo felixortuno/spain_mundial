@@ -978,6 +978,7 @@
     let matches = [];
     let nextMatch = null;
     let lastSuccessfulRefresh = 0;
+    let calendarSource = "";
     let countdownTimer = null;
     let toastTimer = null;
 
@@ -1088,6 +1089,7 @@
             throw new Error("la respuesta no parece un calendario ICS");
           }
 
+          calendarSource = response.headers.get("X-Calendar-Source") || "";
           return text;
         } catch (error) {
           failures.push(`${attempt.label}: ${humanizeError(error)}`);
@@ -1460,8 +1462,15 @@
         }
 
         els.syncDot.classList.add("sync-status__dot--ok");
+        const sourceLabel =
+          calendarSource === "api-football"
+            ? " · API-Football"
+            : calendarSource === "ics-fallback"
+              ? " · feed de respaldo"
+              : "";
         els.syncText.textContent =
-          `Actualizado a las ${lastUpdateFormatter.format(lastSuccessfulRefresh)}`;
+          `Actualizado a las ${lastUpdateFormatter.format(lastSuccessfulRefresh)}` +
+          sourceLabel;
       } catch (error) {
         console.error(error);
 
