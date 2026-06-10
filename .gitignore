@@ -3,3 +3,10 @@
 .env
 .env.*
 !.env.example
+
+# ML: datos descargados y modelos entrenados (no versionar binarios grandes)
+ml/data/
+ml/models/
+ml/__pycache__/
+*.pkl
+*.png

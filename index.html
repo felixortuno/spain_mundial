@@ -1116,6 +1116,286 @@
         animation-iteration-count: 1 !important;
       }
     }
+
+    /* ── Pro Mode Panel ─────────────────────────────────────────────── */
+
+    .pro-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      background: rgba(3, 4, 8, .82);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .pro-backdrop[hidden] { display: none; }
+
+    .pro-panel {
+      position: relative;
+      width: min(100%, 860px);
+      max-height: 88vh;
+      overflow-y: auto;
+      border: 1px solid var(--line-strong);
+      border-radius: 26px 26px 20px 20px;
+      background: var(--panel);
+      box-shadow: 0 -20px 80px rgba(0,0,0,.65), 0 0 0 1px rgba(255,212,71,.07);
+      scrollbar-width: thin;
+    }
+
+    .pro-panel__header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-glass);
+      backdrop-filter: blur(14px);
+    }
+
+    .pro-panel__title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .82rem;
+      font-weight: 900;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--yellow);
+    }
+
+    .pro-panel__badge {
+      display: inline-flex;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255,212,71,.12);
+      font-size: .58rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+    }
+
+    .pro-panel__close {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--bg-soft);
+      color: var(--text);
+      font-size: 1.05rem;
+    }
+
+    .pro-panel__body { padding: 20px; }
+
+    .pro-panel__refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      color: var(--text);
+      font-size: .74rem;
+      font-weight: 850;
+      margin-bottom: 20px;
+    }
+
+    .pro-panel__refresh:disabled { opacity: .5; cursor: wait; }
+    .pro-panel__refresh.is-loading .refresh-icon { animation: spin 850ms linear infinite; }
+
+    .pro-generated {
+      margin: -8px 0 16px;
+      color: var(--muted);
+      font-size: .68rem;
+    }
+
+    .picks-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+
+    .pick-card {
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: linear-gradient(145deg, var(--panel), rgba(21,25,37,.7));
+    }
+
+    .pick-card--A { border-left: 3px solid #f97316; }
+    .pick-card--B { border-left: 3px solid var(--blue); }
+    .pick-card--C { border-left: 3px solid var(--green); }
+
+    .pick-card__band {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      font-size: .61rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .pick-card__band-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex: 0 0 8px;
+    }
+
+    .pick-card--A .pick-card__band-dot { background: #f97316; }
+    .pick-card--B .pick-card__band-dot { background: var(--blue); }
+    .pick-card--C .pick-card__band-dot { background: var(--green); }
+
+    .pick-card__match {
+      font-size: 1.05rem; font-weight: 900; letter-spacing: -.025em;
+      margin: 0 0 4px;
+    }
+
+    .pick-card__market { font-size: .8rem; color: var(--muted); margin: 0 0 14px; }
+
+    .pick-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(98px, 1fr));
+      gap: 8px;
+    }
+
+    .pick-metric {
+      padding: 9px 10px;
+      border-radius: 11px;
+      background: var(--bg-soft);
+    }
+
+    .pick-metric__label {
+      display: block;
+      color: var(--muted);
+      font-size: .58rem; font-weight: 850;
+      letter-spacing: .07em; text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .pick-metric__value {
+      display: block;
+      font-size: 1.05rem; font-weight: 900; letter-spacing: -.03em;
+    }
+
+    .pick-metric__value--pos { color: var(--green); }
+    .pick-metric__value--neg { color: var(--red); }
+
+    .pick-card__ci {
+      margin-top: 10px;
+      font-size: .68rem; color: var(--muted);
+    }
+
+    .pick-card__stake {
+      margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid var(--line);
+      display: flex; gap: 14px; flex-wrap: wrap;
+    }
+
+    .stake-item { font-size: .72rem; color: var(--muted); }
+    .stake-item strong { display: block; color: var(--text); font-size: .9rem; font-weight: 900; }
+
+    .analytics-section { margin-top: 4px; }
+
+    .analytics-section h3 {
+      margin: 0 0 12px;
+      font-size: .82rem; font-weight: 900;
+      letter-spacing: .07em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .overround-list { display: grid; gap: 8px; }
+
+    .overround-row { display: flex; align-items: center; gap: 10px; }
+
+    .overround-row__name {
+      width: 110px; flex: 0 0 110px;
+      font-size: .75rem; font-weight: 800;
+    }
+
+    .overround-bar-wrap {
+      flex: 1; height: 6px; border-radius: 99px;
+      background: var(--bg-soft); overflow: hidden;
+    }
+
+    .overround-bar {
+      height: 100%; border-radius: 99px;
+      background: var(--red);
+      transition: width 600ms ease;
+    }
+
+    .overround-bar--best { background: var(--green); }
+
+    .overround-row__pct {
+      width: 44px; text-align: right;
+      font-size: .72rem; font-weight: 850; color: var(--muted);
+    }
+
+    .rg-notice {
+      margin-top: 22px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,212,71,.15);
+      border-radius: var(--radius-sm);
+      background: rgba(255,212,71,.05);
+      font-size: .72rem; color: var(--muted); line-height: 1.6;
+    }
+
+    .rg-notice a { color: var(--yellow); text-decoration: underline; text-underline-offset: 2px; }
+
+    .passphrase-dialog {
+      width: min(100% - 32px, 400px);
+      padding: 28px 24px;
+      border: 1px solid var(--line-strong);
+      border-radius: 22px;
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: 0 32px 100px rgba(0,0,0,.65);
+    }
+
+    .passphrase-dialog::backdrop {
+      background: rgba(3, 4, 8, .8);
+      backdrop-filter: blur(8px);
+    }
+
+    .passphrase-dialog h2 { margin: 0 0 6px; font-size: 1.2rem; letter-spacing: -.03em; }
+    .passphrase-dialog p { margin: 0 0 18px; color: var(--muted); font-size: .8rem; }
+
+    .passphrase-dialog input {
+      display: block; width: 100%;
+      min-height: 44px; padding: 10px 14px; margin-bottom: 8px;
+      border: 1px solid var(--line); border-radius: 12px;
+      background: var(--bg-soft); color: var(--text); font-size: .9rem;
+      font-family: inherit;
+    }
+
+    .passphrase-dialog input:focus {
+      outline: none; border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(255,212,71,.1);
+    }
+
+    .passphrase-dialog__error {
+      display: block; margin-bottom: 10px;
+      color: var(--red); font-size: .74rem; min-height: 1.1em;
+    }
+
+    .passphrase-dialog__actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+    .passphrase-dialog__cancel {
+      padding: 9px 14px; border: 1px solid var(--line);
+      border-radius: 11px; background: transparent;
+      color: var(--muted); font-size: .78rem; font-weight: 850;
+    }
+
+    .passphrase-dialog__confirm {
+      padding: 9px 18px; border: none;
+      border-radius: 11px; background: var(--yellow);
+      color: #1a1820; font-size: .78rem; font-weight: 900;
+    }
   </style>
 </head>
 <body>
@@ -1300,6 +1580,62 @@
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- ── Pro Mode: Passphrase dialog ───────────────────────────────────── -->
+  <!--
+    NOTA DE SEGURIDAD: este panel es ofuscación de UI, NO seguridad real.
+    No hay secretos en el cliente. La lógica del modelo vive en el backend.
+    La passphrase está en el código fuente; no la uses para datos sensibles.
+  -->
+  <dialog id="passphrase-dialog" class="passphrase-dialog" aria-labelledby="pp-title">
+    <h2 id="pp-title">Modo Análisis Pro</h2>
+    <p>Introduce la clave de acceso para ver los picks del modelo y la analítica de mercado.</p>
+    <input id="pp-input" type="password" placeholder="Clave de acceso…" autocomplete="off">
+    <span id="pp-error" class="passphrase-dialog__error" role="alert"></span>
+    <div class="passphrase-dialog__actions">
+      <button id="pp-cancel" class="passphrase-dialog__cancel" type="button">Cancelar</button>
+      <button id="pp-confirm" class="passphrase-dialog__confirm" type="button">Acceder</button>
+    </div>
+  </dialog>
+
+  <!-- ── Pro Mode: Panel overlay ───────────────────────────────────────── -->
+  <div id="pro-backdrop" class="pro-backdrop" hidden aria-label="Panel de análisis pro">
+    <section class="pro-panel" role="region" aria-labelledby="pro-panel-title">
+      <div class="pro-panel__header">
+        <div class="pro-panel__title">
+          <span>Análisis de mercado</span>
+          <span class="pro-panel__badge">PRO</span>
+        </div>
+        <button id="pro-close" class="pro-panel__close" type="button" aria-label="Cerrar panel">×</button>
+      </div>
+
+      <div class="pro-panel__body">
+        <button id="pro-refresh" class="pro-panel__refresh" type="button">
+          <svg class="refresh-icon" viewBox="0 0 24 24" aria-hidden="true" width="15" height="15">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+          </svg>
+          Actualizar picks
+        </button>
+        <p id="pro-generated" class="pro-generated"></p>
+
+        <div id="picks-grid" class="picks-grid"></div>
+
+        <div class="analytics-section">
+          <h3>Analítica de mercado · Overround por casa</h3>
+          <div id="overround-list" class="overround-list"></div>
+        </div>
+
+        <div class="rg-notice">
+          <strong>Juego responsable</strong> · Solo mayores de 18 años.
+          Esto no es consejo financiero. Las probabilidades estimadas son resultados de un modelo estadístico
+          y <strong>no garantizan resultados</strong>. El juego puede causar adicción.
+          Si necesitas ayuda: <a href="https://www.jugarbien.es" target="_blank" rel="noopener">jugarbien.es</a>
+          · <a href="https://www.fejar.org" target="_blank" rel="noopener">fejar.org</a>.
+        </div>
+      </div>
+    </section>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
   <script>
@@ -2151,6 +2487,265 @@
     bindEvents();
     loadCalendar({ initial: true });
     startAutoRefresh();
+
+    // ================================================================
+    // PRO MODE — Análisis de cuotas y picks del modelo
+    // NOTA: esto es ofuscación de UI, no seguridad real. No guarda
+    // secretos sensibles. La lógica del modelo vive en el backend.
+    // ================================================================
+
+    const PRO_SESSION_KEY = "pro_unlocked_v1";
+    // Passphrase por defecto: "pro2026" (cámbiala si despliegas en producción)
+    const PRO_HASH = btoa("pro2026");
+
+    const proBackdrop = document.querySelector("#pro-backdrop");
+    const proClose = document.querySelector("#pro-close");
+    const proRefresh = document.querySelector("#pro-refresh");
+    const proGenerated = document.querySelector("#pro-generated");
+    const picksGrid = document.querySelector("#picks-grid");
+    const overroundList = document.querySelector("#overround-list");
+    const ppDialog = document.querySelector("#passphrase-dialog");
+    const ppInput = document.querySelector("#pp-input");
+    const ppError = document.querySelector("#pp-error");
+    const ppCancel = document.querySelector("#pp-cancel");
+    const ppConfirm = document.querySelector("#pp-confirm");
+
+    let proData = null;
+
+    function isProUnlocked() {
+      return sessionStorage.getItem(PRO_SESSION_KEY) === "1";
+    }
+
+    function unlockPro() {
+      sessionStorage.setItem(PRO_SESSION_KEY, "1");
+      ppDialog.close();
+      openProPanel();
+    }
+
+    function checkPassphrase(value) {
+      return btoa(value.trim()) === PRO_HASH;
+    }
+
+    function openPassphraseDialog() {
+      ppInput.value = "";
+      ppError.textContent = "";
+      ppDialog.showModal();
+      ppInput.focus();
+    }
+
+    function openProPanel() {
+      proBackdrop.hidden = false;
+      document.body.style.overflow = "hidden";
+      if (!proData) {
+        loadPicks();
+      }
+    }
+
+    function closeProPanel() {
+      proBackdrop.hidden = true;
+      document.body.style.overflow = "";
+    }
+
+    function tryOpenPro() {
+      if (isProUnlocked()) {
+        openProPanel();
+      } else {
+        openPassphraseDialog();
+      }
+    }
+
+    // ── Fetch picks ───────────────────────────────────────────────────
+
+    async function loadPicks() {
+      proRefresh.disabled = true;
+      proRefresh.classList.add("is-loading");
+      picksGrid.innerHTML = '<p style="color:var(--muted);font-size:.8rem">Cargando análisis…</p>';
+
+      try {
+        const res = await fetch("/api/picks");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        proData = await res.json();
+        renderProPanel(proData);
+      } catch (err) {
+        picksGrid.innerHTML = `<p style="color:var(--red);font-size:.8rem">Error al cargar picks: ${err.message}</p>`;
+      } finally {
+        proRefresh.disabled = false;
+        proRefresh.classList.remove("is-loading");
+      }
+    }
+
+    // ── Render ────────────────────────────────────────────────────────
+
+    const BAND_META = {
+      "alta_prob_75": { letter: "C", label: "Banda C · ~75% prob. estimada", color: "C" },
+      "media_prob_55": { letter: "B", label: "Banda B · ~55% prob. estimada", color: "B" },
+      "baja_prob_30": { letter: "A", label: "Banda A · ~30% prob. estimada", color: "A" },
+    };
+
+    function renderProPanel(data) {
+      // Header
+      const ts = data.generated_at ? new Date(data.generated_at) : null;
+      proGenerated.textContent = ts
+        ? `Generado: ${ts.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}${data.is_demo ? " · modo demo" : ""}`
+        : "";
+
+      // Picks
+      picksGrid.innerHTML = "";
+      const picks = data.picks || [];
+      if (!picks.length) {
+        picksGrid.innerHTML = '<p style="color:var(--muted);font-size:.82rem">No hay picks disponibles hoy.</p>';
+      }
+
+      for (const pick of picks) {
+        picksGrid.appendChild(renderPickCard(pick));
+      }
+
+      // Market analytics
+      overroundList.innerHTML = "";
+      const ov = data.analitica_mercado?.overround_por_casa || {};
+      const best = data.analitica_mercado?.mejor_casa_precio;
+      const maxOv = Math.max(...Object.values(ov), 0.10);
+
+      for (const [bk, margin] of Object.entries(ov)) {
+        const row = document.createElement("div");
+        row.className = "overround-row";
+        const isBest = bk === best;
+        const pct = ((margin * 100)).toFixed(1);
+        row.innerHTML = `
+          <span class="overround-row__name">${bk}${isBest ? " ★" : ""}</span>
+          <div class="overround-bar-wrap">
+            <div class="overround-bar${isBest ? " overround-bar--best" : ""}"
+                 style="width:${Math.min((margin / maxOv) * 100, 100).toFixed(1)}%"></div>
+          </div>
+          <span class="overround-row__pct">${pct}%</span>
+        `;
+        overroundList.appendChild(row);
+      }
+    }
+
+    function renderPickCard(pick) {
+      const card = document.createElement("article");
+      const meta = BAND_META[pick.banda] || { letter: "?", label: pick.banda, color: "B" };
+      card.className = `pick-card pick-card--${meta.color}`;
+
+      if (pick.sin_valor) {
+        card.innerHTML = `
+          <div class="pick-card__band">
+            <span class="pick-card__band-dot"></span>
+            ${meta.label}
+          </div>
+          <p class="pick-card__market" style="margin:0">${pick.mensaje || "Sin picks con valor hoy."}</p>
+        `;
+        return card;
+      }
+
+      const edgeClass = pick.edge_pp >= 0 ? "pos" : "neg";
+      const evClass = pick.ev >= 0 ? "pos" : "neg";
+      const ciStr = pick.banda_confianza
+        ? `[${(pick.banda_confianza[0] * 100).toFixed(0)}%–${(pick.banda_confianza[1] * 100).toFixed(0)}%]`
+        : "";
+
+      card.innerHTML = `
+        <div class="pick-card__band">
+          <span class="pick-card__band-dot"></span>
+          ${meta.label}
+        </div>
+        <h3 class="pick-card__match">${pick.partido}</h3>
+        <p class="pick-card__market">${pick.mercado} · ${pick.fecha || ""}</p>
+        <div class="pick-metrics">
+          <div class="pick-metric">
+            <span class="pick-metric__label">Mejor cuota</span>
+            <span class="pick-metric__value">${pick.mejor_cuota?.toFixed(2) ?? "—"}</span>
+          </div>
+          <div class="pick-metric">
+            <span class="pick-metric__label">Casa</span>
+            <span class="pick-metric__value" style="font-size:.82rem">${pick.casa ?? "—"}</span>
+          </div>
+          <div class="pick-metric">
+            <span class="pick-metric__label">Prob. modelo</span>
+            <span class="pick-metric__value">${((pick.prob_modelo ?? 0) * 100).toFixed(0)}%</span>
+          </div>
+          <div class="pick-metric">
+            <span class="pick-metric__label">Prob. impl.</span>
+            <span class="pick-metric__value">${((pick.prob_implicita_justa ?? 0) * 100).toFixed(0)}%</span>
+          </div>
+          <div class="pick-metric">
+            <span class="pick-metric__label">Edge</span>
+            <span class="pick-metric__value pick-metric__value--${edgeClass}">${pick.edge_pp != null ? (pick.edge_pp >= 0 ? "+" : "") + pick.edge_pp.toFixed(1) + "pp" : "—"}</span>
+          </div>
+          <div class="pick-metric">
+            <span class="pick-metric__label">EV</span>
+            <span class="pick-metric__value pick-metric__value--${evClass}">${pick.ev != null ? (pick.ev >= 0 ? "+" : "") + pick.ev.toFixed(3) : "—"}</span>
+          </div>
+        </div>
+        ${ciStr ? `<p class="pick-card__ci">IC 95% prob.: <strong>${ciStr}</strong></p>` : ""}
+        <div class="pick-card__stake">
+          <div class="stake-item">
+            <span>Stake plano</span>
+            <strong>${pick.stake_plano_eur?.toFixed(0) ?? 10}€</strong>
+          </div>
+          <div class="stake-item">
+            <span>Kelly ¼ (${((pick.kelly_frac ?? 0) * 100).toFixed(1)}%)</span>
+            <strong>${pick.stake_kelly_eur?.toFixed(0) ?? "—"}€</strong>
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+    // ── Konami code ───────────────────────────────────────────────────
+    // Secuencia: ↑↑↓↓←→←→ba (bonus trigger)
+    const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    let konamiIdx = 0;
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === KONAMI[konamiIdx]) {
+        konamiIdx++;
+        if (konamiIdx === KONAMI.length) {
+          konamiIdx = 0;
+          tryOpenPro();
+        }
+      } else {
+        konamiIdx = e.key === KONAMI[0] ? 1 : 0;
+      }
+    });
+
+    // ── URL param detection (?mode=pro) ───────────────────────────────
+    if (new URLSearchParams(window.location.search).get("mode") === "pro") {
+      tryOpenPro();
+    }
+
+    // ── Event bindings ────────────────────────────────────────────────
+
+    proClose.addEventListener("click", closeProPanel);
+    proBackdrop.addEventListener("click", (e) => {
+      if (e.target === proBackdrop) closeProPanel();
+    });
+    proRefresh.addEventListener("click", () => {
+      proData = null;
+      loadPicks();
+    });
+
+    ppConfirm.addEventListener("click", () => {
+      if (checkPassphrase(ppInput.value)) {
+        ppError.textContent = "";
+        unlockPro();
+      } else {
+        ppError.textContent = "Clave incorrecta. Inténtalo de nuevo.";
+        ppInput.focus();
+      }
+    });
+
+    ppInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") ppConfirm.click();
+      if (e.key === "Escape") ppDialog.close();
+    });
+
+    ppCancel.addEventListener("click", () => ppDialog.close());
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !proBackdrop.hidden) closeProPanel();
+    });
   </script>
 </body>
 </html>
