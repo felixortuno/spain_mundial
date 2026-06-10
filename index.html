@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#9f1725">
+  <meta name="description" content="Calendario autoactualizable de España en el Mundial 2026.">
+  <title>España · Mundial 2026</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --red-950: #5f0814;
+      --red-900: #7f1020;
+      --red-800: #9f1725;
+      --red-700: #ba1f2f;
+      --yellow: #f5c443;
+      --yellow-soft: #fff2bd;
+      --ink: #19181b;
+      --muted: #69656d;
+      --surface: #ffffff;
+      --surface-soft: #f7f5f2;
+      --surface-raised: #fffdf9;
+      --line: #e4dfd8;
+      --success: #16734b;
+      --warning: #975a00;
+      --shadow: 0 16px 42px rgba(58, 22, 27, 0.1);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 11px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(245, 196, 67, 0.17), transparent 25rem),
+        var(--surface-soft);
+      color: var(--ink);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .shell {
+      width: min(100% - 28px, 1040px);
+      margin-inline: auto;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 24px 0 30px;
+      background: linear-gradient(145deg, var(--red-950), var(--red-800) 68%, #c52a37);
+      color: #fff;
+      box-shadow: 0 10px 34px rgba(95, 8, 20, 0.22);
+    }
+
+    .hero::before,
+    .hero::after {
+      position: absolute;
+      content: "";
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      width: 220px;
+      height: 220px;
+      top: -145px;
+      right: -70px;
+      border: 38px solid rgba(245, 196, 67, 0.14);
+    }
+
+    .hero::after {
+      width: 120px;
+      height: 120px;
+      right: 28%;
+      bottom: -95px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .hero__content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      color: var(--yellow);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 8px;
+      height: 8px;
+      content: "";
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 5px rgba(245, 196, 67, 0.14);
+    }
+
+    h1 {
+      max-width: 680px;
+      margin: 0;
+      font-size: clamp(2rem, 8.5vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+      overflow-wrap: anywhere;
+    }
+
+    .hero__intro {
+      max-width: 650px;
+      margin: 13px 0 20px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.93rem;
+    }
+
+    .subscription-grid {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .calendar-button,
+    .copy-button,
+    .refresh-button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 0;
+      border-radius: var(--radius-sm);
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition:
+        transform 160ms ease,
+        box-shadow 160ms ease,
+        background-color 160ms ease;
+    }
+
+    .calendar-button:hover,
+    .copy-button:hover,
+    .refresh-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .calendar-button:focus-visible,
+    .copy-button:focus-visible,
+    .refresh-button:focus-visible {
+      outline: 3px solid var(--yellow);
+      outline-offset: 3px;
+    }
+
+    .calendar-button {
+      min-width: 0;
+      padding: 9px 7px;
+      background: #fff;
+      color: #2a2225;
+      box-shadow: 0 8px 20px rgba(45, 4, 10, 0.15);
+    }
+
+    .calendar-button > span:last-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .calendar-button__mark {
+      display: grid;
+      width: 23px;
+      height: 23px;
+      flex: 0 0 23px;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      font-size: 0.69rem;
+      font-weight: 900;
+    }
+
+    .calendar-button--apple .calendar-button__mark {
+      background: #242126;
+    }
+
+    .calendar-button--google .calendar-button__mark {
+      background: linear-gradient(135deg, #4285f4 50%, #34a853 50%);
+    }
+
+    .calendar-button--outlook .calendar-button__mark {
+      background: #087ad8;
+    }
+
+    .subscription-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 11px;
+    }
+
+    .subscription-note {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.67);
+      font-size: 0.74rem;
+      line-height: 1.35;
+    }
+
+    .copy-button {
+      min-height: 36px;
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 0.72rem;
+    }
+
+    main {
+      padding: 24px 0 42px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .sync-status {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 9px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.79rem;
+    }
+
+    .sync-status__dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 8px;
+      border-radius: 50%;
+      background: #a9a5aa;
+    }
+
+    .sync-status__dot--ok {
+      background: var(--success);
+      box-shadow: 0 0 0 4px rgba(22, 115, 75, 0.1);
+    }
+
+    .refresh-button {
+      min-height: 40px;
+      flex: 0 0 auto;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: 0 5px 16px rgba(40, 26, 28, 0.05);
+    }
+
+    .refresh-button[disabled] {
+      opacity: 0.58;
+      cursor: wait;
+      transform: none;
+    }
+
+    .refresh-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .refresh-button.is-loading .refresh-icon {
+      animation: spin 900ms linear infinite;
+    }
+
+    .state {
+      display: grid;
+      min-height: 260px;
+      place-items: center;
+      padding: 30px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .state[hidden] {
+      display: none;
+    }
+
+    .spinner {
+      width: 38px;
+      height: 38px;
+      margin: 0 auto 14px;
+      border: 4px solid rgba(159, 23, 37, 0.14);
+      border-top-color: var(--red-800);
+      border-radius: 50%;
+      animation: spin 800ms linear infinite;
+    }
+
+    .state__icon {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 13px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--yellow-soft);
+      color: var(--red-900);
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+
+    .state h2 {
+      margin: 0 0 7px;
+      font-size: 1.16rem;
+    }
+
+    .state p {
+      max-width: 560px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .state__detail {
+      margin-top: 10px !important;
+      font-size: 0.78rem !important;
+    }
+
+    .schedule[hidden] {
+      display: none;
+    }
+
+    .next-match {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 26px;
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, #211d20, #3b292d);
+      color: #fff;
+      box-shadow: 0 18px 42px rgba(41, 26, 30, 0.2);
+    }
+
+    .next-match::after {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      right: -65px;
+      bottom: -80px;
+      content: "";
+      border: 28px solid rgba(245, 196, 67, 0.12);
+      border-radius: 50%;
+    }
+
+    .next-match__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 12px;
+      color: var(--yellow);
+      font-size: 0.71rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .next-match__label::before {
+      width: 16px;
+      height: 2px;
+      content: "";
+      background: currentColor;
+    }
+
+    .next-match h2 {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0;
+      font-size: clamp(1.5rem, 7vw, 2.7rem);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    .next-match__date {
+      position: relative;
+      z-index: 1;
+      margin: 9px 0 0;
+      color: rgba(255, 255, 255, 0.73);
+      font-size: 0.93rem;
+    }
+
+    .countdown {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      margin-top: 16px;
+      padding: 7px 11px;
+      border: 1px solid rgba(245, 196, 67, 0.28);
+      border-radius: 999px;
+      background: rgba(245, 196, 67, 0.1);
+      color: #ffe18b;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .section {
+      margin-top: 27px;
+    }
+
+    .section[hidden] {
+      display: none;
+    }
+
+    .section__heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+    }
+
+    .section__heading h2 {
+      margin: 0;
+      font-size: 1.17rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section__count {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .match-list {
+      display: grid;
+      gap: 11px;
+    }
+
+    .match-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 62px minmax(0, 1fr);
+      gap: 14px;
+      overflow: hidden;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: 0 7px 24px rgba(52, 35, 39, 0.055);
+    }
+
+    .match-card::before {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      content: "";
+      background: var(--red-700);
+    }
+
+    .match-card--knockout::before {
+      background: var(--yellow);
+    }
+
+    .match-card--past {
+      opacity: 0.7;
+      box-shadow: none;
+    }
+
+    .match-date {
+      align-self: start;
+      padding: 7px 4px;
+      border-radius: 12px;
+      background: var(--surface-soft);
+      text-align: center;
+    }
+
+    .match-date__day {
+      display: block;
+      font-size: 1.48rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .match-date__month {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .match-card__topline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(159, 23, 37, 0.09);
+      color: var(--red-800);
+      font-size: 0.63rem;
+      font-weight: 900;
+      letter-spacing: 0.045em;
+      text-transform: uppercase;
+    }
+
+    .badge--knockout {
+      background: var(--yellow-soft);
+      color: #765000;
+    }
+
+    .badge--pending {
+      background: #fff0de;
+      color: var(--warning);
+    }
+
+    .match-card h3 {
+      margin: 0;
+      font-size: 1.08rem;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    .match-card__time {
+      margin: 5px 0 0;
+      color: var(--ink);
+      font-size: 0.84rem;
+      font-weight: 750;
+    }
+
+    .match-card__details {
+      display: grid;
+      gap: 3px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .match-card__details p {
+      margin: 0;
+    }
+
+    .match-card__details strong {
+      color: var(--ink);
+      font-weight: 750;
+    }
+
+    .footer {
+      padding: 0 0 30px;
+      color: var(--muted);
+      font-size: 0.73rem;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 10;
+      right: 14px;
+      bottom: 14px;
+      left: 14px;
+      max-width: 420px;
+      margin-inline: auto;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: #201d1f;
+      color: #fff;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+      font-size: 0.82rem;
+      font-weight: 750;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 359px) {
+      .calendar-button {
+        gap: 5px;
+        padding-inline: 5px;
+        font-size: 0.75rem;
+      }
+
+      .calendar-button__mark {
+        width: 21px;
+        height: 21px;
+        flex-basis: 21px;
+      }
+    }
+
+    @media (min-width: 620px) {
+      .shell {
+        width: min(100% - 48px, 1040px);
+      }
+
+      .hero {
+        padding: 38px 0 42px;
+      }
+
+      .hero__intro {
+        font-size: 1rem;
+      }
+
+      .subscription-grid {
+        max-width: 610px;
+        gap: 10px;
+      }
+
+      .calendar-button {
+        padding: 10px 16px;
+        font-size: 0.88rem;
+      }
+
+      .subscription-meta {
+        max-width: 760px;
+      }
+
+      main {
+        padding-top: 32px;
+      }
+
+      .match-card {
+        grid-template-columns: 72px minmax(0, 1fr);
+        padding: 18px 20px;
+      }
+
+      .next-match {
+        padding: 28px;
+      }
+    }
+
+    @media (min-width: 860px) {
+      .hero__content {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(400px, 0.92fr);
+        column-gap: 54px;
+        align-items: end;
+      }
+
+      .hero__copy {
+        grid-row: 1 / 3;
+      }
+
+      .hero__intro {
+        margin-bottom: 0;
+      }
+
+      .subscription-grid {
+        align-self: end;
+      }
+
+      .subscription-meta {
+        align-self: start;
+        margin-top: 12px;
+      }
+
+      .match-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .match-card--past {
+        min-height: 174px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --ink: #f5f0ed;
+        --muted: #b8b1b4;
+        --surface: #1d1a1c;
+        --surface-soft: #131113;
+        --surface-raised: #242023;
+        --line: #393337;
+        --yellow-soft: #493911;
+        --shadow: 0 16px 42px rgba(0, 0, 0, 0.28);
+      }
+
+      body {
+        background:
+          radial-gradient(circle at 10% 0%, rgba(245, 196, 67, 0.08), transparent 25rem),
+          var(--surface-soft);
+      }
+
+      .calendar-button {
+        background: #f8f5f3;
+        color: #211d20;
+      }
+
+      .badge {
+        background: rgba(219, 61, 78, 0.16);
+        color: #ff9ba7;
+      }
+
+      .badge--knockout {
+        background: #493911;
+        color: #ffe083;
+      }
+
+      .badge--pending {
+        background: #4a2e18;
+        color: #ffc77d;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="shell hero__content">
+      <div class="hero__copy">
+        <p class="eyebrow">Calendario oficial</p>
+        <h1 id="calendar-title">España · Mundial 2026</h1>
+        <p class="hero__intro">
+          Partidos de la selección actualizados desde un calendario en vivo.
+          Suscríbete una vez y los cruces confirmados aparecerán automáticamente.
+        </p>
+      </div>
+
+      <nav class="subscription-grid" aria-label="Suscribirse al calendario">
+        <a id="apple-link" class="calendar-button calendar-button--apple" href="#" target="_blank" rel="noopener">
+          <span class="calendar-button__mark" aria-hidden="true">A</span>
+          <span>Apple</span>
+        </a>
+        <a id="google-link" class="calendar-button calendar-button--google" href="#" target="_blank" rel="noopener">
+          <span class="calendar-button__mark" aria-hidden="true">G</span>
+          <span>Google</span>
+        </a>
+        <a id="outlook-link" class="calendar-button calendar-button--outlook" href="#" target="_blank" rel="noopener">
+          <span class="calendar-button__mark" aria-hidden="true">O</span>
+          <span>Outlook</span>
+        </a>
+      </nav>
+
+      <div class="subscription-meta">
+        <p class="subscription-note">
+          Es una suscripción: se actualiza sola, a diferencia de descargar un archivo .ics.
+        </p>
+        <button id="copy-feed" class="copy-button" type="button">Copiar enlace</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="toolbar">
+      <p class="sync-status" aria-live="polite">
+        <span id="sync-dot" class="sync-status__dot" aria-hidden="true"></span>
+        <span id="sync-text">Preparando calendario…</span>
+      </p>
+      <button id="refresh-button" class="refresh-button" type="button">
+        <svg class="refresh-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+        </svg>
+        <span>Actualizar</span>
+      </button>
+    </div>
+
+    <section id="loading-state" class="state" aria-live="polite">
+      <div>
+        <div class="spinner" aria-hidden="true"></div>
+        <h2>Cargando partidos</h2>
+        <p>Consultando el calendario de España…</p>
+      </div>
+    </section>
+
+    <section id="error-state" class="state" hidden aria-live="assertive">
+      <div>
+        <div class="state__icon" aria-hidden="true">!</div>
+        <h2>No se pudo cargar el calendario</h2>
+        <p id="error-message">
+          Revisa la URL del feed y, si el servidor bloquea la petición, configura un proxy CORS.
+        </p>
+        <p id="error-detail" class="state__detail"></p>
+      </div>
+    </section>
+
+    <section id="empty-state" class="state" hidden>
+      <div>
+        <div class="state__icon" aria-hidden="true">0</div>
+        <h2>Aún no hay partidos publicados</h2>
+        <p>El feed funciona, pero no contiene eventos. Vuelve a actualizar cuando se publique el calendario.</p>
+      </div>
+    </section>
+
+    <div id="schedule" class="schedule" hidden>
+      <article id="next-match" class="next-match" hidden>
+        <span class="next-match__label">Próximo partido</span>
+        <h2 id="next-title"></h2>
+        <p id="next-date" class="next-match__date"></p>
+        <span id="countdown" class="countdown"></span>
+      </article>
+
+      <section id="upcoming-section" class="section" aria-labelledby="upcoming-heading">
+        <div class="section__heading">
+          <h2 id="upcoming-heading">Próximos</h2>
+          <span id="upcoming-count" class="section__count"></span>
+        </div>
+        <div id="upcoming-list" class="match-list"></div>
+      </section>
+
+      <section id="past-section" class="section" aria-labelledby="past-heading">
+        <div class="section__heading">
+          <h2 id="past-heading">Jugados</h2>
+          <span id="past-count" class="section__count"></span>
+        </div>
+        <div id="past-list" class="match-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="shell footer">
+    Las horas se muestran en horario de España peninsular.
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
+  <script>
+    // ================================================================
+    // CONFIGURACIÓN: personaliza estas constantes antes de publicar.
+    // ================================================================
+
+    // URL del feed ICS auto-actualizable de la selección española.
+    // Sustituir por un feed real por equipo (p.ej. de un servicio de fixtures
+    // filtrado a "Spain", o un feed propio alojado en GitHub Pages).
+    const FEED_URL = "https://EJEMPLO.com/spain-world-cup-2026.ics";
+
+    // Proxy CORS opcional (necesario si el feed no envía cabeceras CORS).
+    // Dejar "" para intentar fetch directo primero.
+    const CORS_PROXY = ""; // p.ej. "https://corsproxy.io/?url="
+
+    const CALENDAR_NAME = "España · Mundial 2026";
+    const TIMEZONE = "Europe/Madrid";
+
+    // Intervalo de auto-refresco mientras la pestaña permanece abierta.
+    const REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000;
+
+    // ================================================================
+    // FIN DE LA CONFIGURACIÓN
+    // ================================================================
+
+    const els = {
+      title: document.querySelector("#calendar-title"),
+      appleLink: document.querySelector("#apple-link"),
+      googleLink: document.querySelector("#google-link"),
+      outlookLink: document.querySelector("#outlook-link"),
+      copyFeed: document.querySelector("#copy-feed"),
+      refreshButton: document.querySelector("#refresh-button"),
+      syncDot: document.querySelector("#sync-dot"),
+      syncText: document.querySelector("#sync-text"),
+      loading: document.querySelector("#loading-state"),
+      error: document.querySelector("#error-state"),
+      errorMessage: document.querySelector("#error-message"),
+      errorDetail: document.querySelector("#error-detail"),
+      empty: document.querySelector("#empty-state"),
+      schedule: document.querySelector("#schedule"),
+      nextMatch: document.querySelector("#next-match"),
+      nextTitle: document.querySelector("#next-title"),
+      nextDate: document.querySelector("#next-date"),
+      countdown: document.querySelector("#countdown"),
+      upcomingSection: document.querySelector("#upcoming-section"),
+      upcomingCount: document.querySelector("#upcoming-count"),
+      upcomingList: document.querySelector("#upcoming-list"),
+      pastSection: document.querySelector("#past-section"),
+      pastCount: document.querySelector("#past-count"),
+      pastList: document.querySelector("#past-list"),
+      toast: document.querySelector("#toast")
+    };
+
+    const dateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
+      timeZone: TIMEZONE,
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+
+    const fullDateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
+      timeZone: TIMEZONE,
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+
+    const dayFormatter = new Intl.DateTimeFormat("es-ES", {
+      timeZone: TIMEZONE,
+      day: "2-digit"
+    });
+
+    const monthFormatter = new Intl.DateTimeFormat("es-ES", {
+      timeZone: TIMEZONE,
+      month: "short"
+    });
+
+    const timeFormatter = new Intl.DateTimeFormat("es-ES", {
+      timeZone: TIMEZONE,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+
+    const lastUpdateFormatter = new Intl.DateTimeFormat("es-ES", {
+      timeZone: TIMEZONE,
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    let matches = [];
+    let nextMatch = null;
+    let lastSuccessfulRefresh = 0;
+    let countdownTimer = null;
+    let toastTimer = null;
+
+    function configureSubscriptionLinks() {
+      // Estas URLs son suscripciones, no descargas puntuales.
+      const httpsUrl = FEED_URL;
+      const webcalUrl = FEED_URL.replace(/^https?:\/\//, "webcal://");
+
+      const appleLink = webcalUrl;
+      const googleLink =
+        "https://calendar.google.com/calendar/r?cid=" + encodeURIComponent(webcalUrl);
+      const outlookLink =
+        "https://outlook.live.com/calendar/0/addfromweb?url=" +
+        encodeURIComponent(httpsUrl) +
+        "&name=" +
+        encodeURIComponent(CALENDAR_NAME);
+
+      els.title.textContent = CALENDAR_NAME;
+      document.title = CALENDAR_NAME;
+      els.appleLink.href = appleLink;
+      els.googleLink.href = googleLink;
+      els.outlookLink.href = outlookLink;
+
+      els.copyFeed.addEventListener("click", () => copyFeedUrl(webcalUrl));
+    }
+
+    async function copyFeedUrl(webcalUrl) {
+      try {
+        await navigator.clipboard.writeText(webcalUrl);
+        showToast("Enlace webcal copiado");
+      } catch (error) {
+        const helper = document.createElement("textarea");
+        helper.value = webcalUrl;
+        helper.setAttribute("readonly", "");
+        helper.style.position = "fixed";
+        helper.style.opacity = "0";
+        document.body.appendChild(helper);
+        helper.select();
+
+        try {
+          document.execCommand("copy");
+          showToast("Enlace webcal copiado");
+        } catch (fallbackError) {
+          showToast("No se pudo copiar el enlace");
+        } finally {
+          helper.remove();
+        }
+      }
+    }
+
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.classList.add("is-visible");
+      toastTimer = window.setTimeout(() => {
+        els.toast.classList.remove("is-visible");
+      }, 2400);
+    }
+
+    function setLoading(isLoading) {
+      els.refreshButton.disabled = isLoading;
+      els.refreshButton.classList.toggle("is-loading", isLoading);
+      els.refreshButton.setAttribute("aria-busy", String(isLoading));
+    }
+
+    function showState(state) {
+      els.loading.hidden = state !== "loading";
+      els.error.hidden = state !== "error";
+      els.empty.hidden = state !== "empty";
+      els.schedule.hidden = state !== "schedule";
+    }
+
+    function buildProxyUrl(feedUrl) {
+      if (!CORS_PROXY) {
+        return "";
+      }
+
+      if (CORS_PROXY.includes("{url}")) {
+        return CORS_PROXY.replace("{url}", encodeURIComponent(feedUrl));
+      }
+
+      return CORS_PROXY + encodeURIComponent(feedUrl);
+    }
+
+    async function fetchIcs() {
+      const attempts = [{ label: "directa", url: FEED_URL }];
+      const proxyUrl = buildProxyUrl(FEED_URL);
+
+      if (proxyUrl && proxyUrl !== FEED_URL) {
+        attempts.push({ label: "mediante el proxy CORS", url: proxyUrl });
+      }
+
+      const failures = [];
+
+      for (const attempt of attempts) {
+        try {
+          const response = await fetch(attempt.url, {
+            cache: "no-store",
+            headers: { Accept: "text/calendar, text/plain;q=0.9, */*;q=0.1" }
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const text = await response.text();
+          if (!/BEGIN:VCALENDAR/i.test(text)) {
+            throw new Error("la respuesta no parece un calendario ICS");
+          }
+
+          return text;
+        } catch (error) {
+          failures.push(`${attempt.label}: ${humanizeError(error)}`);
+        }
+      }
+
+      const corsHint = CORS_PROXY
+        ? "También falló el proxy configurado."
+        : "El feed podría no permitir peticiones CORS. Configura CORS_PROXY al inicio del script.";
+
+      throw new Error(`${failures.join(" · ")}. ${corsHint}`);
+    }
+
+    function humanizeError(error) {
+      if (error instanceof TypeError) {
+        return "fallo de red o bloqueo CORS";
+      }
+
+      return error && error.message ? error.message : "error desconocido";
+    }
+
+    function registerTimezones(calendarComponent) {
+      const timezones = calendarComponent.getAllSubcomponents("vtimezone");
+
+      for (const timezoneComponent of timezones) {
+        try {
+          const timezone = new ICAL.Timezone(timezoneComponent);
+          ICAL.TimezoneService.register(timezone.tzid, timezone);
+        } catch (error) {
+          console.warn("No se pudo registrar una zona horaria del feed.", error);
+        }
+      }
+    }
+
+    function parseMatches(icsText) {
+      if (!window.ICAL) {
+        throw new Error("ICAL.js no está disponible. Comprueba la conexión con el CDN.");
+      }
+
+      let parsed;
+      try {
+        parsed = ICAL.parse(icsText);
+      } catch (error) {
+        throw new Error("El contenido recibido no es un ICS válido.");
+      }
+
+      const calendarComponent = new ICAL.Component(parsed);
+      registerTimezones(calendarComponent);
+
+      return calendarComponent
+        .getAllSubcomponents("vevent")
+        .map((component) => eventToMatch(component))
+        .filter(Boolean)
+        .sort((a, b) => a.start.getTime() - b.start.getTime());
+    }
+
+    function eventToMatch(component) {
+      const event = new ICAL.Event(component);
+      const status = String(component.getFirstPropertyValue("status") || "").toUpperCase();
+
+      if (status === "CANCELLED" || !event.startDate) {
+        return null;
+      }
+
+      const start = safeJsDate(event.startDate);
+      if (!start) {
+        return null;
+      }
+
+      const end = safeJsDate(event.endDate) || new Date(start.getTime() + 2 * 60 * 60 * 1000);
+      const summary = cleanText(event.summary || "Partido de España");
+      const description = cleanText(event.description || "");
+      const location = cleanText(event.location || "");
+      const combinedText = `${summary}\n${description}`;
+      const stage = detectStage(combinedText);
+
+      return {
+        uid: event.uid || `${start.toISOString()}-${summary}`,
+        title: summary,
+        description,
+        location,
+        start,
+        end,
+        allDay: Boolean(event.startDate.isDate),
+        stage,
+        pending: isPendingOpponent(combinedText)
+      };
+    }
+
+    function safeJsDate(icalTime) {
+      if (!icalTime) {
+        return null;
+      }
+
+      try {
+        const date = icalTime.toJSDate();
+        return Number.isNaN(date.getTime()) ? null : date;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function cleanText(value) {
+      return String(value)
+        .replace(/\\n/gi, "\n")
+        .replace(/\r/g, "")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function normalizeText(value) {
+      return String(value)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    }
+
+    function detectStage(value) {
+      const text = normalizeText(value);
+
+      const knockoutPatterns = [
+        { pattern: /\b(semifinal|semi-final)\b/, label: "Semifinal" },
+        { pattern: /\b(cuartos|quarter[- ]?final)\b/, label: "Cuartos" },
+        { pattern: /\b(octavos|round of 16)\b/, label: "Octavos" },
+        { pattern: /\b(dieciseisavos|round of 32)\b/, label: "Dieciseisavos" },
+        { pattern: /\b(eliminatoria|knockout|play-?off)\b/, label: "Eliminatorias" },
+        { pattern: /(^|[\n·:;-])\s*final\b|\bworld cup final\b/, label: "Final" }
+      ];
+
+      for (const item of knockoutPatterns) {
+        if (item.pattern.test(text)) {
+          return { type: "knockout", label: item.label };
+        }
+      }
+
+      if (/\b(fase de grupos?|group stage|grupo [a-l])\b/.test(text)) {
+        return { type: "group", label: "Fase de grupos" };
+      }
+
+      return { type: "unknown", label: "Mundial 2026" };
+    }
+
+    function isPendingOpponent(value) {
+      const text = normalizeText(value);
+      return /\b(tbd|tbc|por confirmar|pendiente|to be determined|to be confirmed|ganador(?: del?)? grupo|winner group|ganador partido|winner match|mejor tercero|best third)\b/.test(text);
+    }
+
+    function extractCompetition(description) {
+      if (!description) {
+        return "";
+      }
+
+      const lines = description
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      const preferred = lines.find((line) =>
+        /\b(fase|grupo|jornada|mundial|world cup|octavos|cuartos|semifinal|final|round)\b/i.test(line)
+      );
+
+      return (preferred || lines[0] || "").replace(/^(fase|competici[oó]n)\s*:\s*/i, "");
+    }
+
+    function formatCompactDate(match) {
+      const parts = Object.fromEntries(
+        dateTimeFormatter
+          .formatToParts(match.start)
+          .filter((part) => part.type !== "literal")
+          .map((part) => [part.type, part.value.replace(".", "")])
+      );
+      const date = `${capitalizeFirst(parts.weekday)} ${parts.day} ${parts.month}`;
+
+      return match.allDay ? date : `${date} · ${parts.hour}:${parts.minute}`;
+    }
+
+    function formatFullDate(match) {
+      if (match.allDay) {
+        return capitalizeFirst(
+          new Intl.DateTimeFormat("es-ES", {
+            timeZone: TIMEZONE,
+            weekday: "long",
+            day: "numeric",
+            month: "long"
+          }).format(match.start)
+        );
+      }
+
+      return `${capitalizeFirst(fullDateTimeFormatter.format(match.start).replace(",", " ·"))} h`;
+    }
+
+    function capitalizeFirst(value) {
+      return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+    }
+
+    function renderSchedule() {
+      const now = new Date();
+      const upcoming = matches.filter((match) => match.end.getTime() >= now.getTime());
+      const past = matches
+        .filter((match) => match.end.getTime() < now.getTime())
+        .sort((a, b) => b.start.getTime() - a.start.getTime());
+
+      nextMatch = upcoming[0] || null;
+
+      els.upcomingList.replaceChildren(...upcoming.map((match) => createMatchCard(match, false)));
+      els.pastList.replaceChildren(...past.map((match) => createMatchCard(match, true)));
+
+      els.upcomingSection.hidden = upcoming.length === 0;
+      els.pastSection.hidden = past.length === 0;
+      els.upcomingCount.textContent = formatMatchCount(upcoming.length);
+      els.pastCount.textContent = formatMatchCount(past.length);
+
+      renderNextMatch();
+      showState("schedule");
+    }
+
+    function renderNextMatch() {
+      window.clearInterval(countdownTimer);
+
+      if (!nextMatch) {
+        els.nextMatch.hidden = true;
+        return;
+      }
+
+      els.nextTitle.textContent = nextMatch.title;
+      els.nextDate.textContent = formatFullDate(nextMatch);
+      els.nextMatch.hidden = false;
+      updateCountdown();
+      countdownTimer = window.setInterval(updateCountdown, 60 * 1000);
+    }
+
+    function updateCountdown() {
+      if (!nextMatch) {
+        return;
+      }
+
+      const now = Date.now();
+      const start = nextMatch.start.getTime();
+      const end = nextMatch.end.getTime();
+
+      if (now >= start && now <= end) {
+        els.countdown.textContent = "En juego";
+        return;
+      }
+
+      if (now > end) {
+        renderSchedule();
+        return;
+      }
+
+      const totalMinutes = Math.max(1, Math.ceil((start - now) / 60000));
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const minutes = totalMinutes % 60;
+
+      if (days > 0) {
+        els.countdown.textContent =
+          `Faltan ${days} ${days === 1 ? "día" : "días"}` +
+          (hours ? ` y ${hours} h` : "");
+      } else if (hours > 0) {
+        els.countdown.textContent = `Faltan ${hours} h ${minutes} min`;
+      } else {
+        els.countdown.textContent = `Faltan ${minutes} min`;
+      }
+    }
+
+    function createMatchCard(match, isPast) {
+      const card = document.createElement("article");
+      card.className =
+        `match-card match-card--${match.stage.type}` + (isPast ? " match-card--past" : "");
+
+      const dateBlock = document.createElement("div");
+      dateBlock.className = "match-date";
+      dateBlock.setAttribute("aria-hidden", "true");
+
+      const day = document.createElement("span");
+      day.className = "match-date__day";
+      day.textContent = dayFormatter.format(match.start);
+
+      const month = document.createElement("span");
+      month.className = "match-date__month";
+      month.textContent = monthFormatter.format(match.start).replace(".", "");
+
+      dateBlock.append(day, month);
+
+      const content = document.createElement("div");
+      const topLine = document.createElement("div");
+      topLine.className = "match-card__topline";
+
+      const stageBadge = document.createElement("span");
+      stageBadge.className =
+        "badge" + (match.stage.type === "knockout" ? " badge--knockout" : "");
+      stageBadge.textContent = match.stage.label;
+      topLine.appendChild(stageBadge);
+
+      if (match.pending) {
+        const pendingBadge = document.createElement("span");
+        pendingBadge.className = "badge badge--pending";
+        pendingBadge.textContent = "Pendiente de confirmar";
+        topLine.appendChild(pendingBadge);
+      }
+
+      const title = document.createElement("h3");
+      title.textContent = match.title;
+
+      const date = document.createElement("p");
+      date.className = "match-card__time";
+      date.textContent = match.allDay
+        ? formatCompactDate(match)
+        : `${formatCompactDate(match)} h`;
+
+      content.append(topLine, title, date);
+
+      const competition = extractCompetition(match.description);
+      if (competition || match.location) {
+        const details = document.createElement("div");
+        details.className = "match-card__details";
+
+        if (competition) {
+          const phase = document.createElement("p");
+          const label = document.createElement("strong");
+          label.textContent = "Competición: ";
+          phase.append(label, competition);
+          details.appendChild(phase);
+        }
+
+        if (match.location) {
+          const venue = document.createElement("p");
+          const label = document.createElement("strong");
+          label.textContent = "Sede: ";
+          venue.append(label, match.location);
+          details.appendChild(venue);
+        }
+
+        content.appendChild(details);
+      }
+
+      card.append(dateBlock, content);
+      return card;
+    }
+
+    function formatMatchCount(count) {
+      return `${count} ${count === 1 ? "partido" : "partidos"}`;
+    }
+
+    async function loadCalendar({ initial = false } = {}) {
+      setLoading(true);
+      els.syncDot.classList.remove("sync-status__dot--ok");
+      els.syncText.textContent = "Actualizando calendario…";
+
+      if (initial) {
+        showState("loading");
+      }
+
+      try {
+        const icsText = await fetchIcs();
+        const parsedMatches = parseMatches(icsText);
+        matches = parsedMatches;
+        lastSuccessfulRefresh = Date.now();
+
+        if (matches.length === 0) {
+          showState("empty");
+        } else {
+          renderSchedule();
+        }
+
+        els.syncDot.classList.add("sync-status__dot--ok");
+        els.syncText.textContent =
+          `Actualizado a las ${lastUpdateFormatter.format(lastSuccessfulRefresh)}`;
+      } catch (error) {
+        console.error(error);
+
+        if (matches.length > 0) {
+          els.syncText.textContent = "No se pudo actualizar; mostrando los últimos datos";
+          showToast("No se pudo actualizar el feed");
+        } else {
+          els.errorMessage.textContent =
+            "Revisa FEED_URL y, si el servidor no permite peticiones desde esta web, configura CORS_PROXY.";
+          els.errorDetail.textContent = humanizeError(error);
+          els.syncText.textContent = "Error al conectar con el feed";
+          showState("error");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function startAutoRefresh() {
+      window.setInterval(() => loadCalendar(), REFRESH_INTERVAL_MS);
+
+      document.addEventListener("visibilitychange", () => {
+        const isStale = Date.now() - lastSuccessfulRefresh >= REFRESH_INTERVAL_MS;
+        if (document.visibilityState === "visible" && isStale && !els.refreshButton.disabled) {
+          loadCalendar();
+        }
+      });
+    }
+
+    configureSubscriptionLinks();
+    els.refreshButton.addEventListener("click", () => loadCalendar());
+    loadCalendar({ initial: true });
+    startAutoRefresh();
+  </script>
+</body>
+</html>
