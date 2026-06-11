@@ -16,10 +16,8 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-pink-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap');
-
     /* ── Premium Football UI Design System ─────────────────────────── */
     :root {
       color-scheme: dark;
@@ -2938,16 +2936,28 @@ function bindEvents() {
 
 // ── AUTO REFRESH ──────────────────────────────────────────────────────────────
 function startAutoRefresh() {
-  setInterval(() => loadCalendar(), REFRESH_MS);
-  setInterval(() => {
+  let calTimer      = setInterval(() => loadCalendar(), REFRESH_MS);
+  let analysisTimer = setInterval(() => {
     if (isProUnlocked() && !E.pagePro.hidden) loadAnalysis();
   }, ANALYSIS_REFRESH_MS);
-  setInterval(() => {
+  let proCheckTimer = setInterval(() => {
     if (!isProUnlocked() && !E.pagePro.hidden) checkProAccess();
   }, PRO_ACCESS_CHECK_MS);
+
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && Date.now() - lastRefresh >= REFRESH_MS) {
-      loadCalendar();
+    if (document.visibilityState === "visible") {
+      calTimer      = setInterval(() => loadCalendar(), REFRESH_MS);
+      analysisTimer = setInterval(() => {
+        if (isProUnlocked() && !E.pagePro.hidden) loadAnalysis();
+      }, ANALYSIS_REFRESH_MS);
+      proCheckTimer = setInterval(() => {
+        if (!isProUnlocked() && !E.pagePro.hidden) checkProAccess();
+      }, PRO_ACCESS_CHECK_MS);
+      if (Date.now() - lastRefresh >= REFRESH_MS) loadCalendar();
+    } else {
+      clearInterval(calTimer);
+      clearInterval(analysisTimer);
+      clearInterval(proCheckTimer);
     }
   });
 }
