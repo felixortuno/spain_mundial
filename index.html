@@ -523,6 +523,16 @@
     }
     .state-card p + p { margin-top: 6px; font-size: 11px; color: var(--txt-3); }
 
+    #loading-state {
+      min-height: 0;
+      padding: 16px 0 0;
+      background: transparent;
+      border: none;
+      backdrop-filter: none;
+      display: block;
+      text-align: left;
+    }
+
     /* ── Next match hero (Football Pitch Tactical SVG Overlay) ─────────── */
     .hero-card {
       position: relative;
@@ -1663,6 +1673,69 @@
     .grupo-flag { display: flex; align-items: center; flex-shrink: 0; }
     .grupo-flag img { height: 18px; width: auto; }
 
+    /* ── Skeletons shimmer ──────────────────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position:  400px 0; }
+    }
+
+    .sk {
+      border-radius: var(--r-sm);
+      background: linear-gradient(90deg,
+        var(--sur-3) 25%,
+        rgba(255,255,255,0.06) 50%,
+        var(--sur-3) 75%
+      );
+      background-size: 800px 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+
+    .sk-line { height: 12px; margin-bottom: 8px; }
+    .sk-line--lg { height: 18px; }
+    .sk-line--sm { height: 10px; }
+
+    .sk-card {
+      padding: 18px;
+      border-radius: var(--r-xl);
+      background: var(--sur-2);
+      border: 1px solid var(--line-2);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sk-kpi-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 480px) { .sk-kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 640px) { .sk-kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .sk-picks-grid {
+      display: grid;
+      gap: 12px;
+    }
+    @media (min-width: 640px) { .sk-picks-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .sk-cal-list {
+      display: grid;
+      gap: 10px;
+    }
+    @media (min-width: 640px) { .sk-cal-list { grid-template-columns: repeat(2, 1fr); } }
+
+    .sk-match {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 16px;
+      padding: 16px;
+      border-radius: var(--r-lg);
+      background: var(--sur-2);
+      border: 1px solid var(--line-2);
+      border-left: 4px solid var(--sur-4);
+    }
+
     .grupo-name {
       font-size: 12px;
       font-weight: 600;
@@ -1756,11 +1829,12 @@
   </div>
 
   <!-- States -->
-  <section class="state-card" id="loading-state" aria-live="polite">
-    <div>
-      <div class="spinner" aria-hidden="true"></div>
-      <h2>Cargando tu Mundial</h2>
-      <p>Buscando partidos de las selecciones elegidas…</p>
+  <section id="loading-state" aria-live="polite">
+    <div class="sk-cal-list">
+      <div class="sk-match"><div style="display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);padding-right:12px"><div class="sk sk-line" style="width:28px;height:20px"></div><div class="sk sk-line--sm" style="width:22px"></div></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:4px 0"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line--lg" style="width:72%"></div><div class="sk sk-line--sm" style="width:50%"></div></div></div>
+      <div class="sk-match"><div style="display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);padding-right:12px"><div class="sk sk-line" style="width:28px;height:20px"></div><div class="sk sk-line--sm" style="width:22px"></div></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:4px 0"><div class="sk sk-line" style="width:44%"></div><div class="sk sk-line--lg" style="width:65%"></div><div class="sk sk-line--sm" style="width:55%"></div></div></div>
+      <div class="sk-match"><div style="display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);padding-right:12px"><div class="sk sk-line" style="width:28px;height:20px"></div><div class="sk sk-line--sm" style="width:22px"></div></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:4px 0"><div class="sk sk-line" style="width:35%"></div><div class="sk sk-line--lg" style="width:80%"></div><div class="sk sk-line--sm" style="width:48%"></div></div></div>
+      <div class="sk-match"><div style="display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);padding-right:12px"><div class="sk sk-line" style="width:28px;height:20px"></div><div class="sk sk-line--sm" style="width:22px"></div></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:4px 0"><div class="sk sk-line" style="width:42%"></div><div class="sk sk-line--lg" style="width:68%"></div><div class="sk sk-line--sm" style="width:58%"></div></div></div>
     </div>
   </section>
 
@@ -1906,7 +1980,7 @@
       </div>
       <p class="stats-source-note" id="stats-source-note" hidden></p>
       <div id="tournament-kpis" class="tournament-kpis" aria-live="polite">
-        <div class="stats-loading">Preparando estadísticas…</div>
+        <div class="sk-kpi-grid"><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div></div>
       </div>
     </section>
 
@@ -1974,6 +2048,7 @@ const REFRESH_MS      = 6 * 60 * 60 * 1000;
 const ANALYSIS_REFRESH_MS = 5 * 60 * 1000;
 const PRO_ACCESS_CHECK_MS = 15 * 1000;
 const STORAGE_KEY     = "mundial-2026-teams";
+const PRO_VIEWS_KEY   = "mundial-2026-pro-views";
 
 const TEAMS = [
   ["ALG","Argelia","🇩🇿","dz"],  ["ARG","Argentina","🇦🇷","ar"],  ["AUS","Australia","🇦🇺","au"],
@@ -2034,7 +2109,13 @@ let draftCodes    = new Set(selectedCodes);
 let allMatches    = [];
 let currentFilter = "all";
 // Vistas del modo PRO: las Picks del día arrancan desactivadas por defecto.
-let proViews      = { stats: true, picks: false };
+let proViews      = (() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PRO_VIEWS_KEY) || "null");
+    if (saved && typeof saved === "object") return { stats: true, picks: false, ...saved };
+  } catch {}
+  return { stats: true, picks: false };
+})();
 let calSource     = "";
 let lastRefresh   = 0;
 let proData       = null;
@@ -2441,8 +2522,14 @@ function showToast(msg) {
 
 // ── COPY FEED ────────────────────────────────────────────────────────────────
 async function copyFeedUrl() {
+  const url = feedUrl(selectedCodes);
+  if (navigator.share) {
+    try { await navigator.share({ url }); return; } catch (e) {
+      if (e.name === "AbortError") return;
+    }
+  }
   try {
-    await navigator.clipboard.writeText(feedUrl(selectedCodes));
+    await navigator.clipboard.writeText(url);
     showToast("Feed copiado al portapapeles");
   } catch { showToast("No se pudo copiar"); }
 }
@@ -2672,8 +2759,8 @@ async function loadAnalysis() {
   proLoading = true;
   E.proRefresh.disabled = true;
   E.proRefresh.classList.add("loading");
-  E.picksGrid.innerHTML = `<p style="color:var(--txt-2);font-size:13px">Cargando análisis…</p>`;
-  E.tournamentKpis.innerHTML = `<div class="stats-loading">Actualizando estadísticas del torneo…</div>`;
+  E.picksGrid.innerHTML = `<div class="sk-picks-grid"><div class="sk-card"><div class="sk sk-line" style="width:40%"></div><div class="sk sk-line--lg" style="width:80%"></div><div class="sk sk-line--sm" style="width:60%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:40%"></div><div class="sk sk-line--lg" style="width:75%"></div><div class="sk sk-line--sm" style="width:65%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:40%"></div><div class="sk sk-line--lg" style="width:70%"></div><div class="sk sk-line--sm" style="width:55%"></div></div></div>`;
+  E.tournamentKpis.innerHTML = `<div class="sk-kpi-grid"><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div><div class="sk-card"><div class="sk sk-line--sm" style="width:55%"></div><div class="sk sk-line--lg" style="width:70%"></div></div></div>`;
 
   const [picksResult, statsResult] = await Promise.allSettled([
     analysisFetch("/api/picks"),
@@ -2882,6 +2969,7 @@ function bindEvents() {
   document.querySelectorAll(".pro-filters .filter-pill").forEach(btn => {
     btn.addEventListener("click", () => {
       proViews[btn.dataset.proView] = !proViews[btn.dataset.proView];
+      try { localStorage.setItem(PRO_VIEWS_KEY, JSON.stringify(proViews)); } catch {}
       applyProViews();
     });
   });
