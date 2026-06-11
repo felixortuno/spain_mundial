@@ -10,6 +10,15 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mundial 26">
   <title>Mundial 2026</title>
+  <meta property="og:title"       content="Mundial 2026 — Calendario personalizado">
+  <meta property="og:description" content="Sigue los partidos de tus selecciones en el Mundial 2026. Calendario en tiempo real con suscripción a Apple, Google y Outlook.">
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://spain-mundial.vercel.app/">
+  <meta property="og:image"       content="https://spain-mundial.vercel.app/assets/icons/icon-pink-512.png">
+  <meta name="twitter:card"       content="summary">
+  <meta name="twitter:title"      content="Mundial 2026 — Calendario personalizado">
+  <meta name="twitter:description" content="Sigue los partidos de tus selecciones en el Mundial 2026.">
+  <meta name="twitter:image"      content="https://spain-mundial.vercel.app/assets/icons/icon-pink-512.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/assets/icons/favicon-pink.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/icon-pink-32.png">
@@ -2037,6 +2046,11 @@
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+</script>
 <script>
 "use strict";
 
