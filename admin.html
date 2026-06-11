@@ -103,6 +103,30 @@
       font-weight: 800;
     }
 
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      margin-top: 12px;
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .back-link:hover {
+      border-color: rgba(255, 255, 255, .2);
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
     .error {
       min-height: 18px;
       margin: 12px 0 0 !important;
@@ -121,6 +145,17 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+    }
+
+    .topbar__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar__actions .back-link {
+      min-height: 36px;
+      margin-top: 0;
     }
 
     .brand {
@@ -196,6 +231,13 @@
     .empty { padding: 38px; color: var(--muted); text-align: center; }
 
     @media (max-width: 720px) {
+      .topbar {
+        align-items: flex-start;
+      }
+      .topbar__actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
       .summary { grid-template-columns: 1fr; }
       .heading { display: block; }
       .heading .ghost { margin-top: 18px; }
@@ -215,6 +257,7 @@
       <p>Aprueba o revoca el acceso de cada usuario.</p>
       <input id="password" type="password" placeholder="Contraseña de administrador" autocomplete="current-password" required>
       <button class="primary" id="login-submit" type="submit">Entrar</button>
+      <a class="back-link" href="/?mode=pro">← Volver a PRO</a>
       <p class="error" id="login-error" role="alert"></p>
     </form>
   </section>
@@ -222,7 +265,10 @@
   <main class="shell" id="shell" hidden>
     <nav class="topbar">
       <div class="brand"><span class="mark">26</span> Mundial PRO</div>
-      <button class="ghost" id="logout" type="button">Cerrar sesión</button>
+      <div class="topbar__actions">
+        <a class="back-link" href="/?mode=pro">← Volver a PRO</a>
+        <button class="ghost" id="logout" type="button">Cerrar sesión</button>
+      </div>
     </nav>
 
     <header class="heading">
