@@ -1053,12 +1053,6 @@
       box-shadow: 0 6px 18px rgba(255, 208, 0, 0.35);
     }
 
-    .auth-hint {
-      margin-top: 14px;
-      font-size: 11px;
-      color: var(--txt-3);
-    }
-
     /* Pro panel header */
     .pro-head {
       display: flex;
@@ -1096,6 +1090,136 @@
       color: var(--txt-3);
       margin: -14px 0 20px;
       font-weight: 500;
+    }
+
+    .stats-section {
+      margin-bottom: 28px;
+    }
+
+    .stats-section__head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .stats-section__head h3 {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -.01em;
+    }
+
+    .stats-section__head p {
+      margin: 0;
+      color: var(--txt-3);
+      font-size: 11px;
+    }
+
+    .stats-source-note {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: var(--r-md);
+      border: 1px solid rgba(255, 208, 0, 0.2);
+      background: rgba(255, 208, 0, 0.05);
+      color: var(--txt-2);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .stats-source-note[hidden] { display: none; }
+
+    .tournament-kpis {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (min-width: 700px) {
+      .tournament-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    .t-kpi {
+      position: relative;
+      min-width: 0;
+      min-height: 128px;
+      padding: 16px;
+      overflow: hidden;
+      border-radius: var(--r-xl);
+      border: 1px solid var(--line-2);
+      background: var(--sur-2);
+    }
+
+    .t-kpi::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: var(--kpi-color, var(--acc));
+    }
+
+    .t-kpi--green  { --kpi-color: var(--ter); }
+    .t-kpi--yellow { --kpi-color: var(--sec); }
+    .t-kpi--red    { --kpi-color: var(--pri); }
+    .t-kpi--orange { --kpi-color: var(--orn); }
+
+    .t-kpi__label {
+      display: block;
+      color: var(--txt-3);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .07em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .t-kpi__value {
+      display: block;
+      margin-top: 12px;
+      overflow: hidden;
+      color: var(--txt);
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(17px, 2.5vw, 23px);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+      text-overflow: ellipsis;
+    }
+
+    .t-kpi__sub {
+      display: block;
+      margin-top: 7px;
+      color: var(--txt-2);
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .t-kpi--empty .t-kpi__value { color: var(--txt-3); }
+
+    .stats-loading,
+    .stats-error {
+      grid-column: 1 / -1;
+      padding: 20px;
+      border-radius: var(--r-xl);
+      border: 1px solid var(--line-2);
+      background: var(--sur-2);
+      color: var(--txt-2);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .stats-error {
+      color: var(--pri);
+      border-color: rgba(255, 56, 92, 0.25);
+    }
+
+    .pro-section-title {
+      margin: 0 0 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
     }
 
     /* Picks grid */
@@ -1355,6 +1479,104 @@
         transition-duration: .01ms !important;
       }
     }
+
+    /* ── Groups grid ──────────────────────────────────────────────────── */
+    .grupos-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      padding-top: 8px;
+    }
+
+    @media (min-width: 480px) { .grupos-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 760px) { .grupos-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .grupo-card {
+      padding: 14px 16px;
+      border-radius: var(--r-lg);
+      background: var(--sur-2);
+      border: 1px solid var(--line-2);
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+    }
+
+    .grupo-card:hover {
+      background: var(--sur-3);
+      border-color: var(--line);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .grupo-card--highlight {
+      border-color: rgba(255, 56, 92, 0.35);
+      box-shadow: 0 0 0 1px rgba(255,56,92,0.15);
+    }
+
+    .grupo-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line-2);
+    }
+
+    .grupo-letter {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -.02em;
+      color: var(--sec);
+      text-shadow: 0 0 10px rgba(255,208,0,0.2);
+    }
+
+    .grupo-badge {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--pri);
+      background: var(--pri-dim);
+      border: 1px solid rgba(255,56,92,0.2);
+      padding: 2px 7px;
+      border-radius: var(--r-full);
+    }
+
+    .grupo-team {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 8px;
+      border-radius: var(--r-sm);
+      margin: 2px -4px;
+      transition: background 0.15s ease;
+    }
+
+    .grupo-team--selected {
+      background: var(--pri-dim);
+      border: 1px solid rgba(255,56,92,0.2);
+    }
+
+    .grupo-flag { font-size: 18px; line-height: 1; flex-shrink: 0; }
+
+    .grupo-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--txt);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .grupo-team--selected .grupo-name { color: var(--txt); font-weight: 700; }
+
+    .grupo-check {
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--pri);
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -1369,6 +1591,9 @@
   <nav class="app-tabs" role="tablist" aria-label="Secciones">
     <button class="app-tab" role="tab" id="tab-cal" aria-selected="true" aria-controls="page-cal">
       <span class="app-tab__pip" aria-hidden="true"></span>Partidos
+    </button>
+    <button class="app-tab" role="tab" id="tab-grupos" aria-selected="false" aria-controls="page-grupos">
+      <span class="app-tab__pip" aria-hidden="true"></span>Grupos
     </button>
     <button class="app-tab" role="tab" id="tab-pro" aria-selected="false" aria-controls="page-pro">
       <span class="app-tab__pip" aria-hidden="true"></span>Análisis
@@ -1494,6 +1719,19 @@
   <footer>Horarios en Europe/Madrid · Máximo 8 selecciones por calendario.</footer>
 </main>
 
+<!-- ── Groups page ───────────────────────────────────────────────────────────── -->
+<main class="page" id="page-grupos" role="tabpanel" aria-labelledby="tab-grupos" hidden>
+
+  <div class="section-head" style="margin-top:8px">
+    <h2>Grupos · Mundial 2026</h2>
+    <span>48 equipos · 12 grupos</span>
+  </div>
+
+  <div id="grupos-grid" class="grupos-grid"></div>
+
+  <footer>Los equipos marcados en rojo son los que sigues · Mundial 2026 USA/CAN/MEX</footer>
+</main>
+
 <!-- ── Analysis / Pro page ────────────────────────────────────────────────── -->
 <main class="page" id="page-pro" role="tabpanel" aria-labelledby="tab-pro" hidden>
 
@@ -1501,13 +1739,12 @@
   <div class="auth-gate" id="auth-gate">
     <div class="auth-gate__icon" aria-hidden="true">📊</div>
     <h2>Análisis de Mercado</h2>
-    <p>Introduce la clave para ver los picks del modelo y la analítica de cuotas en tiempo real.</p>
+    <p>Introduce la clave para ver los KPIs del torneo, los picks del modelo y la analítica de cuotas.</p>
     <div class="auth-form">
       <input class="auth-input" id="auth-input" type="password" placeholder="Clave de acceso…" autocomplete="off">
       <span class="auth-error" id="auth-error" role="alert"></span>
       <button class="auth-submit" id="auth-submit" type="button">Acceder</button>
     </div>
-    <p class="auth-hint">También puedes activarlo con el código Konami: ↑↑↓↓←→←→BA</p>
   </div>
 
   <!-- Picks content -->
@@ -1515,7 +1752,7 @@
 
     <div class="pro-head">
       <div class="pro-head__left">
-        <h2>Picks del día</h2>
+        <h2>Análisis del Mundial</h2>
         <span class="pro-badge">PRO</span>
       </div>
       <button class="icon-btn" id="pro-refresh" type="button">
@@ -1528,6 +1765,19 @@
     </div>
 
     <p class="pro-ts" id="pro-ts"></p>
+
+    <section class="stats-section" aria-labelledby="stats-title">
+      <div class="stats-section__head">
+        <h3 id="stats-title">KPIs del torneo</h3>
+        <p id="stats-ts">Se completarán cuando empiecen los partidos</p>
+      </div>
+      <p class="stats-source-note" id="stats-source-note" hidden></p>
+      <div id="tournament-kpis" class="tournament-kpis" aria-live="polite">
+        <div class="stats-loading">Preparando estadísticas…</div>
+      </div>
+    </section>
+
+    <h3 class="pro-section-title">Picks del día</h3>
     <div id="picks-grid" class="picks-grid"></div>
 
     <div class="analytics-card">
@@ -1549,6 +1799,9 @@
 <nav class="btm-nav" aria-label="Navegación">
   <button class="btm-btn" id="btm-cal" type="button" aria-selected="true">
     <span class="btm-btn__ico" aria-hidden="true">📅</span>Partidos
+  </button>
+  <button class="btm-btn" id="btm-grupos" type="button" aria-selected="false">
+    <span class="btm-btn__ico" aria-hidden="true">🏆</span>Grupos
   </button>
   <button class="btm-btn" id="btm-pro" type="button" aria-selected="false">
     <span class="btm-btn__ico" aria-hidden="true">📊</span>Análisis
@@ -1588,9 +1841,8 @@ const FEED_PATH       = "/api/calendar";
 const TIMEZONE        = "Europe/Madrid";
 const MAX_TEAMS       = 8;
 const REFRESH_MS      = 6 * 60 * 60 * 1000;
+const ANALYSIS_REFRESH_MS = 5 * 60 * 1000;
 const STORAGE_KEY     = "mundial-2026-teams";
-const PRO_SESSION_KEY = "pro_unlocked_v1";
-const PRO_HASH        = btoa("pro2026"); // UI-only gating, not real security
 
 const TEAMS = [
   ["ALG","Argelia","🇩🇿"],["ARG","Argentina","🇦🇷"],["AUS","Australia","🇦🇺"],
@@ -1613,6 +1865,21 @@ const TEAMS = [
 
 const TEAM_MAP = new Map(TEAMS.map(t => [t.code, t]));
 
+const GROUPS = [
+  { letter: "A", teams: ["MEX","KOR","RSA","CZE"] },
+  { letter: "B", teams: ["CAN","SUI","QAT","BIH"] },
+  { letter: "C", teams: ["BRA","HAI","MAR","SCO"] },
+  { letter: "D", teams: ["USA","AUS","PAR","TUR"] },
+  { letter: "E", teams: ["GER","ECU","CIV","CUW"] },
+  { letter: "F", teams: ["JPN","NED","SWE","TUN"] },
+  { letter: "G", teams: ["BEL","EGY","IRN","NZL"] },
+  { letter: "H", teams: ["ESP","KSA","URU","CPV"] },
+  { letter: "I", teams: ["FRA","IRQ","NOR","SEN"] },
+  { letter: "J", teams: ["ARG","ALG","AUT","JOR"] },
+  { letter: "K", teams: ["POR","COL","COD","UZB"] },
+  { letter: "L", teams: ["ENG","CRO","GHA","PAN"] },
+];
+
 // ── FORMATTERS ──────────────────────────────────────────────────────────────
 const fmtFull = new Intl.DateTimeFormat("es-ES", {
   timeZone: TIMEZONE, weekday:"long", day:"numeric", month:"long",
@@ -1633,6 +1900,9 @@ let currentFilter = "all";
 let calSource     = "";
 let lastRefresh   = 0;
 let proData       = null;
+let statsData     = null;
+let proUnlocked   = false;
+let proLoading    = false;
 let countdownTimer = null;
 let toastTimer    = null;
 
@@ -1672,11 +1942,15 @@ const E = {
   pastList:       G("past-list"),
   toast:          G("toast"),
   tabCal:         G("tab-cal"),
+  tabGrupos:      G("tab-grupos"),
   tabPro:         G("tab-pro"),
   pageCal:        G("page-cal"),
+  pageGrupos:     G("page-grupos"),
   pagePro:        G("page-pro"),
   btmCal:         G("btm-cal"),
+  btmGrupos:      G("btm-grupos"),
   btmPro:         G("btm-pro"),
+  gruposGrid:     G("grupos-grid"),
   authGate:       G("auth-gate"),
   authInput:      G("auth-input"),
   authError:      G("auth-error"),
@@ -1684,6 +1958,9 @@ const E = {
   picksContent:   G("picks-content"),
   proRefresh:     G("pro-refresh"),
   proTs:          G("pro-ts"),
+  statsTs:        G("stats-ts"),
+  statsSourceNote:G("stats-source-note"),
+  tournamentKpis:G("tournament-kpis"),
   picksGrid:      G("picks-grid"),
   ovList:         G("ov-list"),
   dialog:         G("team-dialog"),
@@ -1997,6 +2274,7 @@ function applyPicker() {
   updateBarFlags();
   updateCalLinks();
   closePicker();
+  renderGroups();
   loadCalendar({ initial: true });
 }
 
@@ -2016,63 +2294,153 @@ async function copyFeedUrl() {
   } catch { showToast("No se pudo copiar"); }
 }
 
+// ── GROUPS RENDER ────────────────────────────────────────────────────────────
+function renderGroups() {
+  E.gruposGrid.innerHTML = "";
+  for (const group of GROUPS) {
+    const hasSelected = group.teams.some(c => selectedCodes.includes(c));
+    const card = document.createElement("article");
+    card.className = `grupo-card${hasSelected ? " grupo-card--highlight" : ""}`;
+
+    const header = document.createElement("div");
+    header.className = "grupo-card__header";
+    header.innerHTML = `<span class="grupo-letter">Grupo ${group.letter}</span>${hasSelected ? '<span class="grupo-badge">Sigo</span>' : ""}`;
+    card.appendChild(header);
+
+    for (const code of group.teams) {
+      const team = TEAM_MAP.get(code);
+      if (!team) continue;
+      const isSel = selectedCodes.includes(code);
+      const row = document.createElement("div");
+      row.className = `grupo-team${isSel ? " grupo-team--selected" : ""}`;
+      row.innerHTML = `<span class="grupo-flag">${team.flag}</span><span class="grupo-name">${team.name}</span>${isSel ? '<span class="grupo-check">✓</span>' : ""}`;
+      card.appendChild(row);
+    }
+
+    E.gruposGrid.appendChild(card);
+  }
+}
+
 // ── TAB NAVIGATION ───────────────────────────────────────────────────────────
 function switchTab(name) {
-  const isCal = name === "cal";
+  const isCal    = name === "cal";
+  const isGrupos = name === "grupos";
+  const isPro    = name === "pro";
 
   E.pageCal.classList.toggle("active", isCal);
-  E.pagePro.classList.toggle("active", !isCal);
-  E.pageCal.hidden = !isCal;
-  E.pagePro.hidden = isCal;
+  E.pageGrupos.classList.toggle("active", isGrupos);
+  E.pagePro.classList.toggle("active", isPro);
+  E.pageCal.hidden    = !isCal;
+  E.pageGrupos.hidden = !isGrupos;
+  E.pagePro.hidden    = !isPro;
 
   E.tabCal.setAttribute("aria-selected", String(isCal));
-  E.tabPro.setAttribute("aria-selected", String(!isCal));
+  E.tabGrupos.setAttribute("aria-selected", String(isGrupos));
+  E.tabPro.setAttribute("aria-selected", String(isPro));
   E.btmCal.setAttribute("aria-selected", String(isCal));
-  E.btmPro.setAttribute("aria-selected", String(!isCal));
+  E.btmGrupos.setAttribute("aria-selected", String(isGrupos));
+  E.btmPro.setAttribute("aria-selected", String(isPro));
 
-  if (!isCal && isProUnlocked() && !proData) loadPicks();
+  if (isGrupos) renderGroups();
+  if (isPro && isProUnlocked() && (!proData || !statsData)) loadAnalysis();
 }
 
 // ── PRO MODE ─────────────────────────────────────────────────────────────────
 function isProUnlocked() {
-  return sessionStorage.getItem(PRO_SESSION_KEY) === "1";
+  return proUnlocked;
 }
 
 function unlockPro() {
-  sessionStorage.setItem(PRO_SESSION_KEY, "1");
+  proUnlocked = true;
   E.authGate.hidden     = true;
   E.picksContent.hidden = false;
-  loadPicks();
+  loadAnalysis();
 }
 
-function checkPassphrase(v) {
-  try { return btoa(v.trim()) === PRO_HASH; } catch { return false; }
+function lockPro() {
+  proUnlocked = false;
+  proData = null;
+  statsData = null;
+  E.authGate.hidden = false;
+  E.picksContent.hidden = true;
 }
 
-function initProGate() {
-  if (isProUnlocked()) {
+async function initProGate() {
+  try {
+    const response = await fetch("/api/analysis-auth", {
+      headers: { Accept: "application/json" }
+    });
+    const data = response.ok ? await response.json() : {};
+    if (!data.authenticated) return;
+    proUnlocked = true;
     E.authGate.hidden     = true;
     E.picksContent.hidden = false;
+    if (!E.pagePro.hidden) loadAnalysis();
+  } catch {
+    lockPro();
   }
 }
 
-// ── FETCH PICKS ──────────────────────────────────────────────────────────────
-async function loadPicks() {
+async function loginPro(password) {
+  const response = await fetch("/api/analysis-auth", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ password })
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || "No se pudo validar la clave.");
+  }
+  unlockPro();
+}
+
+async function analysisFetch(path) {
+  const response = await fetch(path, { headers: { Accept: "application/json" } });
+  if (response.status === 401) {
+    lockPro();
+    throw new Error("La sesión ha caducado. Introduce de nuevo la clave.");
+  }
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || `HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+// ── FETCH ANALYSIS ───────────────────────────────────────────────────────────
+async function loadAnalysis() {
+  if (proLoading || !isProUnlocked()) return;
+  proLoading = true;
   E.proRefresh.disabled = true;
   E.proRefresh.classList.add("loading");
   E.picksGrid.innerHTML = `<p style="color:var(--txt-2);font-size:13px">Cargando análisis…</p>`;
+  E.tournamentKpis.innerHTML = `<div class="stats-loading">Actualizando estadísticas del torneo…</div>`;
 
-  try {
-    const res = await fetch("/api/picks");
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    proData = await res.json();
+  const [picksResult, statsResult] = await Promise.allSettled([
+    analysisFetch("/api/picks"),
+    analysisFetch("/api/tournament-stats")
+  ]);
+
+  if (picksResult.status === "fulfilled") {
+    proData = picksResult.value;
     renderPicks(proData);
-  } catch (err) {
-    E.picksGrid.innerHTML = `<p style="color:var(--pri);font-size:13px">Error al cargar: ${err.message}</p>`;
-  } finally {
-    E.proRefresh.disabled = false;
-    E.proRefresh.classList.remove("loading");
+  } else if (isProUnlocked()) {
+    E.picksGrid.innerHTML = `<p style="color:var(--pri);font-size:13px">Error al cargar: ${escapeHtml(picksResult.reason.message)}</p>`;
   }
+
+  if (statsResult.status === "fulfilled") {
+    statsData = statsResult.value;
+    renderTournamentStats(statsData);
+  } else if (isProUnlocked()) {
+    E.tournamentKpis.innerHTML = `<div class="stats-error">${escapeHtml(statsResult.reason.message)}</div>`;
+  }
+
+  proLoading = false;
+  E.proRefresh.disabled = false;
+  E.proRefresh.classList.remove("loading");
 }
 
 const BAND_META = {
@@ -2108,6 +2476,112 @@ function renderPicks(data) {
       <span class="ov-pct">${(margin*100).toFixed(1)}%</span>`;
     E.ovList.appendChild(row);
   }
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  })[char]);
+}
+
+function renderTournamentStats(data) {
+  const summary = data.summary || {};
+  const leaders = data.leaders || {};
+  const gpg = leaders.teamGoalsPerGame;
+  const scorer = leaders.topScorer;
+  const keeper = leaders.bestGoalkeeper;
+  const todayMatch = leaders.bestMatchToday;
+  const assist = leaders.topAssist;
+  const attack = leaders.bestAttack;
+  const defense = leaders.bestDefense;
+  const highMatch = leaders.highestScoringMatch;
+  const bigWin = leaders.biggestWin;
+  const played = Number(summary.playedMatches) || 0;
+  const total = Number(summary.totalFixtures) || 0;
+  const playerStatsAvailable = data.availability?.playerStats !== false;
+  E.statsSourceNote.hidden = !data.availability?.message;
+  E.statsSourceNote.textContent = data.availability?.message || "";
+
+  const cards = [
+    {
+      cls: "t-kpi--green", label: "Equipo · goles por partido",
+      value: gpg?.name || "—",
+      sub: gpg ? `${gpg.goalsPerGame.toFixed(2)} goles/partido · ${gpg.goalsFor} en ${gpg.games}` : "Aún sin partidos"
+    },
+    {
+      cls: "t-kpi--yellow", label: "Máximo goleador",
+      value: scorer?.name || "—",
+      sub: scorer
+        ? `${scorer.value} gol${scorer.value === 1 ? "" : "es"} · ${scorer.team}`
+        : (playerStatsAvailable ? "Aún sin goles" : "Estadística de jugadores no disponible")
+    },
+    {
+      cls: "t-kpi--blue", label: "Mejor portero del día",
+      value: keeper?.name || "—",
+      sub: keeper
+        ? `${keeper.rating?.toFixed(1) || "s/n"} valoración · ${keeper.saves} paradas`
+        : (playerStatsAvailable ? "Sin porteros evaluados hoy" : "Estadística de jugadores no disponible")
+    },
+    {
+      cls: "t-kpi--red", label: "Mejor partido del día",
+      value: todayMatch?.match || "—",
+      sub: todayMatch ? `${todayMatch.score} · ${todayMatch.totalGoals} goles` : "Todavía no hay resultados hoy"
+    },
+    {
+      cls: "t-kpi--orange", label: "Goles del torneo",
+      value: String(Number(summary.totalGoals) || 0),
+      sub: played ? `${played} partidos disputados` : "El contador arrancará con el torneo"
+    },
+    {
+      cls: "t-kpi--green", label: "Media de goles",
+      value: summary.averageGoals != null ? Number(summary.averageGoals).toFixed(2) : "—",
+      sub: "goles por partido"
+    },
+    {
+      cls: "t-kpi--yellow", label: "Máximo asistente",
+      value: assist?.name || "—",
+      sub: assist
+        ? `${assist.value} asistencia${assist.value === 1 ? "" : "s"} · ${assist.team}`
+        : (playerStatsAvailable ? "Aún sin asistencias" : "Estadística de jugadores no disponible")
+    },
+    {
+      cls: "t-kpi--red", label: "Mejor ataque",
+      value: attack?.name || "—",
+      sub: attack ? `${attack.goalsFor} goles totales` : "Aún sin datos"
+    },
+    {
+      cls: "t-kpi--blue", label: "Mejor defensa",
+      value: defense?.name || "—",
+      sub: defense ? `${defense.concededPerGame.toFixed(2)} encajados/partido · ${defense.cleanSheets} porterías a cero` : "Aún sin datos"
+    },
+    {
+      cls: "t-kpi--orange", label: "Partido con más goles",
+      value: highMatch?.match || "—",
+      sub: highMatch ? `${highMatch.score} · ${highMatch.totalGoals} goles` : "Aún sin resultados"
+    },
+    {
+      cls: "t-kpi--red", label: "Mayor goleada",
+      value: bigWin?.match || "—",
+      sub: bigWin ? bigWin.score : "Aún sin victorias"
+    },
+    {
+      cls: "t-kpi--green", label: "Progreso del torneo",
+      value: `${played} / ${total || "—"}`,
+      sub: total ? `${Math.round((played / total) * 100)}% de partidos con resultado` : "Esperando el calendario oficial"
+    }
+  ];
+
+  E.tournamentKpis.innerHTML = cards.map(card => `
+    <article class="t-kpi ${card.cls} ${card.value === "—" ? "t-kpi--empty" : ""}">
+      <span class="t-kpi__label">${escapeHtml(card.label)}</span>
+      <strong class="t-kpi__value" title="${escapeHtml(card.value)}">${escapeHtml(card.value)}</strong>
+      <span class="t-kpi__sub">${escapeHtml(card.sub)}</span>
+    </article>`).join("");
+
+  const ts = data.generated_at ? new Date(data.generated_at) : null;
+  E.statsTs.textContent = ts
+    ? `Actualizado ${ts.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}`
+    : "Se completarán cuando empiecen los partidos";
 }
 
 function buildPickCard(pick) {
@@ -2150,14 +2624,6 @@ function buildPickCard(pick) {
   return card;
 }
 
-// ── KONAMI CODE ───────────────────────────────────────────────────────────────
-const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
-let ki = 0;
-document.addEventListener("keydown", e => {
-  ki = e.key === KONAMI[ki] ? ki + 1 : (e.key === KONAMI[0] ? 1 : 0);
-  if (ki === KONAMI.length) { ki = 0; switchTab("pro"); unlockPro(); }
-});
-
 // ── BIND EVENTS ───────────────────────────────────────────────────────────────
 function bindEvents() {
   E.editTeams.addEventListener("click", openPicker);
@@ -2173,8 +2639,10 @@ function bindEvents() {
   });
 
   E.tabCal.addEventListener("click", () => switchTab("cal"));
+  E.tabGrupos.addEventListener("click", () => switchTab("grupos"));
   E.tabPro.addEventListener("click", () => switchTab("pro"));
   E.btmCal.addEventListener("click", () => switchTab("cal"));
+  E.btmGrupos.addEventListener("click", () => switchTab("grupos"));
   E.btmPro.addEventListener("click", () => switchTab("pro"));
 
   E.dlgClose.addEventListener("click", closePicker);
@@ -2184,23 +2652,35 @@ function bindEvents() {
   E.resetTeams.addEventListener("click", () => { draftCodes = new Set(["ESP"]); buildTeamGrid(); });
   E.applyTeams.addEventListener("click", applyPicker);
 
-  E.authSubmit.addEventListener("click", () => {
-    if (checkPassphrase(E.authInput.value)) {
+  E.authSubmit.addEventListener("click", async () => {
+    E.authSubmit.disabled = true;
+    E.authError.textContent = "";
+    try {
+      await loginPro(E.authInput.value);
       E.authError.textContent = "";
-      unlockPro();
-    } else {
-      E.authError.textContent = "Clave incorrecta.";
+      E.authInput.value = "";
+    } catch (error) {
+      E.authError.textContent = error.message;
       E.authInput.focus();
+    } finally {
+      E.authSubmit.disabled = false;
     }
   });
   E.authInput.addEventListener("keydown", e => { if (e.key === "Enter") E.authSubmit.click(); });
 
-  E.proRefresh.addEventListener("click", () => { proData = null; loadPicks(); });
+  E.proRefresh.addEventListener("click", () => {
+    proData = null;
+    statsData = null;
+    loadAnalysis();
+  });
 }
 
 // ── AUTO REFRESH ──────────────────────────────────────────────────────────────
 function startAutoRefresh() {
   setInterval(() => loadCalendar(), REFRESH_MS);
+  setInterval(() => {
+    if (isProUnlocked() && !E.pagePro.hidden) loadAnalysis();
+  }, ANALYSIS_REFRESH_MS);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && Date.now() - lastRefresh >= REFRESH_MS) {
       loadCalendar();
@@ -2219,9 +2699,9 @@ initProGate();
 loadCalendar({ initial: true });
 startAutoRefresh();
 
-if (new URLSearchParams(location.search).get("mode") === "pro") {
-  switchTab("pro");
-}
+const _urlMode = new URLSearchParams(location.search).get("mode");
+if (_urlMode === "pro")    switchTab("pro");
+if (_urlMode === "grupos") switchTab("grupos");
 </script>
 </body>
 </html>

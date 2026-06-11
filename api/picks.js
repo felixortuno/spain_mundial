@@ -23,6 +23,8 @@
 
 "use strict";
 
+const { requireAnalysisAuth } = require("../lib/analysisAuth");
+
 // ── Configuración ──────────────────────────────────────────────────────────────
 const EDGE_THRESHOLD = parseFloat(process.env.EDGE_THRESHOLD || "0.02");
 const KELLY_FRACTION = parseFloat(process.env.KELLY_FRACTION || "0.25");
@@ -259,10 +261,10 @@ module.exports = async function handler(request, response) {
     return response.status(405).send("Método no permitido");
   }
 
-  response.setHeader("Access-Control-Allow-Origin", "*");
+  if (!requireAnalysisAuth(request, response)) return;
 
   if (request.method === "HEAD") {
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "private, no-store");
     return response.status(200).end();
   }
 
@@ -273,7 +275,7 @@ module.exports = async function handler(request, response) {
       const picks = JSON.parse(picksEnv);
       response.setHeader(
         "Cache-Control",
-        "public, max-age=0, s-maxage=1800, stale-while-revalidate=3600"
+        "private, max-age=0, must-revalidate"
       );
       return response.status(200).json({ ...picks, source: "ml_model" });
     } catch {
@@ -291,7 +293,7 @@ module.exports = async function handler(request, response) {
       const result = await buildLivePicks();
       response.setHeader(
         "Cache-Control",
-        "public, max-age=0, s-maxage=1800, stale-while-revalidate=3600"
+        "private, max-age=0, must-revalidate"
       );
       return response.status(200).json(result);
     } catch (err) {
@@ -302,7 +304,7 @@ module.exports = async function handler(request, response) {
   // ── Nivel 3: Demo ──────────────────────────────────────────────────
   response.setHeader(
     "Cache-Control",
-    "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"
+    "private, max-age=0, must-revalidate"
   );
   return response.status(200).json(DEMO_PICKS);
 };

@@ -4,6 +4,13 @@ Backend serverless para cruzar los partidos de API-Football v3 con las cuotas
 1X2 de The Odds API v4. El frontend y el calendario ICS existentes siguen
 funcionando de forma independiente.
 
+La pestaña de análisis también incluye KPIs deportivos del torneo y está
+protegida por una sesión HTTP-only.
+
+Los KPIs de equipos y partidos usan API-Football y degradan al feed Fixtur.es
+si el plan configurado no da acceso a la temporada 2026. Los líderes de
+jugadores requieren acceso de API-Football a esa temporada.
+
 ## Endpoint
 
 `GET /api/unified-matches`
@@ -23,6 +30,12 @@ La respuesta incluye:
 - Método y confianza de la reconciliación.
 - Partidos no reconciliados y metadatos de caché/cuota.
 
+Otros endpoints:
+
+- `POST /api/analysis-auth`: valida la clave y crea la sesión de análisis.
+- `GET /api/tournament-stats`: líderes y KPIs del torneo.
+- `GET /api/picks`: picks del modelo y analítica de mercado.
+
 ## Variables de entorno
 
 Configura en Vercel, nunca en el navegador:
@@ -36,6 +49,9 @@ ODDS_SPORT_TITLE_HINTS=FIFA World Cup,World Cup,soccer_fifa_world_cup
 ODDS_REGIONS=eu,uk
 ODDS_MARKETS=h2h
 FOOTBALL_ENRICHMENT=basic
+API_FOOTBALL_LIVE_STATS_TTL_MS=300000
+ANALYSIS_PASSWORD=...
+ANALYSIS_SESSION_SECRET=...
 ```
 
 `API_FOOTBALL_KEY` continúa admitido como alias de `APISPORTS_KEY` para que el
