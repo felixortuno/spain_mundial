@@ -1539,62 +1539,12 @@
     }
 
     /* ── Market analytics card ────────────────────────────────────────── */
-    .analytics-card {
-      padding: 20px;
-      border-radius: var(--r-xl);
-      background: var(--sur-2);
-      border: 1px solid var(--line-2);
-      margin-bottom: 24px;
-    }
-
-    .analytics-card h3 {
-      margin: 0 0 16px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--txt-2);
-    }
-
-    .ov-row {
+    /* ── PRO view filters ─────────────────────────────────────────────── */
+    .pro-filters {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 6px 0;
-    }
-
-    .ov-name {
-      width: 110px;
-      flex-shrink: 0;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .ov-track {
-      flex: 1;
-      height: 6px;
-      border-radius: 99px;
-      background: var(--sur-4);
-      overflow: hidden;
-    }
-
-    .ov-fill {
-      height: 100%;
-      border-radius: 99px;
-      background: var(--pri);
-      transition: width 800ms ease;
-    }
-    .ov-fill--best {
-      background: var(--ter);
-      box-shadow: 0 0 6px var(--ter);
-    }
-    .ov-pct {
-      width: 44px;
-      text-align: right;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--txt-2);
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 4px 0 20px;
     }
 
     /* ── Responsible gambling notice ──────────────────────────────────── */
@@ -1941,7 +1891,12 @@
 
     <p class="pro-ts" id="pro-ts"></p>
 
-    <section class="stats-section" aria-labelledby="stats-title">
+    <div class="pro-filters" role="group" aria-label="Qué quieres ver">
+      <button class="filter-pill active" type="button" data-pro-view="stats" aria-pressed="true">KPIs del torneo</button>
+      <button class="filter-pill" type="button" data-pro-view="picks" aria-pressed="false">Picks del día</button>
+    </div>
+
+    <section id="pro-view-stats" class="stats-section" aria-labelledby="stats-title">
       <div class="stats-section__head">
         <h3 id="stats-title">KPIs del torneo</h3>
         <p id="stats-ts">Se completarán cuando empiecen los partidos</p>
@@ -1952,20 +1907,17 @@
       </div>
     </section>
 
-    <h3 class="pro-section-title">Picks del día</h3>
-    <div id="picks-grid" class="picks-grid"></div>
+    <section id="pro-view-picks" hidden>
+      <h3 class="pro-section-title">Picks del día</h3>
+      <div id="picks-grid" class="picks-grid"></div>
 
-    <div class="analytics-card">
-      <h3>Overround por casa · Margen sobre cuotas justas</h3>
-      <div id="ov-list"></div>
-    </div>
-
-    <div class="rg-notice">
-      <strong>Juego responsable</strong> · Solo mayores de 18 años.
-      Estimaciones estadísticas, <strong>no garantías</strong>. El juego puede crear adicción.
-      Ayuda: <a href="https://www.jugarbien.es" target="_blank" rel="noopener">jugarbien.es</a>
-      · <a href="https://www.fejar.org" target="_blank" rel="noopener">fejar.org</a>
-    </div>
+      <div class="rg-notice">
+        <strong>Juego responsable</strong> · Solo mayores de 18 años.
+        Estimaciones estadísticas, <strong>no garantías</strong>. El juego puede crear adicción.
+        Ayuda: <a href="https://www.jugarbien.es" target="_blank" rel="noopener">jugarbien.es</a>
+        · <a href="https://www.fejar.org" target="_blank" rel="noopener">fejar.org</a>
+      </div>
+    </section>
 
   </div>
 </main>
@@ -2026,14 +1978,14 @@ const TEAMS = [
   ["BRA","Brasil","🇧🇷"],["CAN","Canadá","🇨🇦"],["CPV","Cabo Verde","🇨🇻"],
   ["COL","Colombia","🇨🇴"],["CRO","Croacia","🇭🇷"],["CUW","Curazao","🇨🇼"],
   ["CZE","Chequia","🇨🇿"],["COD","RD Congo","🇨🇩"],["ECU","Ecuador","🇪🇨"],
-  ["EGY","Egipto","🇪🇬"],["ENG","Inglaterra","🏴"],["ESP","España","🇪🇸"],
+  ["EGY","Egipto","🇪🇬"],["ENG","Inglaterra","🏴󠁧󠁢󠁥󠁮󠁧󠁿"],["ESP","España","🇪🇸"],
   ["FRA","Francia","🇫🇷"],["GER","Alemania","🇩🇪"],["GHA","Ghana","🇬🇭"],
   ["HAI","Haití","🇭🇹"],["IRN","Irán","🇮🇷"],["IRQ","Irak","🇮🇶"],
   ["CIV","Costa de Marfil","🇨🇮"],["JPN","Japón","🇯🇵"],["JOR","Jordania","🇯🇴"],
   ["MEX","México","🇲🇽"],["MAR","Marruecos","🇲🇦"],["NED","Países Bajos","🇳🇱"],
   ["NZL","Nueva Zelanda","🇳🇿"],["NOR","Noruega","🇳🇴"],["PAN","Panamá","🇵🇦"],
   ["PAR","Paraguay","🇵🇾"],["POR","Portugal","🇵🇹"],["QAT","Catar","🇶🇦"],
-  ["KSA","Arabia Saudí","🇸🇦"],["SCO","Escocia","🏴"],["SEN","Senegal","🇸🇳"],
+  ["KSA","Arabia Saudí","🇸🇦"],["SCO","Escocia","🏴󠁧󠁢󠁳󠁣󠁴󠁿"],["SEN","Senegal","🇸🇳"],
   ["RSA","Sudáfrica","🇿🇦"],["KOR","Corea del Sur","🇰🇷"],["SWE","Suecia","🇸🇪"],
   ["SUI","Suiza","🇨🇭"],["TUN","Túnez","🇹🇳"],["TUR","Turquía","🇹🇷"],
   ["USA","Estados Unidos","🇺🇸"],["URU","Uruguay","🇺🇾"],["UZB","Uzbekistán","🇺🇿"],
@@ -2073,6 +2025,8 @@ let selectedCodes = loadSelection();
 let draftCodes    = new Set(selectedCodes);
 let allMatches    = [];
 let currentFilter = "all";
+// Vistas del modo PRO: las Picks del día arrancan desactivadas por defecto.
+let proViews      = { stats: true, picks: false };
 let calSource     = "";
 let lastRefresh   = 0;
 let proData       = null;
@@ -2148,7 +2102,8 @@ const E = {
   statsSourceNote:G("stats-source-note"),
   tournamentKpis:G("tournament-kpis"),
   picksGrid:      G("picks-grid"),
-  ovList:         G("ov-list"),
+  proViewStats:   G("pro-view-stats"),
+  proViewPicks:   G("pro-view-picks"),
   dialog:         G("team-dialog"),
   dlgClose:       G("dlg-close"),
   teamSearch:     G("team-search"),
@@ -2245,13 +2200,14 @@ function setRefreshing(on) {
 
 function getFlagsFromTitle(title) {
   const normalizedTitle = title.toLowerCase();
-  const flags = [];
+  const found = [];
   for (const team of TEAMS) {
-    if (normalizedTitle.includes(team.name.toLowerCase())) {
-      flags.push(team.flag);
-    }
+    const idx = normalizedTitle.indexOf(team.name.toLowerCase());
+    if (idx !== -1) found.push({ idx, flag: team.flag });
   }
-  return flags.join(" ");
+  // Ordena según el orden de aparición en el título (local a la izquierda).
+  found.sort((a, b) => a.idx - b.idx);
+  return found.map(t => t.flag).join(" ");
 }
 
 function renderSchedule() {
@@ -2546,10 +2502,21 @@ function isProUnlocked() {
   return proUnlocked;
 }
 
+function applyProViews() {
+  E.proViewStats.hidden = !proViews.stats;
+  E.proViewPicks.hidden = !proViews.picks;
+  document.querySelectorAll(".pro-filters .filter-pill").forEach(btn => {
+    const on = Boolean(proViews[btn.dataset.proView]);
+    btn.classList.toggle("active", on);
+    btn.setAttribute("aria-pressed", String(on));
+  });
+}
+
 function unlockPro() {
   proUnlocked = true;
   E.authGate.hidden     = true;
   E.picksContent.hidden = false;
+  applyProViews();
   document.body.classList.remove("no-scroll");
   loadAnalysis();
 }
@@ -2739,23 +2706,6 @@ function renderPicks(data) {
   for (const pick of (data.picks || [])) {
     E.picksGrid.appendChild(buildPickCard(pick));
   }
-
-  // Overround bars
-  E.ovList.innerHTML = "";
-  const ov   = data.analitica_mercado?.overround_por_casa || {};
-  const best = data.analitica_mercado?.mejor_casa_precio;
-  const max  = Math.max(...Object.values(ov).map(Number), 0.08);
-
-  for (const [bk, margin] of Object.entries(ov)) {
-    const isBest = bk === best;
-    const row = document.createElement("div");
-    row.className = "ov-row";
-    row.innerHTML = `
-      <span class="ov-name">${bk}${isBest ? " ★" : ""}</span>
-      <div class="ov-track"><div class="ov-fill${isBest ? " ov-fill--best" : ""}" style="width:${Math.min((margin/max)*100,100).toFixed(1)}%"></div></div>
-      <span class="ov-pct">${(margin*100).toFixed(1)}%</span>`;
-    E.ovList.appendChild(row);
-  }
 }
 
 function escapeHtml(value) {
@@ -2910,11 +2860,18 @@ function bindEvents() {
   E.refreshBtn.addEventListener("click", () => loadCalendar());
   E.copyFeed.addEventListener("click", copyFeedUrl);
 
-  document.querySelectorAll(".filter-pill").forEach(btn => {
+  document.querySelectorAll(".filter-strip .filter-pill").forEach(btn => {
     btn.addEventListener("click", () => {
       currentFilter = btn.dataset.filter;
-      document.querySelectorAll(".filter-pill").forEach(b => b.classList.toggle("active", b === btn));
+      document.querySelectorAll(".filter-strip .filter-pill").forEach(b => b.classList.toggle("active", b === btn));
       if (allMatches.length) applyFilter();
+    });
+  });
+
+  document.querySelectorAll(".pro-filters .filter-pill").forEach(btn => {
+    btn.addEventListener("click", () => {
+      proViews[btn.dataset.proView] = !proViews[btn.dataset.proView];
+      applyProViews();
     });
   });
 
