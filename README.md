@@ -47,6 +47,7 @@ APISPORTS_KEY=...
 ODDS_API_KEY=...
 API_FOOTBALL_LEAGUE_ID=1
 API_FOOTBALL_SEASON=2026
+API_FOOTBALL_SEASON_DATA_ENABLED=false
 ODDS_SPORT_TITLE_HINTS=FIFA World Cup,World Cup,soccer_fifa_world_cup
 ODDS_REGIONS=eu,uk
 ODDS_MARKETS=h2h
@@ -62,6 +63,10 @@ PRO_ADMIN_PASSWORD=...
 
 `API_FOOTBALL_KEY` continúa admitido como alias de `APISPORTS_KEY` para que el
 endpoint ICS existente no pierda su configuración.
+
+Con el plan gratuito actual, usa `API_FOOTBALL_SEASON_DATA_ENABLED=false` para
+evitar consultas de temporada 2026 que serán rechazadas. Esto no desactiva el
+endpoint de partidos en directo.
 
 ## Acceso PRO con Firebase
 

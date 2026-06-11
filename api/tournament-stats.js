@@ -27,13 +27,6 @@ module.exports = async function handler(request, response) {
   }
 
   const config = loadConfig();
-  if (!config.apiSportsKey) {
-    response.setHeader("Cache-Control", "private, no-store");
-    return response.status(503).json({
-      error: "Las estadísticas deportivas no están configuradas."
-    });
-  }
-
   const provider = new FootballProvider({
     apiKey: config.apiSportsKey,
     ...config.football,
@@ -47,23 +40,30 @@ module.exports = async function handler(request, response) {
   let fixtures = [];
   let source = "api-football";
   let providerMessage = "";
-  let playerStatsAvailable = true;
+  let playerStatsAvailable = false;
 
-  try {
-    const result = await provider.getFixtures({
-      league,
-      season,
-      timezone: TIME_ZONE
-    });
-    fixtures = result.data;
-    if (!fixtures.length) throw new Error("API-Football no publicó partidos.");
-  } catch (error) {
-    console.warn("[tournament-stats] API-Football no disponible:", error.message);
+  if (
+    config.apiSportsKey &&
+    config.football.seasonDataEnabled !== false
+  ) {
+    try {
+      const result = await provider.getFixtures({
+        league,
+        season,
+        timezone: TIME_ZONE
+      });
+      fixtures = result.data;
+      playerStatsAvailable = fixtures.length > 0;
+    } catch (error) {
+      console.warn("[tournament-stats] API-Football no disponible:", error.message);
+    }
+  }
+
+  if (!fixtures.length) {
     try {
       const fallback = await new FixturesIcsProvider().getFixtures();
       fixtures = fallback.data;
       source = "fixtur.es";
-      playerStatsAvailable = false;
       providerMessage =
         "Datos de partidos mediante el feed de respaldo. Las estadísticas de jugadores requieren acceso API-Football 2026.";
     } catch (fallbackError) {

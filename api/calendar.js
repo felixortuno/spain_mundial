@@ -416,7 +416,10 @@ module.exports = async function handler(request, response) {
     let source = "ics-fallback";
     const apiKey = process.env.API_FOOTBALL_KEY;
 
-    if (apiKey && Date.now() >= apiDisabledUntil) {
+    const seasonDataEnabled =
+      process.env.API_FOOTBALL_SEASON_DATA_ENABLED !== "false";
+
+    if (seasonDataEnabled && apiKey && Date.now() >= apiDisabledUntil) {
       try {
         calendar = await fetchApiFootballCalendar(apiKey, selectedTeams);
         source = "api-football";

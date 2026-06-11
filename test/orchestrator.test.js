@@ -187,3 +187,64 @@ test("usa el feed ICS si API-Football rechaza la temporada", async () => {
   assert.equal(result.counts.reconciled, 1);
   assert.equal(result.matches[0].features.status.short, "NS");
 });
+
+test("omite API-Football si los datos de temporada están desactivados", async () => {
+  let footballCalls = 0;
+  const footballProvider = {
+    async getFixtures() {
+      footballCalls += 1;
+      throw new Error("No debería consultar la temporada.");
+    }
+  };
+  const fixtureFallbackProvider = {
+    async getFixtures() {
+      return {
+        cache: { status: "miss" },
+        metadata: { provider: "fixtur.es", status: 200 },
+        data: []
+      };
+    }
+  };
+  const oddsProvider = {
+    async resolveSportKey() {
+      return {
+        sport: { key: "soccer_fifa_world_cup", title: "FIFA World Cup" },
+        catalog: { ...metadata, data: [] }
+      };
+    },
+    async getOdds() {
+      return { ...metadata, data: [] };
+    }
+  };
+  const config = {
+    apiSportsKey: "free-plan",
+    football: {
+      league: "1",
+      season: "2026",
+      seasonDataEnabled: false,
+      enrichment: "none",
+      enrichmentLimit: 0
+    },
+    odds: {
+      sportKey: "",
+      sportHints: ["World Cup"],
+      regions: ["eu"],
+      markets: ["h2h"]
+    },
+    reconciliation: {
+      timeWindowMinutes: 90,
+      fuzzyThreshold: 0.86
+    }
+  };
+
+  const result = await buildUnifiedMatches({
+    config,
+    footballProvider,
+    fixtureFallbackProvider,
+    oddsProvider,
+    logger: { warn() {} }
+  });
+
+  assert.equal(footballCalls, 0);
+  assert.equal(result.competition.fixturesSource, "fixtur.es");
+});
