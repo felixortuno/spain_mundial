@@ -1778,16 +1778,28 @@
     }
     @media (min-width: 640px) { .toast { bottom: 24px; } }
 
-    /* ── Mobile app bar: compact — hide text label, constrain flags ───── */
+    /* ── Mobile app bar: icono pequeño — sin fondo prominente ──────────── */
     @media (max-width: 639px) {
       .bar-btn-label { display: none; }
-      .bar-btn { padding: 7px 10px; gap: 6px; }
+      .bar-btn {
+        padding: 4px 6px;
+        gap: 3px;
+        background: transparent;
+        border-color: transparent;
+        box-shadow: none;
+      }
+      .bar-btn:hover, .bar-btn:active {
+        background: var(--sur-2);
+        border-color: var(--line);
+      }
       #bar-flags {
         display: flex;
         align-items: center;
-        max-width: 148px;
+        gap: 2px;
+        max-width: 130px;
         overflow: hidden;
       }
+      #bar-flags img { height: 20px; width: auto; border-radius: 2px; }
     }
 
     /* ── Mobile icon buttons: icon-only ──────────────────────────────── */
