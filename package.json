@@ -7,7 +7,7 @@
     "pro:activate": "node --env-file-if-exists=.env scripts/activate-pro-user.js"
   },
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "dependencies": {
     "@google-cloud/firestore": "^8.6.0"
