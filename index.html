@@ -969,19 +969,53 @@
 
     /* ── Pro / Analysis tab ───────────────────────────────────────────── */
     .auth-gate {
+      position: fixed;
+      z-index: 100;
+      inset: 0;
       display: grid;
       place-items: center;
-      min-height: 340px;
-      padding: 48px 24px;
+      padding: 24px;
+      background: rgba(3, 5, 10, 0.86);
+      backdrop-filter: blur(12px);
+    }
+
+    .auth-gate[hidden] { display: none; }
+
+    .auth-gate__card {
+      position: relative;
+      width: min(100%, 430px);
+      padding: 38px 30px 30px;
       text-align: center;
       background: var(--sur-2);
       border-radius: var(--r-xl);
-      border: 1px solid var(--line-2);
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+    }
+
+    .auth-gate__close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--sur-3);
+      color: var(--txt-2);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .auth-gate__close:hover {
+      color: var(--txt);
+      background: var(--sur-4);
     }
 
     .auth-gate__icon {
       font-size: 48px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       line-height: 1;
       filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.15));
     }
@@ -995,10 +1029,34 @@
     }
 
     .auth-gate p {
-      margin: 0 0 24px;
+      margin: 0 0 18px;
       color: var(--txt-2);
       font-size: 13px;
       max-width: 380px;
+    }
+
+    .auth-payment {
+      padding: 16px;
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(255, 208, 0, 0.3);
+      background: var(--sec-dim);
+      color: var(--txt) !important;
+      font-size: 15px !important;
+      line-height: 1.55;
+    }
+
+    .auth-payment strong {
+      display: block;
+      color: var(--sec);
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .auth-instruction {
+      margin-bottom: 12px !important;
+      font-size: 11px !important;
+      color: var(--txt-3) !important;
     }
 
     .auth-form {
@@ -1736,14 +1794,22 @@
 <main class="page" id="page-pro" role="tabpanel" aria-labelledby="tab-pro" hidden>
 
   <!-- Auth gate -->
-  <div class="auth-gate" id="auth-gate">
-    <div class="auth-gate__icon" aria-hidden="true">📊</div>
-    <h2>Análisis de Mercado</h2>
-    <p>Introduce la clave para ver los KPIs del torneo, los picks del modelo y la analítica de cuotas.</p>
-    <div class="auth-form">
-      <input class="auth-input" id="auth-input" type="password" placeholder="Clave de acceso…" autocomplete="off">
-      <span class="auth-error" id="auth-error" role="alert"></span>
-      <button class="auth-submit" id="auth-submit" type="button">Acceder</button>
+  <div class="auth-gate" id="auth-gate" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="auth-gate__card">
+      <button class="auth-gate__close" id="auth-close" type="button" aria-label="Cerrar">×</button>
+      <div class="auth-gate__icon" aria-hidden="true">📊</div>
+      <h2 id="auth-title">Desbloquear análisis</h2>
+      <p class="auth-payment">
+        Bizum de 4.99€ al número
+        <strong>+34 611 476 090</strong>
+        para desbloquear el análisis
+      </p>
+      <p class="auth-instruction">Introduce debajo la clave de acceso recibida.</p>
+      <div class="auth-form">
+        <input class="auth-input" id="auth-input" type="password" placeholder="Clave de acceso…" autocomplete="off">
+        <span class="auth-error" id="auth-error" role="alert"></span>
+        <button class="auth-submit" id="auth-submit" type="button">Desbloquear análisis</button>
+      </div>
     </div>
   </div>
 
@@ -1952,6 +2018,7 @@ const E = {
   btmPro:         G("btm-pro"),
   gruposGrid:     G("grupos-grid"),
   authGate:       G("auth-gate"),
+  authClose:      G("auth-close"),
   authInput:      G("auth-input"),
   authError:      G("auth-error"),
   authSubmit:     G("auth-submit"),
@@ -2342,6 +2409,14 @@ function switchTab(name) {
   E.btmPro.setAttribute("aria-selected", String(isPro));
 
   if (isGrupos) renderGroups();
+  if (isPro && !isProUnlocked()) {
+    E.authGate.hidden = false;
+    document.body.classList.add("no-scroll");
+    requestAnimationFrame(() => E.authInput.focus());
+  } else if (!isPro && !isProUnlocked()) {
+    E.authGate.hidden = true;
+    document.body.classList.remove("no-scroll");
+  }
   if (isPro && isProUnlocked() && (!proData || !statsData)) loadAnalysis();
 }
 
@@ -2354,6 +2429,7 @@ function unlockPro() {
   proUnlocked = true;
   E.authGate.hidden     = true;
   E.picksContent.hidden = false;
+  document.body.classList.remove("no-scroll");
   loadAnalysis();
 }
 
@@ -2361,8 +2437,9 @@ function lockPro() {
   proUnlocked = false;
   proData = null;
   statsData = null;
-  E.authGate.hidden = false;
+  E.authGate.hidden = E.pagePro.hidden;
   E.picksContent.hidden = true;
+  document.body.classList.toggle("no-scroll", !E.pagePro.hidden);
 }
 
 async function initProGate() {
@@ -2375,6 +2452,7 @@ async function initProGate() {
     proUnlocked = true;
     E.authGate.hidden     = true;
     E.picksContent.hidden = false;
+    document.body.classList.remove("no-scroll");
     if (!E.pagePro.hidden) loadAnalysis();
   } catch {
     lockPro();
@@ -2667,6 +2745,12 @@ function bindEvents() {
     }
   });
   E.authInput.addEventListener("keydown", e => { if (e.key === "Enter") E.authSubmit.click(); });
+  E.authClose.addEventListener("click", () => switchTab("cal"));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !E.authGate.hidden && !isProUnlocked()) {
+      switchTab("cal");
+    }
+  });
 
   E.proRefresh.addEventListener("click", () => {
     proData = null;
