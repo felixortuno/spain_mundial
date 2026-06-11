@@ -211,6 +211,13 @@
     .app-tab[aria-selected="true"] { color: var(--txt); }
     .app-tab[aria-selected="true"] .app-tab__pip { background: var(--g3); }
     .app-tab:hover { color: var(--txt); background: var(--bg-3); }
+    .app-tab--live { color: #86efac; }
+    .app-tab--live .app-tab__pip { background: var(--live); animation: live-pulse 1.4s ease infinite; }
+    .app-tab--live[aria-selected="true"] { color: #bbf7d0; background: var(--live-dim); }
+    @keyframes live-pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.45); }
+      50% { opacity: 0.65; box-shadow: 0 0 0 5px rgba(34,197,94,0); }
+    }
 
     /* ── Selecciones bar button ─────────────────────────────────────────── */
     .bar-btn {
@@ -735,6 +742,319 @@
       line-height: 1.5;
     }
     .minfo__detail strong { color: var(--txt-2); font-weight: 600; }
+
+    /* ── Live match page ───────────────────────────────────────────────── */
+    .live-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0 7px;
+    }
+    .live-status-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #86efac;
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .live-status-line__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--live);
+      animation: live-pulse 1.4s ease infinite;
+    }
+    .live-match-switcher {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 2px 0 10px;
+      scrollbar-width: none;
+    }
+    .live-match-switcher::-webkit-scrollbar { display: none; }
+    .live-match-chip {
+      flex: 0 0 auto;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-full);
+      background: var(--bg-1);
+      color: var(--txt-2);
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .live-match-chip.active {
+      color: #bbf7d0;
+      border-color: var(--g2);
+      background: var(--live-dim);
+    }
+    .live-scoreboard {
+      position: relative;
+      overflow: hidden;
+      padding: 16px;
+      border: 1px solid rgba(34,197,94,0.34);
+      border-radius: var(--r-lg);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(34,197,94,0.16), transparent 48%),
+        linear-gradient(180deg, var(--bg-2), var(--bg-1));
+      box-shadow: 0 20px 60px rgba(0,0,0,0.24);
+    }
+    .live-scoreboard::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(90deg, transparent 0 42px, rgba(255,255,255,0.012) 42px 43px);
+    }
+    .live-scoreboard__meta {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 20px;
+      color: var(--txt-2);
+      font-family: var(--font-ui);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .live-badge {
+      padding: 3px 8px;
+      border: 1px solid rgba(34,197,94,0.4);
+      border-radius: var(--r-sharp);
+      background: var(--live-dim);
+      color: #86efac;
+    }
+    .live-teams {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      padding: 22px 0 16px;
+    }
+    .live-team {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+    .live-team__flag {
+      width: 54px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: var(--r-xs);
+      background: var(--bg-3);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+    }
+    .live-team__flag img { width: 100%; height: 100%; object-fit: cover; }
+    .live-team__name {
+      max-width: 100%;
+      color: var(--txt);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.05;
+    }
+    .live-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      min-width: 112px;
+    }
+    .live-score__goals {
+      font-family: var(--font-sport);
+      font-size: 52px;
+      line-height: 0.9;
+      letter-spacing: 0.06em;
+      color: #fff;
+      text-shadow: 0 3px 18px rgba(0,0,0,0.6);
+      white-space: nowrap;
+    }
+    .live-score__clock {
+      color: var(--live);
+      font-family: var(--font-sport);
+      font-size: 16px;
+      letter-spacing: 0.08em;
+    }
+    .live-scoreboard__foot {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+      padding-top: 11px;
+      border-top: 1px solid var(--line);
+      color: var(--txt-3);
+      font-family: var(--font-ui);
+      font-size: 11px;
+      text-align: center;
+    }
+    .live-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .live-kpi {
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      background: var(--bg-1);
+    }
+    .live-kpi__label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--txt-3);
+      font-family: var(--font-ui);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .live-kpi__value {
+      display: block;
+      overflow: hidden;
+      color: var(--txt);
+      font-family: var(--font-sport);
+      font-size: 18px;
+      line-height: 1.05;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .live-kpi__sub {
+      display: block;
+      margin-top: 4px;
+      color: var(--txt-2);
+      font-family: var(--font-ui);
+      font-size: 10px;
+      line-height: 1.25;
+    }
+    .live-panel {
+      margin-top: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      background: var(--bg-1);
+    }
+    .live-panel__head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .live-panel__head h2 { font-size: 15px; }
+    .live-panel__head span {
+      color: var(--txt-3);
+      font-family: var(--font-ui);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .live-stat-list { display: flex; flex-direction: column; gap: 11px; }
+    .live-stat {
+      display: grid;
+      grid-template-columns: 35px 1fr 84px 1fr 35px;
+      align-items: center;
+      gap: 7px;
+    }
+    .live-stat__value {
+      color: var(--txt);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .live-stat__label {
+      color: var(--txt-2);
+      font-family: var(--font-ui);
+      font-size: 10px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .live-stat__track {
+      position: relative;
+      height: 5px;
+      overflow: hidden;
+      border-radius: var(--r-full);
+      background: var(--bg-3);
+    }
+    .live-stat__track span {
+      position: absolute;
+      inset-block: 0;
+      border-radius: inherit;
+      background: var(--g3);
+    }
+    .live-stat__track--home span { right: 0; }
+    .live-stat__track--away span { left: 0; background: var(--gold); }
+    .live-timeline { display: flex; flex-direction: column; }
+    .live-event {
+      display: grid;
+      grid-template-columns: 42px 38px 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 0;
+      border-top: 1px solid var(--line-2);
+    }
+    .live-event:first-child { border-top: none; padding-top: 0; }
+    .live-event__minute {
+      color: var(--live);
+      font-family: var(--font-sport);
+      font-size: 14px;
+      text-align: center;
+    }
+    .live-event__type {
+      padding: 3px 4px;
+      border-radius: var(--r-sharp);
+      background: var(--bg-3);
+      color: var(--gold);
+      font-family: var(--font-ui);
+      font-size: 9px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .live-event__text {
+      min-width: 0;
+      color: var(--txt);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .live-event__text span {
+      display: block;
+      margin-top: 2px;
+      color: var(--txt-3);
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .live-empty-note {
+      padding: 12px 0 2px;
+      color: var(--txt-3);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      text-align: center;
+    }
 
     /* ── Groups page ────────────────────────────────────────────────────── */
     .grupos-grid {
@@ -1328,6 +1648,15 @@
 
       /* Metrics in picks */
       .metrics { grid-template-columns: repeat(2, 1fr); }
+
+      /* Live */
+      .live-kpis { grid-template-columns: repeat(2, 1fr); }
+      .live-teams { gap: 7px; }
+      .live-team__flag { width: 45px; height: 30px; }
+      .live-team__name { font-size: 12px; }
+      .live-score { min-width: 92px; }
+      .live-score__goals { font-size: 43px; }
+      .live-stat { grid-template-columns: 29px 1fr 72px 1fr 29px; gap: 5px; }
     }
 
     /* ── Responsive: desktop (≥640px) ──────────────────────────────────── */
@@ -1356,6 +1685,9 @@
   </div>
 
   <nav class="app-tabs" role="tablist" aria-label="Secciones">
+    <button class="app-tab app-tab--live" role="tab" id="tab-live" aria-selected="false" aria-controls="page-live" hidden>
+      <span class="app-tab__pip" aria-hidden="true"></span>En directo
+    </button>
     <button class="app-tab" role="tab" id="tab-cal" aria-selected="true" aria-controls="page-cal">
       <span class="app-tab__pip" aria-hidden="true"></span>Partidos
     </button>
@@ -1371,6 +1703,85 @@
     <span id="bar-flags" aria-hidden="true"></span><span class="bar-btn-label"> Selecciones</span>
   </button>
 </header>
+
+<!-- ── Live page ─────────────────────────────────────────────────────────── -->
+<main class="page" id="page-live" role="tabpanel" aria-labelledby="tab-live" hidden>
+  <div class="live-top">
+    <p class="live-status-line">
+      <span class="live-status-line__dot" aria-hidden="true"></span>
+      <span id="live-updated">Partido en juego</span>
+    </p>
+    <button class="icon-btn" id="live-refresh" type="button">
+      <svg class="spin-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+      </svg>
+      <span class="icon-btn-label">Actualizar</span>
+    </button>
+  </div>
+
+  <section id="live-loading" aria-live="polite">
+    <div class="sk-card" style="min-height:245px;margin-top:4px">
+      <div class="sk sk-line--sm" style="width:35%;align-self:center"></div>
+      <div class="sk sk-line--lg" style="width:82%;height:72px;align-self:center;margin-top:34px"></div>
+      <div class="sk sk-line--sm" style="width:55%;align-self:center;margin-top:28px"></div>
+    </div>
+  </section>
+
+  <section class="state-card" id="live-error" hidden aria-live="assertive">
+    <div>
+      <div class="state-icon" aria-hidden="true">!</div>
+      <h2>Directo no disponible</h2>
+      <p id="live-error-text">No se pudo actualizar el partido.</p>
+    </div>
+  </section>
+
+  <div id="live-content" hidden>
+    <nav class="live-match-switcher" id="live-match-switcher" aria-label="Partidos en directo"></nav>
+
+    <article class="live-scoreboard">
+      <div class="live-scoreboard__meta">
+        <span class="live-badge">En directo</span>
+        <span id="live-round"></span>
+      </div>
+      <div class="live-teams">
+        <div class="live-team">
+          <span class="live-team__flag" id="live-home-flag" aria-hidden="true"></span>
+          <span class="live-team__name" id="live-home-name"></span>
+        </div>
+        <div class="live-score">
+          <strong class="live-score__goals" id="live-score"></strong>
+          <span class="live-score__clock" id="live-clock"></span>
+        </div>
+        <div class="live-team">
+          <span class="live-team__flag" id="live-away-flag" aria-hidden="true"></span>
+          <span class="live-team__name" id="live-away-name"></span>
+        </div>
+      </div>
+      <div class="live-scoreboard__foot" id="live-venue"></div>
+    </article>
+
+    <section class="live-kpis" id="live-kpis" aria-label="Indicadores del partido"></section>
+
+    <section class="live-panel" aria-labelledby="live-stats-title">
+      <div class="live-panel__head">
+        <h2 id="live-stats-title">Estadísticas</h2>
+        <span>Datos del partido</span>
+      </div>
+      <div class="live-stat-list" id="live-stat-list"></div>
+    </section>
+
+    <section class="live-panel" aria-labelledby="live-events-title">
+      <div class="live-panel__head">
+        <h2 id="live-events-title">Cronología</h2>
+        <span>Últimas acciones</span>
+      </div>
+      <div class="live-timeline" id="live-timeline"></div>
+    </section>
+  </div>
+
+  <footer>El directo se actualiza automáticamente. Los datos pueden llevar unos minutos de retraso.</footer>
+</main>
 
 <!-- ── Calendar page ─────────────────────────────────────────────────────── -->
 <main class="page active" id="page-cal" role="tabpanel" aria-labelledby="tab-cal">
@@ -1593,6 +2004,9 @@
 
 <!-- ── Bottom nav (mobile) ───────────────────────────────────────────────── -->
 <nav class="btm-nav" aria-label="Navegación">
+  <button class="btm-btn" id="btm-live" type="button" aria-selected="false" hidden>
+    <span class="btm-btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m8 2 4 3 4-3"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span>Directo
+  </button>
   <button class="btm-btn" id="btm-cal" type="button" aria-selected="true">
     <span class="btm-btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg></span>Partidos
   </button>
@@ -1642,6 +2056,7 @@ const FEED_PATH       = "/api/calendar";
 const TIMEZONE        = "Europe/Madrid";
 const MAX_TEAMS       = 8;
 const REFRESH_MS      = 6 * 60 * 60 * 1000;
+const LIVE_REFRESH_MS = 60 * 1000;
 const ANALYSIS_REFRESH_MS = 5 * 60 * 1000;
 const PRO_ACCESS_CHECK_MS = 15 * 1000;
 const STORAGE_KEY     = "mundial-2026-teams";
@@ -1667,6 +2082,34 @@ const TEAMS = [
 ].map(([code,name,flag,iso2]) => ({ code, name, flag, iso2 }));
 
 const TEAM_MAP = new Map(TEAMS.map(t => [t.code, t]));
+const TEAM_NAME_MAP = new Map();
+
+function normalizeTeamName(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+for (const team of TEAMS) TEAM_NAME_MAP.set(normalizeTeamName(team.name), team.code);
+[
+  ["Algeria","ALG"], ["Australia","AUS"], ["Austria","AUT"], ["Belgium","BEL"],
+  ["Bosnia and Herzegovina","BIH"], ["Bosnia-Herzegovina","BIH"], ["Brazil","BRA"],
+  ["Canada","CAN"], ["Cape Verde","CPV"], ["Colombia","COL"], ["Croatia","CRO"],
+  ["Curacao","CUW"], ["Curaçao","CUW"], ["Czech Republic","CZE"], ["Czechia","CZE"],
+  ["DR Congo","COD"], ["Congo DR","COD"], ["Ecuador","ECU"], ["Egypt","EGY"],
+  ["England","ENG"], ["France","FRA"], ["Germany","GER"], ["Ghana","GHA"],
+  ["Haiti","HAI"], ["Iran","IRN"], ["Iraq","IRQ"], ["Ivory Coast","CIV"],
+  ["Japan","JPN"], ["Jordan","JOR"], ["Mexico","MEX"], ["Morocco","MAR"],
+  ["Netherlands","NED"], ["New Zealand","NZL"], ["Norway","NOR"], ["Panama","PAN"],
+  ["Paraguay","PAR"], ["Portugal","POR"], ["Qatar","QAT"], ["Saudi Arabia","KSA"],
+  ["Scotland","SCO"], ["Senegal","SEN"], ["South Africa","RSA"], ["South Korea","KOR"],
+  ["Korea Republic","KOR"], ["Spain","ESP"], ["Sweden","SWE"], ["Switzerland","SUI"],
+  ["Tunisia","TUN"], ["Turkiye","TUR"], ["Türkiye","TUR"], ["Turkey","TUR"],
+  ["United States","USA"], ["USA","USA"], ["Uruguay","URU"], ["Uzbekistan","UZB"]
+].forEach(([name, code]) => TEAM_NAME_MAP.set(normalizeTeamName(name), code));
 
 function flagImg(team, h = 18) {
   const w = Math.round(h * 1.5);
@@ -1704,6 +2147,10 @@ const fmtTime  = new Intl.DateTimeFormat("es-ES", { timeZone: TIMEZONE, hour:"2-
 let selectedCodes = loadSelection();
 let draftCodes    = new Set(selectedCodes);
 let allMatches    = [];
+let liveMatches   = [];
+let liveAvailable = false;
+let liveLoading   = false;
+let selectedLiveMatchId = null;
 let currentFilter = "all";
 // Vistas del modo PRO: las Picks del día arrancan desactivadas por defecto.
 let proViews      = (() => {
@@ -1715,6 +2162,7 @@ let proViews      = (() => {
 })();
 let calSource     = "";
 let lastRefresh   = 0;
+let lastLiveRefresh = 0;
 let proData       = null;
 let statsData     = null;
 let proUnlocked   = false;
@@ -1760,13 +2208,34 @@ const E = {
   pastSection:    G("past-section"),
   pastCount:      G("past-count"),
   pastList:       G("past-list"),
+  liveRefresh:    G("live-refresh"),
+  liveUpdated:    G("live-updated"),
+  liveLoading:    G("live-loading"),
+  liveError:      G("live-error"),
+  liveErrorText:  G("live-error-text"),
+  liveContent:    G("live-content"),
+  liveSwitcher:   G("live-match-switcher"),
+  liveRound:      G("live-round"),
+  liveHomeFlag:   G("live-home-flag"),
+  liveHomeName:   G("live-home-name"),
+  liveAwayFlag:   G("live-away-flag"),
+  liveAwayName:   G("live-away-name"),
+  liveScore:      G("live-score"),
+  liveClock:      G("live-clock"),
+  liveVenue:      G("live-venue"),
+  liveKpis:       G("live-kpis"),
+  liveStatList:   G("live-stat-list"),
+  liveTimeline:   G("live-timeline"),
   toast:          G("toast"),
+  tabLive:        G("tab-live"),
   tabCal:         G("tab-cal"),
   tabGrupos:      G("tab-grupos"),
   tabPro:         G("tab-pro"),
+  pageLive:       G("page-live"),
   pageCal:        G("page-cal"),
   pageGrupos:     G("page-grupos"),
   pagePro:        G("page-pro"),
+  btmLive:        G("btm-live"),
   btmCal:         G("btm-cal"),
   btmGrupos:      G("btm-grupos"),
   btmPro:         G("btm-pro"),
@@ -2131,6 +2600,354 @@ async function copyFeedUrl() {
   } catch { showToast("No se pudo copiar"); }
 }
 
+// ── LIVE MATCHES ────────────────────────────────────────────────────────────
+const LIVE_STATUS_LABELS = {
+  "1H": "Primera parte",
+  "HT": "Descanso",
+  "2H": "Segunda parte",
+  "ET": "Prórroga",
+  "BT": "Descanso de la prórroga",
+  "P": "Penaltis",
+  "SUSP": "Suspendido",
+  "INT": "Interrumpido",
+  "LIVE": "En juego"
+};
+
+function liveTeamMeta(name) {
+  const code = TEAM_NAME_MAP.get(normalizeTeamName(name));
+  const team = code ? TEAM_MAP.get(code) : null;
+  return {
+    name: team?.name || name || "Por confirmar",
+    flag: team ? flagImg(team, 36) : ""
+  };
+}
+
+function liveStatusText(status = {}) {
+  const code = String(status.short || "").toUpperCase();
+  if (["HT", "BT", "SUSP", "INT"].includes(code)) {
+    return LIVE_STATUS_LABELS[code];
+  }
+  const elapsed = Number(status.elapsed);
+  if (Number.isFinite(elapsed)) return `${elapsed}'`;
+  return LIVE_STATUS_LABELS[code] || status.long || "En juego";
+}
+
+function liveRoundText(value) {
+  const round = String(value || "");
+  const normalized = round.toLowerCase();
+  if (normalized.includes("group")) return "Fase de grupos";
+  if (normalized.includes("round of 32")) return "Dieciseisavos";
+  if (normalized.includes("round of 16")) return "Octavos de final";
+  if (normalized.includes("quarter")) return "Cuartos de final";
+  if (normalized.includes("semi")) return "Semifinal";
+  if (normalized.includes("third")) return "Tercer puesto";
+  if (normalized.includes("final")) return "Final";
+  return round || "Mundial 2026";
+}
+
+function setLiveNavigation(visible) {
+  liveAvailable = visible;
+  E.tabLive.hidden = !visible;
+  E.btmLive.hidden = !visible;
+}
+
+function selectedLiveMatch() {
+  return liveMatches.find(match => String(match.id) === String(selectedLiveMatchId)) || liveMatches[0] || null;
+}
+
+function renderLiveSwitcher() {
+  E.liveSwitcher.innerHTML = "";
+  E.liveSwitcher.hidden = liveMatches.length < 2;
+  for (const match of liveMatches) {
+    const home = liveTeamMeta(match.home?.name);
+    const away = liveTeamMeta(match.away?.name);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `live-match-chip${String(match.id) === String(selectedLiveMatchId) ? " active" : ""}`;
+    button.textContent = `${home.name} ${match.home?.goals ?? 0}–${match.away?.goals ?? 0} ${away.name}`;
+    button.addEventListener("click", () => {
+      selectedLiveMatchId = match.id;
+      renderLiveMatch();
+    });
+    E.liveSwitcher.appendChild(button);
+  }
+}
+
+function statDisplay(value, suffix = "") {
+  return isLiveMetric(value) ? `${Number(value)}${suffix}` : "—";
+}
+
+function isLiveMetric(value) {
+  return value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value));
+}
+
+function sideLeader(homeValue, awayValue, minimumDifference = 0) {
+  const hasHome = isLiveMetric(homeValue);
+  const hasAway = isLiveMetric(awayValue);
+  if (!hasHome && !hasAway) return null;
+  const home = hasHome ? Number(homeValue) : 0;
+  const away = hasAway ? Number(awayValue) : 0;
+  if (Math.abs((home || 0) - (away || 0)) <= minimumDifference) return "even";
+  return (home || 0) > (away || 0) ? "home" : "away";
+}
+
+function renderLiveKpis(match, home, away) {
+  const insights = match.insights || {};
+  const pressureHome = Number(insights.pressure?.home);
+  const pressureAway = Number(insights.pressure?.away);
+  const pressureSide = pressureHome + pressureAway > 0
+    ? sideLeader(pressureHome, pressureAway, 1.5)
+    : null;
+  const accuracySide = sideLeader(
+    insights.shotAccuracy?.home,
+    insights.shotAccuracy?.away,
+    0.5
+  );
+  const conversionSide = sideLeader(
+    insights.conversion?.home,
+    insights.conversion?.away,
+    0.5
+  );
+  const cardStats = [
+    match.statistics?.home?.yellowCards,
+    match.statistics?.home?.redCards,
+    match.statistics?.away?.yellowCards,
+    match.statistics?.away?.redCards
+  ];
+  const hasCardData = cardStats.some(isLiveMetric);
+  const totalCards = cardStats.reduce((sum, value) => sum + (Number(value) || 0), 0);
+  const lastEvent = match.events?.[0];
+
+  const sideName = side => side === "home" ? home.name : side === "away" ? away.name : "Igualado";
+  const sideMetric = (side, values, suffix) => {
+    if (!side || side === "even") return side ? "Igualado" : "—";
+    return statDisplay(side === "home" ? values.home : values.away, suffix);
+  };
+
+  const cards = [
+    {
+      label: "Índice de presión",
+      value: pressureSide ? sideName(pressureSide) : "—",
+      sub: pressureSide
+        ? `${pressureHome.toFixed(1)} – ${pressureAway.toFixed(1)}`
+        : "Esperando estadísticas"
+    },
+    {
+      label: "Precisión de tiro",
+      value: sideMetric(accuracySide, insights.shotAccuracy || {}, "%"),
+      sub: accuracySide ? sideName(accuracySide) : "Esperando estadísticas"
+    },
+    {
+      label: "Conversión",
+      value: sideMetric(conversionSide, insights.conversion || {}, "%"),
+      sub: conversionSide ? sideName(conversionSide) : "Esperando estadísticas"
+    },
+    {
+      label: "Ritmo ofensivo",
+      value: isLiveMetric(insights.projectedShots90)
+        ? Number(insights.projectedShots90).toFixed(1)
+        : "—",
+      sub: "Tiros proyectados a 90 min"
+    },
+    {
+      label: "Disciplina",
+      value: hasCardData ? String(totalCards) : "—",
+      sub: hasCardData ? "Tarjetas mostradas" : "Sin datos todavía"
+    },
+    {
+      label: "Última acción",
+      value: lastEvent ? eventTypeLabel(lastEvent) : "—",
+      sub: lastEvent ? `${eventMinute(lastEvent)} · ${lastEvent.player || lastEvent.team || "Partido"}` : "Aún sin incidencias"
+    }
+  ];
+
+  E.liveKpis.innerHTML = cards.map(card => `
+    <article class="live-kpi">
+      <span class="live-kpi__label">${escapeHtml(card.label)}</span>
+      <strong class="live-kpi__value" title="${escapeHtml(card.value)}">${escapeHtml(card.value)}</strong>
+      <span class="live-kpi__sub">${escapeHtml(card.sub)}</span>
+    </article>`).join("");
+}
+
+function renderLiveStats(match) {
+  const rows = [
+    ["Posesión", "possession", "%"],
+    ["Tiros", "totalShots", ""],
+    ["A puerta", "shotsOnGoal", ""],
+    ["Goles esperados", "expectedGoals", ""],
+    ["Córners", "corners", ""],
+    ["Precisión de pase", "passAccuracy", "%"],
+    ["Faltas", "fouls", ""],
+    ["Paradas", "goalkeeperSaves", ""],
+    ["Fueras de juego", "offsides", ""]
+  ].map(([label, key, suffix]) => ({
+    label,
+    suffix,
+    home: match.statistics?.home?.[key],
+    away: match.statistics?.away?.[key]
+  })).filter(row =>
+    isLiveMetric(row.home) || isLiveMetric(row.away)
+  );
+
+  if (!rows.length) {
+    E.liveStatList.innerHTML = '<p class="live-empty-note">Las estadísticas aparecerán cuando el proveedor las publique.</p>';
+    return;
+  }
+
+  E.liveStatList.innerHTML = rows.map(row => {
+    const home = Number(row.home) || 0;
+    const away = Number(row.away) || 0;
+    const max = Math.max(home, away, 1);
+    return `
+      <div class="live-stat">
+        <span class="live-stat__value">${statDisplay(row.home, row.suffix)}</span>
+        <span class="live-stat__track live-stat__track--home"><span style="width:${Math.round((home / max) * 100)}%"></span></span>
+        <span class="live-stat__label">${escapeHtml(row.label)}</span>
+        <span class="live-stat__track live-stat__track--away"><span style="width:${Math.round((away / max) * 100)}%"></span></span>
+        <span class="live-stat__value">${statDisplay(row.away, row.suffix)}</span>
+      </div>`;
+  }).join("");
+}
+
+function eventMinute(event) {
+  const elapsed = Number(event.elapsed);
+  if (!Number.isFinite(elapsed)) return "—";
+  const extra = Number(event.extra);
+  return `${elapsed}${Number.isFinite(extra) && extra > 0 ? `+${extra}` : ""}'`;
+}
+
+function eventTypeLabel(event) {
+  const type = String(event.type || "").toLowerCase();
+  const detail = String(event.detail || "").toLowerCase();
+  if (type === "goal") return detail.includes("missed") ? "Penalti fallado" : "Gol";
+  if (type === "card") return detail.includes("red") ? "Tarjeta roja" : "Tarjeta";
+  if (type.includes("subst")) return "Cambio";
+  if (type === "var") return "VAR";
+  return event.type || "Acción";
+}
+
+function eventTypeCode(event) {
+  const label = eventTypeLabel(event);
+  if (label === "Gol") return "GOL";
+  if (label === "Penalti fallado") return "PEN";
+  if (label === "Tarjeta roja") return "TR";
+  if (label === "Tarjeta") return "TA";
+  if (label === "Cambio") return "CAM";
+  if (label === "VAR") return "VAR";
+  return "•";
+}
+
+function renderLiveTimeline(match) {
+  const events = (match.events || []).slice(0, 12);
+  if (!events.length) {
+    E.liveTimeline.innerHTML = '<p class="live-empty-note">Todavía no hay incidencias destacadas.</p>';
+    return;
+  }
+
+  E.liveTimeline.innerHTML = events.map(event => {
+    const team = liveTeamMeta(event.team);
+    const secondary = [
+      event.team ? team.name : "",
+      event.assist ? `Asistencia: ${event.assist}` : "",
+      event.comments || ""
+    ].filter(Boolean).join(" · ");
+    return `
+      <div class="live-event">
+        <span class="live-event__minute">${escapeHtml(eventMinute(event))}</span>
+        <span class="live-event__type">${escapeHtml(eventTypeCode(event))}</span>
+        <p class="live-event__text">
+          ${escapeHtml(event.player || eventTypeLabel(event))}
+          <span>${escapeHtml(secondary)}</span>
+        </p>
+      </div>`;
+  }).join("");
+}
+
+function renderLiveMatch() {
+  const match = selectedLiveMatch();
+  if (!match) return;
+  selectedLiveMatchId = match.id;
+  const home = liveTeamMeta(match.home?.name);
+  const away = liveTeamMeta(match.away?.name);
+  const venue = [match.venue?.name, match.venue?.city].filter(Boolean).join(" · ");
+
+  renderLiveSwitcher();
+  E.liveRound.textContent = liveRoundText(match.competition?.round);
+  E.liveHomeFlag.innerHTML = home.flag;
+  E.liveHomeName.textContent = home.name;
+  E.liveAwayFlag.innerHTML = away.flag;
+  E.liveAwayName.textContent = away.name;
+  E.liveScore.textContent = `${match.home?.goals ?? 0} – ${match.away?.goals ?? 0}`;
+  E.liveClock.textContent = liveStatusText(match.status);
+  E.liveVenue.textContent = [venue, match.referee ? `Árbitro: ${match.referee}` : ""].filter(Boolean).join(" · ") || "Mundial 2026";
+  renderLiveKpis(match, home, away);
+  renderLiveStats(match);
+  renderLiveTimeline(match);
+}
+
+async function loadLiveMatches({ initial = false, preferLive = false } = {}) {
+  if (liveLoading) return;
+  liveLoading = true;
+  E.liveRefresh.disabled = true;
+  E.liveRefresh.classList.add("loading");
+  if (!liveMatches.length) {
+    E.liveLoading.hidden = false;
+    E.liveError.hidden = true;
+    E.liveContent.hidden = true;
+  }
+
+  try {
+    const response = await fetch("/api/live-matches", {
+      cache: "no-store",
+      headers: { Accept: "application/json" }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+
+    const hadLive = liveAvailable;
+    liveMatches = Array.isArray(data.matches) ? data.matches : [];
+    lastLiveRefresh = Date.now();
+
+    if (liveMatches.length) {
+      setLiveNavigation(true);
+      if (!liveMatches.some(match => String(match.id) === String(selectedLiveMatchId))) {
+        selectedLiveMatchId = liveMatches[0].id;
+      }
+      E.liveLoading.hidden = true;
+      E.liveError.hidden = true;
+      E.liveContent.hidden = false;
+      E.liveUpdated.textContent = `Actualizado ${fmtTime.format(lastLiveRefresh)}`;
+      renderLiveMatch();
+      if (initial && preferLive) switchTab("live");
+      else if (!hadLive && !initial) showToast("Hay un partido en directo");
+    } else {
+      liveMatches = [];
+      selectedLiveMatchId = null;
+      setLiveNavigation(false);
+      E.liveLoading.hidden = true;
+      E.liveContent.hidden = true;
+      if (!E.pageLive.hidden) {
+        switchTab("cal");
+        showToast("El directo ha terminado");
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    if (!liveMatches.length) {
+      setLiveNavigation(false);
+      E.liveLoading.hidden = true;
+      E.liveErrorText.textContent = error.message || "No se pudo actualizar el partido.";
+      E.liveError.hidden = E.pageLive.hidden;
+    } else {
+      E.liveUpdated.textContent = "Sin conexión · mostrando datos anteriores";
+    }
+  } finally {
+    liveLoading = false;
+    E.liveRefresh.disabled = false;
+    E.liveRefresh.classList.remove("loading");
+  }
+}
+
 // ── GROUPS RENDER ────────────────────────────────────────────────────────────
 function renderGroups() {
   E.gruposGrid.innerHTML = "";
@@ -2160,21 +2977,27 @@ function renderGroups() {
 
 // ── TAB NAVIGATION ───────────────────────────────────────────────────────────
 function switchTab(name) {
+  if (name === "live" && !liveAvailable) name = "cal";
+  const isLive   = name === "live";
   const isCal    = name === "cal";
   const isGrupos = name === "grupos";
   const isPro    = name === "pro";
   const leavingPro = !isPro && !E.pagePro.hidden;
 
+  E.pageLive.classList.toggle("active", isLive);
   E.pageCal.classList.toggle("active", isCal);
   E.pageGrupos.classList.toggle("active", isGrupos);
   E.pagePro.classList.toggle("active", isPro);
+  E.pageLive.hidden   = !isLive;
   E.pageCal.hidden    = !isCal;
   E.pageGrupos.hidden = !isGrupos;
   E.pagePro.hidden    = !isPro;
 
+  E.tabLive.setAttribute("aria-selected", String(isLive));
   E.tabCal.setAttribute("aria-selected", String(isCal));
   E.tabGrupos.setAttribute("aria-selected", String(isGrupos));
   E.tabPro.setAttribute("aria-selected", String(isPro));
+  E.btmLive.setAttribute("aria-selected", String(isLive));
   E.btmCal.setAttribute("aria-selected", String(isCal));
   E.btmGrupos.setAttribute("aria-selected", String(isGrupos));
   E.btmPro.setAttribute("aria-selected", String(isPro));
@@ -2553,6 +3376,7 @@ function buildPickCard(pick) {
 function bindEvents() {
   E.editTeams.addEventListener("click", openPicker);
   E.refreshBtn.addEventListener("click", () => loadCalendar());
+  E.liveRefresh.addEventListener("click", () => loadLiveMatches());
   E.copyFeed.addEventListener("click", copyFeedUrl);
 
   document.querySelectorAll(".filter-strip .filter-pill").forEach(btn => {
@@ -2571,9 +3395,11 @@ function bindEvents() {
     });
   });
 
+  E.tabLive.addEventListener("click", () => switchTab("live"));
   E.tabCal.addEventListener("click", () => switchTab("cal"));
   E.tabGrupos.addEventListener("click", () => switchTab("grupos"));
   E.tabPro.addEventListener("click", () => switchTab("pro"));
+  E.btmLive.addEventListener("click", () => switchTab("live"));
   E.btmCal.addEventListener("click", () => switchTab("cal"));
   E.btmGrupos.addEventListener("click", () => switchTab("grupos"));
   E.btmPro.addEventListener("click", () => switchTab("pro"));
@@ -2635,6 +3461,7 @@ function bindEvents() {
 // ── AUTO REFRESH ──────────────────────────────────────────────────────────────
 function startAutoRefresh() {
   let calTimer      = setInterval(() => loadCalendar(), REFRESH_MS);
+  let liveTimer     = setInterval(() => loadLiveMatches(), LIVE_REFRESH_MS);
   let analysisTimer = setInterval(() => {
     if (isProUnlocked() && !E.pagePro.hidden) loadAnalysis();
   }, ANALYSIS_REFRESH_MS);
@@ -2645,6 +3472,7 @@ function startAutoRefresh() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       calTimer      = setInterval(() => loadCalendar(), REFRESH_MS);
+      liveTimer     = setInterval(() => loadLiveMatches(), LIVE_REFRESH_MS);
       analysisTimer = setInterval(() => {
         if (isProUnlocked() && !E.pagePro.hidden) loadAnalysis();
       }, ANALYSIS_REFRESH_MS);
@@ -2652,8 +3480,10 @@ function startAutoRefresh() {
         if (!isProUnlocked() && !E.pagePro.hidden) checkProAccess();
       }, PRO_ACCESS_CHECK_MS);
       if (Date.now() - lastRefresh >= REFRESH_MS) loadCalendar();
+      if (Date.now() - lastLiveRefresh >= LIVE_REFRESH_MS) loadLiveMatches();
     } else {
       clearInterval(calTimer);
+      clearInterval(liveTimer);
       clearInterval(analysisTimer);
       clearInterval(proCheckTimer);
     }
@@ -2669,11 +3499,15 @@ updateCalLinks();
 bindEvents();
 initProGate();
 loadCalendar({ initial: true });
-startAutoRefresh();
 
 const _urlMode = new URLSearchParams(location.search).get("mode");
 if (_urlMode === "pro")    switchTab("pro");
 if (_urlMode === "grupos") switchTab("grupos");
+loadLiveMatches({
+  initial: true,
+  preferLive: !_urlMode || _urlMode === "live"
+});
+startAutoRefresh();
 </script>
 </body>
 </html>

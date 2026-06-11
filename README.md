@@ -32,6 +32,7 @@ La respuesta incluye:
 
 Otros endpoints:
 
+- `GET /api/live-matches`: partidos activos, marcador, estadísticas e incidencias.
 - `POST /api/analysis-auth`: registra solicitudes o inicia una sesión PRO.
 - `DELETE /api/analysis-auth`: cierra y elimina la sesión PRO.
 - `GET /api/tournament-stats`: líderes y KPIs del torneo.
