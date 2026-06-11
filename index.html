@@ -1763,6 +1763,57 @@
       color: var(--pri);
       flex-shrink: 0;
     }
+
+    /* ── PWA safe area & mobile layout fixes ──────────────────────────── */
+
+    /* iOS PWA: status bar overlay — push content below status bar */
+    .app-bar {
+      padding-top: env(safe-area-inset-top, 0px);
+      height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
+    }
+
+    /* Toast: respect bottom safe area */
+    .toast {
+      bottom: calc(var(--btm-h) + env(safe-area-inset-bottom, 0px) + 12px);
+    }
+    @media (min-width: 640px) { .toast { bottom: 24px; } }
+
+    /* ── Mobile app bar: compact — hide text label, constrain flags ───── */
+    @media (max-width: 639px) {
+      .bar-btn-label { display: none; }
+      .bar-btn { padding: 7px 10px; gap: 6px; }
+      #bar-flags {
+        display: flex;
+        align-items: center;
+        max-width: 148px;
+        overflow: hidden;
+      }
+    }
+
+    /* ── Mobile icon buttons: icon-only ──────────────────────────────── */
+    @media (max-width: 639px) {
+      .icon-btn .icon-btn-label { display: none; }
+      .icon-btn { padding: 9px 11px; min-width: 38px; justify-content: center; }
+    }
+
+    /* ── Chips: predictable 2×2 grid on mobile ───────────────────────── */
+    @media (max-width: 639px) {
+      .chips { display: grid; grid-template-columns: repeat(2, 1fr); }
+      .chip  { min-width: unset; }
+    }
+
+    /* ── Subscribe row: slightly smaller buttons on tiny screens ─────── */
+    @media (max-width: 400px) {
+      .cal-btn { padding: 7px 10px; font-size: 10px; }
+      .cal-btn__ico { width: 18px; height: 18px; font-size: 9px; }
+    }
+
+    /* ── Bottom nav: prevent overflow, ensure 3 equal tabs ──────────── */
+    .btm-btn { min-width: 0; }
+    .btm-nav { overflow: hidden; }
+
+    /* ── Prevent body-level horizontal scroll on mobile ─────────────── */
+    body { overflow-x: clip; }
   </style>
 </head>
 <body>
@@ -1787,7 +1838,7 @@
   </nav>
 
   <button class="bar-btn" id="edit-teams" type="button" aria-label="Cambiar selecciones">
-    <span id="bar-flags" aria-hidden="true"></span> Selecciones
+    <span id="bar-flags" aria-hidden="true"></span><span class="bar-btn-label"> Selecciones</span>
   </button>
 </header>
 
@@ -1804,7 +1855,7 @@
         <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
       </svg>
-      Actualizar
+      <span class="icon-btn-label">Actualizar</span>
     </button>
   </div>
 
@@ -1970,7 +2021,7 @@
             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
           </svg>
-          Actualizar
+          <span class="icon-btn-label">Actualizar</span>
         </button>
       </div>
     </div>
