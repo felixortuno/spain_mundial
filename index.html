@@ -592,10 +592,12 @@
     .badge--pending  { background: var(--acc-dim); border-color: rgba(0,210,255,0.25); color: var(--acc); }
 
     .hero-flags {
-      font-size: 24px;
-      letter-spacing: -.08em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
+    .hero-flags img { height: 24px; width: auto; }
 
     .hero-card h2 {
       position: relative;
@@ -700,7 +702,8 @@
       flex-wrap: wrap;
     }
 
-    .minfo__flags { margin-left: auto; font-size: 15px; letter-spacing: -.08em; }
+    .minfo__flags { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+    .minfo__flags img { height: 14px; width: auto; }
 
     .minfo h3 {
       margin: 0 0 4px;
@@ -927,7 +930,8 @@
 
     .team-opt.sel .team-check { display: block; }
 
-    .team-flag  { font-size: 18px; line-height: 1; }
+    .team-flag  { display: flex; align-items: center; justify-content: center; }
+    .team-flag img { height: 18px; width: auto; }
     .team-name  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .team-check { display: none; font-size: 12px; color: var(--pri); font-weight: bold; }
 
@@ -1656,7 +1660,8 @@
       border: 1px solid rgba(255,56,92,0.2);
     }
 
-    .grupo-flag { font-size: 18px; line-height: 1; flex-shrink: 0; }
+    .grupo-flag { display: flex; align-items: center; flex-shrink: 0; }
+    .grupo-flag img { height: 18px; width: auto; }
 
     .grupo-name {
       font-size: 12px;
@@ -1971,25 +1976,30 @@ const PRO_ACCESS_CHECK_MS = 15 * 1000;
 const STORAGE_KEY     = "mundial-2026-teams";
 
 const TEAMS = [
-  ["ALG","Argelia","🇩🇿"],["ARG","Argentina","🇦🇷"],["AUS","Australia","🇦🇺"],
-  ["AUT","Austria","🇦🇹"],["BEL","Bélgica","🇧🇪"],["BIH","Bosnia-Herzegovina","🇧🇦"],
-  ["BRA","Brasil","🇧🇷"],["CAN","Canadá","🇨🇦"],["CPV","Cabo Verde","🇨🇻"],
-  ["COL","Colombia","🇨🇴"],["CRO","Croacia","🇭🇷"],["CUW","Curazao","🇨🇼"],
-  ["CZE","Chequia","🇨🇿"],["COD","RD Congo","🇨🇩"],["ECU","Ecuador","🇪🇨"],
-  ["EGY","Egipto","🇪🇬"],["ENG","Inglaterra","🏴󠁧󠁢󠁥󠁮󠁧󠁿"],["ESP","España","🇪🇸"],
-  ["FRA","Francia","🇫🇷"],["GER","Alemania","🇩🇪"],["GHA","Ghana","🇬🇭"],
-  ["HAI","Haití","🇭🇹"],["IRN","Irán","🇮🇷"],["IRQ","Irak","🇮🇶"],
-  ["CIV","Costa de Marfil","🇨🇮"],["JPN","Japón","🇯🇵"],["JOR","Jordania","🇯🇴"],
-  ["MEX","México","🇲🇽"],["MAR","Marruecos","🇲🇦"],["NED","Países Bajos","🇳🇱"],
-  ["NZL","Nueva Zelanda","🇳🇿"],["NOR","Noruega","🇳🇴"],["PAN","Panamá","🇵🇦"],
-  ["PAR","Paraguay","🇵🇾"],["POR","Portugal","🇵🇹"],["QAT","Catar","🇶🇦"],
-  ["KSA","Arabia Saudí","🇸🇦"],["SCO","Escocia","🏴󠁧󠁢󠁳󠁣󠁴󠁿"],["SEN","Senegal","🇸🇳"],
-  ["RSA","Sudáfrica","🇿🇦"],["KOR","Corea del Sur","🇰🇷"],["SWE","Suecia","🇸🇪"],
-  ["SUI","Suiza","🇨🇭"],["TUN","Túnez","🇹🇳"],["TUR","Turquía","🇹🇷"],
-  ["USA","Estados Unidos","🇺🇸"],["URU","Uruguay","🇺🇾"],["UZB","Uzbekistán","🇺🇿"],
-].map(([code,name,flag]) => ({ code, name, flag }));
+  ["ALG","Argelia","🇩🇿","dz"],  ["ARG","Argentina","🇦🇷","ar"],  ["AUS","Australia","🇦🇺","au"],
+  ["AUT","Austria","🇦🇹","at"],  ["BEL","Bélgica","🇧🇪","be"],   ["BIH","Bosnia-Herzegovina","🇧🇦","ba"],
+  ["BRA","Brasil","🇧🇷","br"],   ["CAN","Canadá","🇨🇦","ca"],    ["CPV","Cabo Verde","🇨🇻","cv"],
+  ["COL","Colombia","🇨🇴","co"], ["CRO","Croacia","🇭🇷","hr"],   ["CUW","Curazao","🇨🇼","cw"],
+  ["CZE","Chequia","🇨🇿","cz"],  ["COD","RD Congo","🇨🇩","cd"],  ["ECU","Ecuador","🇪🇨","ec"],
+  ["EGY","Egipto","🇪🇬","eg"],   ["ENG","Inglaterra","🏴󠁧󠁢󠁥󠁮󠁧󠁿","gb-eng"], ["ESP","España","🇪🇸","es"],
+  ["FRA","Francia","🇫🇷","fr"],  ["GER","Alemania","🇩🇪","de"],  ["GHA","Ghana","🇬🇭","gh"],
+  ["HAI","Haití","🇭🇹","ht"],    ["IRN","Irán","🇮🇷","ir"],      ["IRQ","Irak","🇮🇶","iq"],
+  ["CIV","Costa de Marfil","🇨🇮","ci"], ["JPN","Japón","🇯🇵","jp"], ["JOR","Jordania","🇯🇴","jo"],
+  ["MEX","México","🇲🇽","mx"],   ["MAR","Marruecos","🇲🇦","ma"], ["NED","Países Bajos","🇳🇱","nl"],
+  ["NZL","Nueva Zelanda","🇳🇿","nz"], ["NOR","Noruega","🇳🇴","no"], ["PAN","Panamá","🇵🇦","pa"],
+  ["PAR","Paraguay","🇵🇾","py"], ["POR","Portugal","🇵🇹","pt"],  ["QAT","Catar","🇶🇦","qa"],
+  ["KSA","Arabia Saudí","🇸🇦","sa"], ["SCO","Escocia","🏴󠁧󠁢󠁳󠁣󠁴󠁿","gb-sct"], ["SEN","Senegal","🇸🇳","sn"],
+  ["RSA","Sudáfrica","🇿🇦","za"], ["KOR","Corea del Sur","🇰🇷","kr"], ["SWE","Suecia","🇸🇪","se"],
+  ["SUI","Suiza","🇨🇭","ch"],    ["TUN","Túnez","🇹🇳","tn"],    ["TUR","Turquía","🇹🇷","tr"],
+  ["USA","Estados Unidos","🇺🇸","us"], ["URU","Uruguay","🇺🇾","uy"], ["UZB","Uzbekistán","🇺🇿","uz"],
+].map(([code,name,flag,iso2]) => ({ code, name, flag, iso2 }));
 
 const TEAM_MAP = new Map(TEAMS.map(t => [t.code, t]));
+
+function flagImg(team, h = 18) {
+  const w = Math.round(h * 1.5);
+  return `<img src="https://flagcdn.com/${team.iso2}.svg" width="${w}" height="${h}" loading="lazy" alt="" aria-hidden="true">`;
+}
 
 const GROUPS = [
   { letter: "A", teams: ["MEX","KOR","RSA","CZE"] },
@@ -2141,7 +2151,10 @@ function updateCalLinks() {
 }
 
 function updateBarFlags() {
-  E.barFlags.textContent = selectedCodes.map(c => TEAM_MAP.get(c)?.flag || "").join("") + " ";
+  E.barFlags.innerHTML = selectedCodes.map(c => {
+    const t = TEAM_MAP.get(c);
+    return t ? flagImg(t) : "";
+  }).join("") + " ";
   E.statTeams.textContent = selectedCodes.length;
 }
 
@@ -2201,11 +2214,11 @@ function getFlagsFromTitle(title) {
   const found = [];
   for (const team of TEAMS) {
     const idx = normalizedTitle.indexOf(team.name.toLowerCase());
-    if (idx !== -1) found.push({ idx, flag: team.flag });
+    if (idx !== -1) found.push({ idx, team });
   }
   // Ordena según el orden de aparición en el título (local a la izquierda).
   found.sort((a, b) => a.idx - b.idx);
-  return found.map(t => t.flag).join(" ");
+  return found.map(t => flagImg(t.team)).join(" ");
 }
 
 function renderSchedule() {
@@ -2216,7 +2229,7 @@ function renderSchedule() {
 
   if (next) {
     E.heroCard.hidden   = false;
-    E.heroFlags.textContent = getFlagsFromTitle(next.title);
+    E.heroFlags.innerHTML = getFlagsFromTitle(next.title);
     E.heroTitle.textContent = next.title;
     E.heroDate.textContent  = cap(fmtFull.format(next.start).replace(",", " ·")) + " h";
     startCountdown(next.start);
@@ -2358,7 +2371,7 @@ function buildTeamGrid() {
     btn.dataset.code = team.code;
     btn.className = `team-opt${draftCodes.has(team.code) ? " sel" : ""}`;
     btn.setAttribute("aria-pressed", String(draftCodes.has(team.code)));
-    btn.innerHTML = `<span class="team-flag" aria-hidden="true">${team.flag}</span><span class="team-name">${team.name}</span><span class="team-check" aria-hidden="true">✓</span>`;
+    btn.innerHTML = `<span class="team-flag">${flagImg(team)}</span><span class="team-name">${team.name}</span><span class="team-check" aria-hidden="true">✓</span>`;
     btn.addEventListener("click", () => toggleTeam(team.code, btn));
     E.teamGrid.appendChild(btn);
   }
@@ -2453,7 +2466,7 @@ function renderGroups() {
       const isSel = selectedCodes.includes(code);
       const row = document.createElement("div");
       row.className = `grupo-team${isSel ? " grupo-team--selected" : ""}`;
-      row.innerHTML = `<span class="grupo-flag">${team.flag}</span><span class="grupo-name">${team.name}</span>${isSel ? '<span class="grupo-check">✓</span>' : ""}`;
+      row.innerHTML = `<span class="grupo-flag">${flagImg(team)}</span><span class="grupo-name">${team.name}</span>${isSel ? '<span class="grupo-check">✓</span>' : ""}`;
       card.appendChild(row);
     }
 
