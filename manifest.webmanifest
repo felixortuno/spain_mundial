@@ -1,0 +1,24 @@
+{
+  "name": "Mundial 2026",
+  "short_name": "Mundial 26",
+  "description": "Calendario y análisis PRO del Mundial 2026.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ff385c",
+  "theme_color": "#ff385c",
+  "icons": [
+    {
+      "src": "/assets/icons/icon-pink-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-pink-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

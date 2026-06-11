@@ -1,0 +1,24 @@
+{
+  "name": "Administración Mundial PRO",
+  "short_name": "Admin PRO",
+  "description": "Panel de usuarios PRO del Mundial 2026.",
+  "start_url": "/admin",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#16b978",
+  "theme_color": "#16b978",
+  "icons": [
+    {
+      "src": "/assets/icons/icon-green-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-green-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
