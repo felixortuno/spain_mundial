@@ -1,4 +1,4 @@
-const CACHE = "mundial-2026-v3";
+const CACHE = "mundial-2026-v4";
 
 const PRECACHE = [
   "/",
@@ -32,9 +32,13 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const { request } = e;
   const url = new URL(request.url);
+  const isNavigation =
+    request.mode === "navigate" ||
+    url.pathname === "/" ||
+    url.pathname === "/index.html";
 
-  // Network-first para /api/* y feeds del calendario
-  if (url.pathname.match(API_RE) || FEED_RE.test(url.pathname) || url.searchParams.has("teams")) {
+  // Network-first para páginas, /api/* y feeds del calendario.
+  if (isNavigation || url.pathname.match(API_RE) || FEED_RE.test(url.pathname) || url.searchParams.has("teams")) {
     e.respondWith(
       fetch(request)
         .then(res => {
