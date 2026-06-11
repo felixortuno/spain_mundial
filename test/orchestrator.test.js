@@ -107,3 +107,83 @@ test("orquesta catálogo, fixtures, cuotas, reconciliación y merge", async () =
   assert.equal(result.matches[0].reconciliacion.metodo, "alias");
   assert.equal(result.matches[0].reconciliacion.orientacion, "same");
 });
+
+test("usa el feed ICS si API-Football rechaza la temporada", async () => {
+  const footballProvider = {
+    async getFixtures() {
+      throw new Error("Free plans do not have access to this season.");
+    },
+    async enrichFixtures() {
+      throw new Error("No debería enriquecer fixtures del fallback.");
+    }
+  };
+  const fixtureFallbackProvider = {
+    async getFixtures() {
+      return {
+        cache: { status: "miss" },
+        metadata: { provider: "fixtur.es", status: 200 },
+        data: [{
+          source: "fixtur.es",
+          id: "ics-1",
+          commenceTime: "2026-06-15T16:00:00Z",
+          home: { id: null, name: "Spain" },
+          away: { id: null, name: "Cape Verde" },
+          competition: { id: 1, name: "FIFA World Cup", season: 2026 },
+          features: { status: { short: "NS" }, goals: { home: null, away: null } }
+        }]
+      };
+    }
+  };
+  const oddsProvider = {
+    async resolveSportKey() {
+      return {
+        sport: { key: "soccer_fifa_world_cup", title: "FIFA World Cup" },
+        catalog: { ...metadata, data: [] }
+      };
+    },
+    async getOdds() {
+      return {
+        ...metadata,
+        data: [{
+          source: "the-odds-api",
+          id: "odds-1",
+          commenceTime: "2026-06-15T16:00:00Z",
+          homeTeam: "Spain",
+          awayTeam: "Cape Verde",
+          bookmakers: []
+        }]
+      };
+    }
+  };
+  const config = {
+    apiSportsKey: "free-plan",
+    football: {
+      league: "1",
+      season: "2026",
+      enrichment: "basic",
+      enrichmentLimit: 8
+    },
+    odds: {
+      sportKey: "",
+      sportHints: ["World Cup"],
+      regions: ["eu"],
+      markets: ["h2h"]
+    },
+    reconciliation: {
+      timeWindowMinutes: 90,
+      fuzzyThreshold: 0.86
+    }
+  };
+
+  const result = await buildUnifiedMatches({
+    config,
+    footballProvider,
+    fixtureFallbackProvider,
+    oddsProvider,
+    logger: { warn() {} }
+  });
+
+  assert.equal(result.competition.fixturesSource, "fixtur.es");
+  assert.equal(result.counts.reconciled, 1);
+  assert.equal(result.matches[0].features.status.short, "NS");
+});
