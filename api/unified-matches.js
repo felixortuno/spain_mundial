@@ -1,5 +1,6 @@
 "use strict";
 
+const { requireAdmin } = require("../lib/adminAuth");
 const { buildUnifiedMatches } = require("../lib/orchestrator");
 
 function queryValue(request, key) {
@@ -28,10 +29,9 @@ module.exports = async function handler(request, response) {
     return response.status(405).json({ error: "Método no permitido" });
   }
 
-  response.setHeader("Access-Control-Allow-Origin", "*");
+  if (!requireAdmin(request, response)) return;
 
   if (request.method === "HEAD") {
-    response.setHeader("Cache-Control", "no-store");
     return response.status(200).end();
   }
 
@@ -44,10 +44,7 @@ module.exports = async function handler(request, response) {
       sportKey: queryValue(request, "sportKey") || undefined,
       enrichment: queryValue(request, "enrichment") || undefined
     });
-    response.setHeader(
-      "Cache-Control",
-      "public, max-age=0, s-maxage=1800, stale-while-revalidate=21600"
-    );
+    response.setHeader("Cache-Control", "private, no-store");
     return response.status(200).json(data);
   } catch (error) {
     console.error("[unified-matches]", error);

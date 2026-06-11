@@ -6,6 +6,10 @@ const {
   setAdminCookie,
   validAdminPassword
 } = require("../lib/adminAuth");
+const {
+  applyRateLimitHeaders,
+  consumeRateLimit
+} = require("../lib/rateLimit");
 
 async function bodyFromRequest(request) {
   if (request.body && typeof request.body === "object") return request.body;
@@ -36,6 +40,19 @@ module.exports = async function handler(request, response) {
   }
 
   if (request.method === "POST") {
+    const rateLimit = consumeRateLimit({
+      request,
+      scope: "admin-login",
+      limit: 5,
+      windowMs: 15 * 60 * 1000
+    });
+    applyRateLimitHeaders(response, rateLimit);
+    if (!rateLimit.allowed) {
+      return response.status(429).json({
+        error: "Demasiados intentos. Prueba de nuevo dentro de 15 minutos."
+      });
+    }
+
     const body = await bodyFromRequest(request);
     try {
       if (!validAdminPassword(body.password)) {

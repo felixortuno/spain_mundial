@@ -1,4 +1,4 @@
-const CACHE = "mundial-2026-v4";
+const CACHE = "mundial-2026-v5";
 
 const PRECACHE = [
   "/",
@@ -37,8 +37,14 @@ self.addEventListener("fetch", e => {
     url.pathname === "/" ||
     url.pathname === "/index.html";
 
-  // Network-first para páginas, /api/* y feeds del calendario.
-  if (isNavigation || url.pathname.match(API_RE) || FEED_RE.test(url.pathname) || url.searchParams.has("teams")) {
+  // Las respuestas API pueden contener datos privados y nunca se cachean.
+  if (url.pathname.match(API_RE)) {
+    e.respondWith(fetch(request));
+    return;
+  }
+
+  // Network-first para páginas y feeds del calendario.
+  if (isNavigation || FEED_RE.test(url.pathname) || url.searchParams.has("teams")) {
     e.respondWith(
       fetch(request)
         .then(res => {

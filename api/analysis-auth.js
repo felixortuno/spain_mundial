@@ -9,6 +9,10 @@ const {
 } = require("../lib/analysisAuth");
 const { firebaseConfigured } = require("../lib/firebaseAdmin");
 const { ProAuthError, ProUserStore } = require("../lib/proUserStore");
+const {
+  applyRateLimitHeaders,
+  consumeRateLimit
+} = require("../lib/rateLimit");
 
 async function bodyFromRequest(request) {
   if (request.body && typeof request.body === "object") return request.body;
@@ -76,6 +80,23 @@ module.exports = async function handler(request, response) {
 
   if (request.method === "POST") {
     const body = await bodyFromRequest(request);
+    const isRegistration = body.action === "register";
+    const rateLimit = consumeRateLimit({
+      request,
+      scope: isRegistration ? "pro-register" : "pro-login",
+      limit: isRegistration ? 3 : 10,
+      windowMs: isRegistration ? 60 * 60 * 1000 : 15 * 60 * 1000
+    });
+    applyRateLimitHeaders(response, rateLimit);
+    if (!rateLimit.allowed) {
+      return response.status(429).json({
+        error: isRegistration
+          ? "Demasiadas solicitudes desde este dispositivo. Prueba más tarde."
+          : "Demasiados intentos de acceso. Prueba de nuevo más tarde.",
+        code: "RATE_LIMITED"
+      });
+    }
+
     if (!firebaseConfigured()) {
       return response.status(503).json({
         error: "El acceso PRO todavía no está conectado a Firebase.",

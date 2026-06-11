@@ -2459,20 +2459,22 @@ function matchCard(match, isPast) {
   info.className = "minfo";
 
   const flags = getFlagsFromTitle(match.title);
-  const topBadges = `<span class="badge badge--${match.stage.type === "knockout" ? "knockout" : "group"}">${match.stage.label}</span>${match.pending ? '<span class="badge badge--pending">Por confirmar</span>' : ""}${flags ? `<span class="minfo__flags">${flags}</span>` : ""}`;
+  const topBadges = `<span class="badge badge--${match.stage.type === "knockout" ? "knockout" : "group"}">${escapeHtml(match.stage.label)}</span>${match.pending ? '<span class="badge badge--pending">Por confirmar</span>' : ""}${flags ? `<span class="minfo__flags">${flags}</span>` : ""}`;
   const timeStr   = match.allDay ? shortDate(match.start) : fmtTime.format(match.start) + " h";
 
   info.innerHTML = `
     <div class="minfo__top">${topBadges}</div>
-    <h3>${match.title}</h3>
+    <h3>${escapeHtml(match.title)}</h3>
     <p class="minfo__time">${cap(fmtShort.format(match.start).replace(",", ""))} · ${timeStr}</p>`;
 
   const phase    = match.description.split("\n")[0].trim();
   if (phase || match.location) {
     const det = document.createElement("div");
     det.className = "minfo__detail";
-    if (phase)        det.innerHTML += `<p><strong>Torneo:</strong> ${phase}</p>`;
-    if (match.location) det.innerHTML += `<p><strong>Sede:</strong> ${match.location}</p>`;
+    if (phase) det.innerHTML += `<p><strong>Torneo:</strong> ${escapeHtml(phase)}</p>`;
+    if (match.location) {
+      det.innerHTML += `<p><strong>Sede:</strong> ${escapeHtml(match.location)}</p>`;
+    }
     info.appendChild(det);
   }
 
@@ -3367,8 +3369,8 @@ function buildPickCard(pick) {
   if (pick.sin_valor) {
     card.classList.add("pick-card--empty");
     card.innerHTML = `
-      <div class="pick-band"><span class="pick-band__dot"></span>${meta.label}</div>
-      <p class="pick-match">${pick.mensaje || "Sin picks con valor hoy."}</p>`;
+      <div class="pick-band"><span class="pick-band__dot"></span>${escapeHtml(meta.label)}</div>
+      <p class="pick-match">${escapeHtml(pick.mensaje || "Sin picks con valor hoy.")}</p>`;
     return card;
   }
 
@@ -3379,9 +3381,9 @@ function buildPickCard(pick) {
     ? `[${(pick.banda_confianza[0]*100).toFixed(0)}%–${(pick.banda_confianza[1]*100).toFixed(0)}%]` : "";
 
   card.innerHTML = `
-    <div class="pick-band"><span class="pick-band__dot"></span>${meta.label}</div>
-    <h3 class="pick-match">${pick.partido}</h3>
-    <p class="pick-market">${pick.mercado} · ${pick.fecha || ""}</p>
+    <div class="pick-band"><span class="pick-band__dot"></span>${escapeHtml(meta.label)}</div>
+    <h3 class="pick-match">${escapeHtml(pick.partido)}</h3>
+    <p class="pick-market">${escapeHtml(pick.mercado)} · ${escapeHtml(pick.fecha || "")}</p>
     <div class="prob-track"><div class="prob-fill" style="width:${Math.min(prob,100).toFixed(1)}%"></div></div>
     <div class="metrics">
       <div class="metric"><span class="metric__l">Cuota</span><span class="metric__v">${(pick.mejor_cuota||0).toFixed(2)}</span></div>
@@ -3389,7 +3391,7 @@ function buildPickCard(pick) {
       <div class="metric"><span class="metric__l">Edge</span><span class="metric__v metric__v--${edgeCls}">${(pick.edge_pp||0)>=0?"+":""}${(pick.edge_pp||0).toFixed(1)}pp</span></div>
       <div class="metric"><span class="metric__l">Impl.</span><span class="metric__v">${((pick.prob_implicita_justa||0)*100).toFixed(0)}%</span></div>
       <div class="metric"><span class="metric__l">EV</span><span class="metric__v metric__v--${evCls}">${(pick.ev||0)>=0?"+":""}${(pick.ev||0).toFixed(3)}</span></div>
-      <div class="metric"><span class="metric__l">Casa</span><span class="metric__v" style="font-size:11px;letter-spacing:0">${pick.casa||"—"}</span></div>
+      <div class="metric"><span class="metric__l">Casa</span><span class="metric__v" style="font-size:11px;letter-spacing:0">${escapeHtml(pick.casa || "—")}</span></div>
     </div>
     ${ciStr ? `<p class="pick-ci">IC 95%: <strong>${ciStr}</strong></p>` : ""}
     <div class="pick-stake">

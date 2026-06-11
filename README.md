@@ -57,7 +57,7 @@ FIREBASE_CLIENT_EMAIL=...
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 FIREBASE_PRO_USERS_COLLECTION=pro_users
 ANALYSIS_SESSION_SECRET=...
-PRO_ADMIN_PASSWORD=elonmusk
+PRO_ADMIN_PASSWORD=...
 ```
 
 `API_FOOTBALL_KEY` continúa admitido como alias de `APISPORTS_KEY` para que el
@@ -72,9 +72,9 @@ endpoint ICS existente no pierda su configuración.
 5. El cliente hace el Bizum y crea una solicitud con teléfono y PIN.
 6. Abre `/admin.html`, inicia sesión y aprueba o revoca cada solicitud.
 
-La contraseña inicial solicitada es `elonmusk`. Se valida únicamente en el
-servidor mediante `PRO_ADMIN_PASSWORD`; conviene cambiarla en Vercel antes de
-publicar el panel.
+La contraseña se valida únicamente en el servidor mediante
+`PRO_ADMIN_PASSWORD`. Usa un valor largo, único y distinto del secreto de
+sesión.
 
 También puedes activar una cuenta desde terminal:
 
