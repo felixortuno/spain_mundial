@@ -261,7 +261,7 @@ module.exports = async function handler(request, response) {
     return response.status(405).send("Método no permitido");
   }
 
-  if (!requireAnalysisAuth(request, response)) return;
+  if (!await requireAnalysisAuth(request, response)) return;
 
   if (request.method === "HEAD") {
     response.setHeader("Cache-Control", "private, no-store");

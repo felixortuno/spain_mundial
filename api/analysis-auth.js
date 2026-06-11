@@ -1,11 +1,14 @@
 "use strict";
 
 const {
+  authenticatedUserId,
   clearSessionCookie,
-  isAuthenticated,
-  setSessionCookie,
-  validPassword
+  deviceUserId,
+  setDeviceCookie,
+  setSessionCookie
 } = require("../lib/analysisAuth");
+const { firebaseConfigured } = require("../lib/firebaseAdmin");
+const { ProAuthError, ProUserStore } = require("../lib/proUserStore");
 
 async function bodyFromRequest(request) {
   if (request.body && typeof request.body === "object") return request.body;
@@ -31,18 +34,100 @@ module.exports = async function handler(request, response) {
   response.setHeader("Cache-Control", "private, no-store");
 
   if (request.method === "GET" || request.method === "HEAD") {
-    const authenticated = isAuthenticated(request);
     if (request.method === "HEAD") return response.status(200).end();
-    return response.status(200).json({ authenticated });
+    if (!firebaseConfigured()) {
+      return response.status(200).json({
+        authenticated: false,
+        firebaseConfigured: false
+      });
+    }
+
+    try {
+      const store = new ProUserStore();
+      const sessionUserId = authenticatedUserId(request);
+      const rememberedUserId = deviceUserId(request);
+      const userId = sessionUserId || rememberedUserId;
+      const user = userId ? await store.getById(userId) : null;
+      const authenticated = user?.active === true;
+
+      if (authenticated && !sessionUserId) {
+        setSessionCookie(response, request, user.userId);
+      } else if (sessionUserId && !authenticated) {
+        clearSessionCookie(response, request);
+      }
+
+      return response.status(200).json({
+        authenticated,
+        pending: Boolean(user && !user.active),
+        firebaseConfigured: true,
+        user: user ? {
+          phoneMasked: user.phoneMasked,
+          status: user.status
+        } : null
+      });
+    } catch (error) {
+      console.error("[analysis-auth:get]", error);
+      return response.status(502).json({
+        authenticated: false,
+        error: "No se pudo comprobar el acceso PRO."
+      });
+    }
   }
 
   if (request.method === "POST") {
     const body = await bodyFromRequest(request);
-    if (!validPassword(body.password)) {
-      return response.status(401).json({ error: "Clave incorrecta." });
+    if (!firebaseConfigured()) {
+      return response.status(503).json({
+        error: "El acceso PRO todavía no está conectado a Firebase.",
+        code: "FIREBASE_NOT_CONFIGURED"
+      });
     }
-    setSessionCookie(response, request);
-    return response.status(200).json({ authenticated: true });
+
+    const store = new ProUserStore();
+    try {
+      if (body.action === "register") {
+        const user = await store.register({
+          phone: body.phone,
+          pin: body.pin
+        });
+        setDeviceCookie(response, request, user.userId);
+        return response.status(201).json({
+          authenticated: false,
+          pending: true,
+          user
+        });
+      }
+
+      if (body.action !== "login") {
+        return response.status(400).json({
+          error: "Acción de acceso no válida.",
+          code: "INVALID_ACTION"
+        });
+      }
+
+      const user = await store.authenticate({
+        phone: body.phone,
+        pin: body.pin
+      });
+      setSessionCookie(response, request, user.userId);
+      setDeviceCookie(response, request, user.userId);
+      return response.status(200).json({
+        authenticated: true,
+        user: { phoneMasked: user.phoneMasked }
+      });
+    } catch (error) {
+      if (error instanceof ProAuthError) {
+        return response.status(error.status).json({
+          error: error.message,
+          code: error.code
+        });
+      }
+      console.error("[analysis-auth]", error);
+      return response.status(502).json({
+        error: "No se pudo conectar con Firebase.",
+        code: "FIREBASE_ERROR"
+      });
+    }
   }
 
   if (request.method === "DELETE") {

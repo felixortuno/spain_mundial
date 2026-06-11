@@ -20,7 +20,7 @@ module.exports = async function handler(request, response) {
     response.setHeader("Allow", "GET, HEAD");
     return response.status(405).json({ error: "Método no permitido." });
   }
-  if (!requireAnalysisAuth(request, response)) return;
+  if (!await requireAnalysisAuth(request, response)) return;
   if (request.method === "HEAD") {
     response.setHeader("Cache-Control", "private, no-store");
     return response.status(200).end();

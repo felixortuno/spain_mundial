@@ -4,8 +4,8 @@ Backend serverless para cruzar los partidos de API-Football v3 con las cuotas
 1X2 de The Odds API v4. El frontend y el calendario ICS existentes siguen
 funcionando de forma independiente.
 
-La pestaña de análisis también incluye KPIs deportivos del torneo y está
-protegida por una sesión HTTP-only.
+La pestaña PRO también incluye KPIs deportivos del torneo y está protegida por
+una sesión HTTP-only que se destruye al abandonar el apartado.
 
 Los KPIs de equipos y partidos usan API-Football y degradan al feed Fixtur.es
 si el plan configurado no da acceso a la temporada 2026. Los líderes de
@@ -32,7 +32,8 @@ La respuesta incluye:
 
 Otros endpoints:
 
-- `POST /api/analysis-auth`: valida la clave y crea la sesión de análisis.
+- `POST /api/analysis-auth`: registra solicitudes o inicia una sesión PRO.
+- `DELETE /api/analysis-auth`: cierra y elimina la sesión PRO.
 - `GET /api/tournament-stats`: líderes y KPIs del torneo.
 - `GET /api/picks`: picks del modelo y analítica de mercado.
 
@@ -50,12 +51,43 @@ ODDS_REGIONS=eu,uk
 ODDS_MARKETS=h2h
 FOOTBALL_ENRICHMENT=basic
 API_FOOTBALL_LIVE_STATS_TTL_MS=300000
-ANALYSIS_PASSWORD=...
+FIREBASE_PROJECT_ID=...
+FIREBASE_CLIENT_EMAIL=...
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_PRO_USERS_COLLECTION=pro_users
 ANALYSIS_SESSION_SECRET=...
+PRO_ADMIN_PASSWORD=elonmusk
 ```
 
 `API_FOOTBALL_KEY` continúa admitido como alias de `APISPORTS_KEY` para que el
 endpoint ICS existente no pierda su configuración.
+
+## Acceso PRO con Firebase
+
+1. Crea un proyecto Firebase y una base Cloud Firestore.
+2. En `Configuración del proyecto > Cuentas de servicio`, genera una clave.
+3. Añade sus valores como variables de entorno en Vercel.
+4. Despliega las reglas cerradas con `firebase deploy --only firestore:rules`.
+5. El cliente hace el Bizum y crea una solicitud con teléfono y PIN.
+6. Abre `/admin.html`, inicia sesión y aprueba o revoca cada solicitud.
+
+La contraseña inicial solicitada es `elonmusk`. Se valida únicamente en el
+servidor mediante `PRO_ADMIN_PASSWORD`; conviene cambiarla en Vercel antes de
+publicar el panel.
+
+También puedes activar una cuenta desde terminal:
+
+```bash
+npm run pro:activate -- +34611476090
+```
+
+Las solicitudes se guardan en `pro_users` con `status: "pending"`. El panel o
+el script las cambia a `status: "active"` y `active: true`. Tras la aprobación,
+el navegador registrado abre PRO sin volver a pedir teléfono ni PIN. La
+sesión corta se elimina al salir de PRO y se recrea solo si el usuario sigue
+aprobado. El PIN se deriva con `scrypt` y nunca se almacena en texto claro.
+Tras cinco intentos incorrectos, la cuenta queda bloqueada durante quince
+minutos.
 
 ## Arquitectura
 

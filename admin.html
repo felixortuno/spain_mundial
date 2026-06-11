@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Administración PRO · Mundial 2026</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070a11;
+      --surface: #101622;
+      --surface-2: #171f2f;
+      --line: rgba(255, 255, 255, .1);
+      --text: #f4f7fb;
+      --muted: #8d99ad;
+      --red: #ff385c;
+      --green: #25d68a;
+      --yellow: #ffd24a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 0, rgba(255, 56, 92, .12), transparent 32rem),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
+
+    .login {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .login__card {
+      width: min(100%, 390px);
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(16, 22, 34, .94);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, .5);
+      text-align: center;
+    }
+
+    .mark {
+      display: inline-grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--red);
+      color: white;
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+
+    h1 { margin: 18px 0 8px; font-size: 25px; }
+    .login p { margin: 0 0 22px; color: var(--muted); font-size: 14px; }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: none;
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(255, 56, 92, .14);
+    }
+
+    .primary {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 10px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--red);
+      color: white;
+      font-weight: 800;
+    }
+
+    .error {
+      min-height: 18px;
+      margin: 12px 0 0 !important;
+      color: #ff8399 !important;
+      font-size: 12px !important;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 30px 0 64px;
+    }
+
+    .topbar, .heading, .filters {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 850;
+    }
+
+    .brand .mark { width: 38px; height: 38px; border-radius: 11px; }
+
+    .ghost, .action {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 9px 13px;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .heading { margin: 54px 0 24px; align-items: flex-end; }
+    .heading h1 { margin: 0 0 7px; font-size: clamp(26px, 4vw, 42px); }
+    .heading p { margin: 0; color: var(--muted); }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .metric span { display: block; color: var(--muted); font-size: 11px; font-weight: 750; text-transform: uppercase; }
+    .metric strong { display: block; margin-top: 6px; font-size: 28px; }
+
+    .filters { margin-bottom: 12px; justify-content: flex-start; }
+    .filter.active { border-color: var(--red); background: rgba(255, 56, 92, .12); }
+
+    .table-wrap {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px 18px; text-align: left; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+    td { font-size: 13px; }
+    tr:last-child td { border-bottom: 0; }
+
+    .status {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .status--active { color: var(--green); background: rgba(37, 214, 138, .12); }
+    .status--pending { color: var(--yellow); background: rgba(255, 210, 74, .12); }
+    .status--revoked { color: #ff8399; background: rgba(255, 56, 92, .12); }
+    .action--approve { color: var(--green); }
+    .action--revoke { color: #ff8399; }
+    .empty { padding: 38px; color: var(--muted); text-align: center; }
+
+    @media (max-width: 720px) {
+      .summary { grid-template-columns: 1fr; }
+      .heading { display: block; }
+      .heading .ghost { margin-top: 18px; }
+      thead { display: none; }
+      tr, td { display: block; }
+      tr { padding: 15px; border-bottom: 1px solid var(--line); }
+      td { padding: 5px 0; border: 0; }
+      td:last-child { margin-top: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <section class="login" id="login">
+    <form class="login__card" id="login-form">
+      <span class="mark">26</span>
+      <h1>Administración PRO</h1>
+      <p>Aprueba o revoca el acceso de cada usuario.</p>
+      <input id="password" type="password" placeholder="Contraseña de administrador" autocomplete="current-password" required>
+      <button class="primary" id="login-submit" type="submit">Entrar</button>
+      <p class="error" id="login-error" role="alert"></p>
+    </form>
+  </section>
+
+  <main class="shell" id="shell" hidden>
+    <nav class="topbar">
+      <div class="brand"><span class="mark">26</span> Mundial PRO</div>
+      <button class="ghost" id="logout" type="button">Cerrar sesión</button>
+    </nav>
+
+    <header class="heading">
+      <div>
+        <h1>Usuarios PRO</h1>
+        <p>Los cambios de acceso se aplican inmediatamente.</p>
+      </div>
+      <button class="ghost" id="refresh" type="button">Actualizar lista</button>
+    </header>
+
+    <section class="summary" aria-label="Resumen">
+      <div class="metric"><span>Pendientes</span><strong id="pending-count">0</strong></div>
+      <div class="metric"><span>Activos</span><strong id="active-count">0</strong></div>
+      <div class="metric"><span>Total</span><strong id="total-count">0</strong></div>
+    </section>
+
+    <div class="filters" aria-label="Filtros">
+      <button class="ghost filter active" data-filter="all" type="button">Todos</button>
+      <button class="ghost filter" data-filter="pending" type="button">Pendientes</button>
+      <button class="ghost filter" data-filter="active" type="button">Activos</button>
+      <button class="ghost filter" data-filter="revoked" type="button">Revocados</button>
+    </div>
+
+    <section class="table-wrap">
+      <table>
+        <thead><tr><th>Teléfono</th><th>Solicitud</th><th>Estado</th><th>Acción</th></tr></thead>
+        <tbody id="users"></tbody>
+      </table>
+      <p class="empty" id="empty" hidden>No hay usuarios en este filtro.</p>
+    </section>
+  </main>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    let users = [];
+    let filter = "all";
+
+    function formatDate(value) {
+      if (!value) return "Sin fecha";
+      return new Intl.DateTimeFormat("es-ES", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(new Date(value));
+    }
+
+    function showPanel() {
+      $("#login").hidden = true;
+      $("#shell").hidden = false;
+      loadUsers();
+    }
+
+    function showLogin() {
+      $("#shell").hidden = true;
+      $("#login").hidden = false;
+      $("#password").focus();
+    }
+
+    function render() {
+      const visible = users.filter((user) =>
+        filter === "all" || user.status === filter
+      );
+      const body = $("#users");
+      body.replaceChildren();
+      $("#empty").hidden = visible.length > 0;
+
+      for (const user of visible) {
+        const row = document.createElement("tr");
+        const phone = document.createElement("td");
+        const created = document.createElement("td");
+        const stateCell = document.createElement("td");
+        const actionCell = document.createElement("td");
+        const state = document.createElement("span");
+        const action = document.createElement("button");
+
+        phone.textContent = user.phone || user.phoneMasked;
+        created.textContent = formatDate(user.createdAt);
+        state.className = `status status--${user.status}`;
+        state.textContent = user.status === "active"
+          ? "Activo"
+          : user.status === "revoked" ? "Revocado" : "Pendiente";
+        action.className = `action ${user.active ? "action--revoke" : "action--approve"}`;
+        action.type = "button";
+        action.textContent = user.active ? "Revocar acceso" : "Aprobar acceso";
+        action.addEventListener("click", () => updateAccess(user, !user.active, action));
+
+        stateCell.append(state);
+        actionCell.append(action);
+        row.append(phone, created, stateCell, actionCell);
+        body.append(row);
+      }
+
+      $("#pending-count").textContent =
+        users.filter((user) => user.status === "pending").length;
+      $("#active-count").textContent =
+        users.filter((user) => user.active).length;
+      $("#total-count").textContent = users.length;
+    }
+
+    async function loadUsers() {
+      $("#refresh").disabled = true;
+      try {
+        const response = await fetch("/api/pro-users", {
+          headers: { Accept: "application/json" }
+        });
+        if (response.status === 401) return showLogin();
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "No se pudo cargar la lista.");
+        users = data.users || [];
+        render();
+      } catch (error) {
+        window.alert(error.message);
+      } finally {
+        $("#refresh").disabled = false;
+      }
+    }
+
+    async function updateAccess(user, active, button) {
+      button.disabled = true;
+      try {
+        const response = await fetch("/api/pro-users", {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ userId: user.userId, active })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.status === 401) return showLogin();
+        if (!response.ok) throw new Error(data.error || "No se pudo cambiar el acceso.");
+        await loadUsers();
+      } catch (error) {
+        window.alert(error.message);
+        button.disabled = false;
+      }
+    }
+
+    $("#login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = $("#login-submit");
+      button.disabled = true;
+      $("#login-error").textContent = "";
+      try {
+        const response = await fetch("/api/pro-admin-auth", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ password: $("#password").value })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "No se pudo iniciar sesión.");
+        $("#password").value = "";
+        showPanel();
+      } catch (error) {
+        $("#login-error").textContent = error.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    $("#refresh").addEventListener("click", loadUsers);
+    $("#logout").addEventListener("click", async () => {
+      await fetch("/api/pro-admin-auth", { method: "DELETE" }).catch(() => {});
+      showLogin();
+    });
+    document.querySelectorAll(".filter").forEach((button) => {
+      button.addEventListener("click", () => {
+        filter = button.dataset.filter;
+        document.querySelectorAll(".filter").forEach((item) =>
+          item.classList.toggle("active", item === button)
+        );
+        render();
+      });
+    });
+
+    fetch("/api/pro-admin-auth", { headers: { Accept: "application/json" } })
+      .then((response) => response.json())
+      .then((data) => data.authenticated ? showPanel() : showLogin())
+      .catch(showLogin);
+  </script>
+</body>
+</html>

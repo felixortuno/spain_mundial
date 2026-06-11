@@ -1,0 +1,15 @@
+{
+  "name": "spain-mundial",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "pro:activate": "node --env-file-if-exists=.env scripts/activate-pro-user.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^8.6.0"
+  }
+}

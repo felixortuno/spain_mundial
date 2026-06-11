@@ -144,6 +144,16 @@
       font-weight: 800;
     }
 
+    .standalone-auth input + input { margin-top: 10px; }
+
+    .standalone-auth__create {
+      display: inline-block;
+      margin-top: 16px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     .standalone-auth__error {
       min-height: 18px;
       margin: 8px 0 0 !important;
@@ -858,11 +868,13 @@
   <section class="standalone-auth" id="standalone-auth">
     <div class="standalone-auth__card">
       <span class="standalone-auth__mark" aria-hidden="true">26</span>
-      <h1>Análisis protegido</h1>
-      <p>Bizum de 4.99€ al número <strong>+34 611 476 090</strong> para desbloquear el análisis.</p>
-      <input id="standalone-password" type="password" placeholder="Clave de acceso…" autocomplete="off">
+      <h1>Acceso PRO</h1>
+      <p>Bizum de 4.99€ al número <strong>+34 611 476 090</strong> para desbloquear PRO.</p>
+      <input id="standalone-phone" type="tel" placeholder="Teléfono · +34 611 476 090" autocomplete="tel" inputmode="tel">
+      <input id="standalone-pin" type="password" placeholder="PIN de 4 dígitos" autocomplete="one-time-code" inputmode="numeric" maxlength="4">
       <p class="standalone-auth__error" id="standalone-error" role="alert"></p>
-      <button id="standalone-submit" type="button">Desbloquear análisis</button>
+      <button id="standalone-submit" type="button">Vincular este dispositivo</button>
+      <a class="standalone-auth__create" href="/?mode=pro">Solicitar acceso PRO</a>
     </div>
   </section>
 
@@ -1201,25 +1213,43 @@
       $("#overround-note").textContent = market.nota || "";
     }
 
-    async function unlockStandalone(password) {
-      const options = password == null
-        ? { headers: { Accept: "application/json" } }
-        : {
-            method: "POST",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ password })
-          };
-      const response = await fetch("/api/analysis-auth", options);
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.authenticated) {
-        throw new Error(data.error || "Introduce la clave para continuar.");
-      }
+    function showStandaloneAnalysis() {
       $("#standalone-auth").hidden = true;
       $("#analysis-shell").hidden = false;
       load();
+    }
+
+    async function unlockStandalone(phone, pin) {
+      const response = await fetch("/api/analysis-auth", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ action: "login", phone, pin })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.authenticated) {
+        throw new Error(data.error || "No se pudo validar el acceso PRO.");
+      }
+      showStandaloneAnalysis();
+    }
+
+    async function checkRememberedAccess() {
+      try {
+        const response = await fetch("/api/analysis-auth", {
+          headers: { Accept: "application/json" }
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.authenticated) {
+          showStandaloneAnalysis();
+        } else if (data.pending) {
+          $("#standalone-error").textContent =
+            "Tu solicitud todavía está pendiente de aprobación.";
+        }
+      } catch {
+        // El formulario manual permanece disponible.
+      }
     }
 
     $("#refresh").addEventListener("click", load);
@@ -1228,18 +1258,30 @@
       button.disabled = true;
       $("#standalone-error").textContent = "";
       try {
-        await unlockStandalone($("#standalone-password").value);
+        await unlockStandalone(
+          $("#standalone-phone").value,
+          $("#standalone-pin").value
+        );
       } catch (error) {
         $("#standalone-error").textContent = error.message;
-        $("#standalone-password").focus();
+        $("#standalone-pin").focus();
       } finally {
         button.disabled = false;
       }
     });
-    $("#standalone-password").addEventListener("keydown", (event) => {
-      if (event.key === "Enter") $("#standalone-submit").click();
+    ["#standalone-phone", "#standalone-pin"].forEach((selector) => {
+      $(selector).addEventListener("keydown", (event) => {
+        if (event.key === "Enter") $("#standalone-submit").click();
+      });
     });
-    unlockStandalone(null).catch(() => {});
+    checkRememberedAccess();
+    window.addEventListener("pagehide", () => {
+      fetch("/api/analysis-auth", {
+        method: "DELETE",
+        headers: { Accept: "application/json" },
+        keepalive: true
+      }).catch(() => {});
+    });
   </script>
 </body>
 </html>

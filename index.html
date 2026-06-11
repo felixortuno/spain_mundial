@@ -1059,12 +1059,41 @@
       color: var(--txt-3) !important;
     }
 
+    .auth-modes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      width: 100%;
+      max-width: 330px;
+      margin: 0 auto 14px;
+      padding: 4px;
+      border-radius: var(--r-md);
+      background: var(--sur-3);
+      border: 1px solid var(--line-2);
+    }
+
+    .auth-mode {
+      min-height: 38px;
+      padding: 8px 10px;
+      border-radius: var(--r-sm);
+      color: var(--txt-2);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .auth-mode.active {
+      background: var(--sec);
+      color: var(--sec-on);
+      box-shadow: 0 3px 10px var(--sec-dim);
+    }
+
     .auth-form {
       display: flex;
       flex-direction: column;
       gap: 10px;
       width: 100%;
-      max-width: 300px;
+      max-width: 330px;
+      margin-inline: auto;
     }
 
     .auth-input {
@@ -1109,6 +1138,12 @@
     .auth-submit:hover {
       transform: translateY(-1px);
       box-shadow: 0 6px 18px rgba(255, 208, 0, 0.35);
+    }
+
+    .auth-input[hidden] { display: none; }
+
+    .auth-success {
+      color: var(--ter);
     }
 
     /* Pro panel header */
@@ -1654,7 +1689,7 @@
       <span class="app-tab__pip" aria-hidden="true"></span>Grupos
     </button>
     <button class="app-tab" role="tab" id="tab-pro" aria-selected="false" aria-controls="page-pro">
-      <span class="app-tab__pip" aria-hidden="true"></span>Análisis
+      <span class="app-tab__pip" aria-hidden="true"></span>PRO
     </button>
   </nav>
 
@@ -1798,18 +1833,25 @@
     <div class="auth-gate__card">
       <button class="auth-gate__close" id="auth-close" type="button" aria-label="Cerrar">×</button>
       <div class="auth-gate__icon" aria-hidden="true">📊</div>
-      <h2 id="auth-title">Desbloquear análisis</h2>
+      <h2 id="auth-title">Acceso PRO</h2>
       <p class="auth-payment">
         Bizum de 4.99€ al número
         <strong>+34 611 476 090</strong>
-        para desbloquear el análisis
+        para desbloquear PRO
       </p>
-      <p class="auth-instruction">Introduce debajo la clave de acceso recibida.</p>
-      <div class="auth-form">
-        <input class="auth-input" id="auth-input" type="password" placeholder="Clave de acceso…" autocomplete="off">
-        <span class="auth-error" id="auth-error" role="alert"></span>
-        <button class="auth-submit" id="auth-submit" type="button">Desbloquear análisis</button>
+      <div class="auth-modes" role="tablist" aria-label="Acceso PRO">
+        <button class="auth-mode active" id="auth-mode-login" type="button" role="tab" aria-selected="true">Vincular dispositivo</button>
+        <button class="auth-mode" id="auth-mode-register" type="button" role="tab" aria-selected="false">Solicitar acceso</button>
       </div>
+      <p class="auth-instruction" id="auth-instruction">Vincula este navegador una sola vez con tu teléfono y PIN.</p>
+      <div class="auth-form">
+        <input class="auth-input" id="auth-phone" type="tel" placeholder="Teléfono · +34 611 476 090" autocomplete="tel" inputmode="tel">
+        <input class="auth-input" id="auth-pin" type="password" placeholder="PIN de 4 dígitos" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{4}" maxlength="4">
+        <input class="auth-input" id="auth-pin-confirm" type="password" placeholder="Repite el PIN" autocomplete="new-password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" hidden>
+        <span class="auth-error" id="auth-error" role="alert"></span>
+        <button class="auth-submit" id="auth-submit" type="button">Vincular y entrar</button>
+      </div>
+      <p class="auth-instruction">Cuando el administrador te apruebe, PRO se abrirá sin pedirte nada en este navegador.</p>
     </div>
   </div>
 
@@ -1818,7 +1860,7 @@
 
     <div class="pro-head">
       <div class="pro-head__left">
-        <h2>Análisis del Mundial</h2>
+        <h2>PRO Mundial</h2>
         <span class="pro-badge">PRO</span>
       </div>
       <button class="icon-btn" id="pro-refresh" type="button">
@@ -1870,7 +1912,7 @@
     <span class="btm-btn__ico" aria-hidden="true">🏆</span>Grupos
   </button>
   <button class="btm-btn" id="btm-pro" type="button" aria-selected="false">
-    <span class="btm-btn__ico" aria-hidden="true">📊</span>Análisis
+    <span class="btm-btn__ico" aria-hidden="true">📊</span>PRO
   </button>
 </nav>
 
@@ -1908,6 +1950,7 @@ const TIMEZONE        = "Europe/Madrid";
 const MAX_TEAMS       = 8;
 const REFRESH_MS      = 6 * 60 * 60 * 1000;
 const ANALYSIS_REFRESH_MS = 5 * 60 * 1000;
+const PRO_ACCESS_CHECK_MS = 15 * 1000;
 const STORAGE_KEY     = "mundial-2026-teams";
 
 const TEAMS = [
@@ -1969,6 +2012,10 @@ let proData       = null;
 let statsData     = null;
 let proUnlocked   = false;
 let proLoading    = false;
+let proAuthMode   = "login";
+let proLogoutPromise = null;
+let proLoadVersion = 0;
+let proAccessCheckVersion = 0;
 let countdownTimer = null;
 let toastTimer    = null;
 
@@ -2019,7 +2066,12 @@ const E = {
   gruposGrid:     G("grupos-grid"),
   authGate:       G("auth-gate"),
   authClose:      G("auth-close"),
-  authInput:      G("auth-input"),
+  authModeLogin:  G("auth-mode-login"),
+  authModeRegister:G("auth-mode-register"),
+  authInstruction:G("auth-instruction"),
+  authPhone:      G("auth-phone"),
+  authPin:        G("auth-pin"),
+  authPinConfirm: G("auth-pin-confirm"),
   authError:      G("auth-error"),
   authSubmit:     G("auth-submit"),
   picksContent:   G("picks-content"),
@@ -2393,6 +2445,7 @@ function switchTab(name) {
   const isCal    = name === "cal";
   const isGrupos = name === "grupos";
   const isPro    = name === "pro";
+  const leavingPro = !isPro && !E.pagePro.hidden;
 
   E.pageCal.classList.toggle("active", isCal);
   E.pageGrupos.classList.toggle("active", isGrupos);
@@ -2408,11 +2461,12 @@ function switchTab(name) {
   E.btmGrupos.setAttribute("aria-selected", String(isGrupos));
   E.btmPro.setAttribute("aria-selected", String(isPro));
 
+  if (leavingPro) logoutPro();
   if (isGrupos) renderGroups();
   if (isPro && !isProUnlocked()) {
-    E.authGate.hidden = false;
-    document.body.classList.add("no-scroll");
-    requestAnimationFrame(() => E.authInput.focus());
+    E.authGate.hidden = true;
+    document.body.classList.remove("no-scroll");
+    checkProAccess();
   } else if (!isPro && !isProUnlocked()) {
     E.authGate.hidden = true;
     document.body.classList.remove("no-scroll");
@@ -2433,53 +2487,131 @@ function unlockPro() {
   loadAnalysis();
 }
 
-function lockPro() {
+function lockPro({ showGate = !E.pagePro.hidden } = {}) {
+  proLoadVersion += 1;
+  proAccessCheckVersion += 1;
   proUnlocked = false;
   proData = null;
   statsData = null;
-  E.authGate.hidden = E.pagePro.hidden;
+  proLoading = false;
+  E.authGate.hidden = !showGate;
   E.picksContent.hidden = true;
-  document.body.classList.toggle("no-scroll", !E.pagePro.hidden);
+  document.body.classList.toggle("no-scroll", showGate);
 }
 
-async function initProGate() {
+function initProGate() {
+  logoutPro();
+}
+
+function setProAuthMode(mode) {
+  proAuthMode = mode === "register" ? "register" : "login";
+  const registering = proAuthMode === "register";
+  E.authModeLogin.classList.toggle("active", !registering);
+  E.authModeRegister.classList.toggle("active", registering);
+  E.authModeLogin.setAttribute("aria-selected", String(!registering));
+  E.authModeRegister.setAttribute("aria-selected", String(registering));
+  E.authPinConfirm.hidden = !registering;
+  E.authInstruction.textContent = registering
+    ? "Tras hacer el Bizum, crea tu PIN. Activaremos el acceso al comprobar el pago."
+    : "Vincula este navegador una sola vez con tu teléfono y PIN.";
+  E.authSubmit.textContent = registering ? "Solicitar acceso PRO" : "Vincular y entrar";
+  E.authError.textContent = "";
+  E.authError.classList.remove("auth-success");
+}
+
+function showProGate({ pending = false } = {}) {
+  if (E.pagePro.hidden || isProUnlocked()) return;
+  E.authGate.hidden = false;
+  document.body.classList.add("no-scroll");
+  if (pending) {
+    E.authError.textContent =
+      "Tu solicitud sigue pendiente. Cuando sea aprobada, PRO se abrirá automáticamente.";
+    E.authError.classList.add("auth-success");
+  }
+  requestAnimationFrame(() => E.authPhone.focus());
+}
+
+async function checkProAccess() {
+  const checkVersion = ++proAccessCheckVersion;
+  if (proLogoutPromise) await proLogoutPromise;
   try {
     const response = await fetch("/api/analysis-auth", {
       headers: { Accept: "application/json" }
     });
-    const data = response.ok ? await response.json() : {};
-    if (!data.authenticated) return;
-    proUnlocked = true;
-    E.authGate.hidden     = true;
-    E.picksContent.hidden = false;
-    document.body.classList.remove("no-scroll");
-    if (!E.pagePro.hidden) loadAnalysis();
+    const data = await response.json().catch(() => ({}));
+    if (
+      checkVersion !== proAccessCheckVersion ||
+      E.pagePro.hidden ||
+      isProUnlocked()
+    ) return;
+    if (response.ok && data.authenticated) {
+      unlockPro();
+      return;
+    }
+    showProGate({ pending: Boolean(data.pending) });
   } catch {
-    lockPro();
+    if (checkVersion === proAccessCheckVersion) showProGate();
   }
 }
 
-async function loginPro(password) {
+async function submitProCredentials({ phone, pin, pinConfirm }) {
+  if (proLogoutPromise) await proLogoutPromise;
+  if (!/^\d{4}$/.test(pin)) {
+    throw new Error("El PIN debe tener exactamente 4 dígitos.");
+  }
+  if (proAuthMode === "register" && pin !== pinConfirm) {
+    throw new Error("Los dos PIN no coinciden.");
+  }
+
   const response = await fetch("/api/analysis-auth", {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ password })
+    body: JSON.stringify({
+      action: proAuthMode,
+      phone,
+      pin
+    })
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    throw new Error(data.error || "No se pudo validar la clave.");
+    throw new Error(data.error || "No se pudo validar el acceso PRO.");
+  }
+  if (proAuthMode === "register") {
+    E.authError.textContent =
+      "Solicitud creada. Cuando la aprobemos, PRO se abrirá sin pedirte nada.";
+    E.authError.classList.add("auth-success");
+    E.authPin.value = "";
+    E.authPinConfirm.value = "";
+    return;
   }
   unlockPro();
+}
+
+async function logoutPro() {
+  if (proLogoutPromise) return proLogoutPromise;
+  lockPro({ showGate: false });
+  proLogoutPromise = fetch("/api/analysis-auth", {
+      method: "DELETE",
+      headers: { Accept: "application/json" },
+      keepalive: true
+    })
+    .catch(() => {
+      // La interfaz queda bloqueada aunque la limpieza remota falle.
+    })
+    .finally(() => {
+      proLogoutPromise = null;
+    });
+  return proLogoutPromise;
 }
 
 async function analysisFetch(path) {
   const response = await fetch(path, { headers: { Accept: "application/json" } });
   if (response.status === 401) {
     lockPro();
-    throw new Error("La sesión ha caducado. Introduce de nuevo la clave.");
+    throw new Error("Tu acceso PRO no está activo.");
   }
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
@@ -2491,6 +2623,7 @@ async function analysisFetch(path) {
 // ── FETCH ANALYSIS ───────────────────────────────────────────────────────────
 async function loadAnalysis() {
   if (proLoading || !isProUnlocked()) return;
+  const loadVersion = ++proLoadVersion;
   proLoading = true;
   E.proRefresh.disabled = true;
   E.proRefresh.classList.add("loading");
@@ -2501,6 +2634,8 @@ async function loadAnalysis() {
     analysisFetch("/api/picks"),
     analysisFetch("/api/tournament-stats")
   ]);
+
+  if (loadVersion !== proLoadVersion || !isProUnlocked()) return;
 
   if (picksResult.status === "fulfilled") {
     proData = picksResult.value;
@@ -2733,18 +2868,31 @@ function bindEvents() {
   E.authSubmit.addEventListener("click", async () => {
     E.authSubmit.disabled = true;
     E.authError.textContent = "";
+    E.authError.classList.remove("auth-success");
     try {
-      await loginPro(E.authInput.value);
-      E.authError.textContent = "";
-      E.authInput.value = "";
+      await submitProCredentials({
+        phone: E.authPhone.value,
+        pin: E.authPin.value,
+        pinConfirm: E.authPinConfirm.value
+      });
+      if (proAuthMode === "login") {
+        E.authError.textContent = "";
+        E.authPin.value = "";
+      }
     } catch (error) {
       E.authError.textContent = error.message;
-      E.authInput.focus();
+      E.authPin.focus();
     } finally {
       E.authSubmit.disabled = false;
     }
   });
-  E.authInput.addEventListener("keydown", e => { if (e.key === "Enter") E.authSubmit.click(); });
+  E.authModeLogin.addEventListener("click", () => setProAuthMode("login"));
+  E.authModeRegister.addEventListener("click", () => setProAuthMode("register"));
+  [E.authPhone, E.authPin, E.authPinConfirm].forEach(input => {
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") E.authSubmit.click();
+    });
+  });
   E.authClose.addEventListener("click", () => switchTab("cal"));
   document.addEventListener("keydown", e => {
     if (e.key === "Escape" && !E.authGate.hidden && !isProUnlocked()) {
@@ -2757,6 +2905,11 @@ function bindEvents() {
     statsData = null;
     loadAnalysis();
   });
+
+  window.addEventListener("pagehide", () => {
+    if (!isProUnlocked()) return;
+    logoutPro();
+  });
 }
 
 // ── AUTO REFRESH ──────────────────────────────────────────────────────────────
@@ -2765,6 +2918,9 @@ function startAutoRefresh() {
   setInterval(() => {
     if (isProUnlocked() && !E.pagePro.hidden) loadAnalysis();
   }, ANALYSIS_REFRESH_MS);
+  setInterval(() => {
+    if (!isProUnlocked() && !E.pagePro.hidden) checkProAccess();
+  }, PRO_ACCESS_CHECK_MS);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && Date.now() - lastRefresh >= REFRESH_MS) {
       loadCalendar();

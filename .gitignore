@@ -3,6 +3,7 @@
 .env
 .env.*
 !.env.example
+node_modules/
 
 # ML: datos descargados y modelos entrenados (no versionar binarios grandes)
 ml/data/
