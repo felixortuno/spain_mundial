@@ -1165,6 +1165,56 @@
 
     .pro-head__left { display: flex; align-items: center; gap: 10px; }
 
+    .pro-head__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 38px;
+      padding: 9px 13px;
+      border-radius: var(--r-md);
+      border: 1px solid rgba(37, 214, 138, 0.35);
+      background: rgba(37, 214, 138, 0.1);
+      color: var(--ter);
+      font-size: 11px;
+      font-weight: 850;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .admin-link:hover {
+      background: rgba(37, 214, 138, 0.18);
+      border-color: rgba(37, 214, 138, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .admin-link svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 520px) {
+      .pro-head {
+        align-items: flex-start;
+      }
+
+      .pro-head__actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .admin-link,
+      .pro-head__actions .icon-btn {
+        justify-content: center;
+      }
+    }
+
     .pro-head h2 {
       margin: 0;
       font-family: 'Outfit', sans-serif;
@@ -1871,13 +1921,22 @@
         <h2>PRO Mundial</h2>
         <span class="pro-badge">PRO</span>
       </div>
-      <button class="icon-btn" id="pro-refresh" type="button">
-        <svg class="spin-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
-        </svg>
-        Actualizar
-      </button>
+      <div class="pro-head__actions">
+        <a class="admin-link" href="/admin?login=1" aria-label="Entrar en Administración con contraseña">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-5-7V7a5 5 0 0 1 10 0v3m-9 0h8a2 2 0 0 1 2 2v7H6v-7a2 2 0 0 1 2-2Z"/>
+          </svg>
+          Administración
+        </a>
+        <button class="icon-btn" id="pro-refresh" type="button">
+          <svg class="spin-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+          </svg>
+          Actualizar
+        </button>
+      </div>
     </div>
 
     <p class="pro-ts" id="pro-ts"></p>

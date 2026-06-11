@@ -400,10 +400,22 @@
       });
     });
 
-    fetch("/api/pro-admin-auth", { headers: { Accept: "application/json" } })
-      .then((response) => response.json())
-      .then((data) => data.authenticated ? showPanel() : showLogin())
-      .catch(showLogin);
+    async function initializeAdmin() {
+      const forceLogin = new URLSearchParams(location.search).get("login") === "1";
+      if (forceLogin) {
+        await fetch("/api/pro-admin-auth", { method: "DELETE" }).catch(() => {});
+        history.replaceState(null, "", "/admin");
+        showLogin();
+        return;
+      }
+
+      fetch("/api/pro-admin-auth", { headers: { Accept: "application/json" } })
+        .then((response) => response.json())
+        .then((data) => data.authenticated ? showPanel() : showLogin())
+        .catch(showLogin);
+    }
+
+    initializeAdmin();
   </script>
 </body>
 </html>
