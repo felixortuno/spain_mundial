@@ -17,6 +17,17 @@ test("la contraseña de administrador se valida solo en servidor", () => {
   else process.env.PRO_ADMIN_PASSWORD = previous;
 });
 
+test("el administrador queda deshabilitado si falta su contraseña", () => {
+  const previous = process.env.PRO_ADMIN_PASSWORD;
+  delete process.env.PRO_ADMIN_PASSWORD;
+  assert.throws(
+    () => validAdminPassword("cualquier-valor"),
+    (error) => error.code === "MISSING_ADMIN_PASSWORD"
+  );
+  if (previous === undefined) delete process.env.PRO_ADMIN_PASSWORD;
+  else process.env.PRO_ADMIN_PASSWORD = previous;
+});
+
 test("la sesión de administrador está firmada y caduca", () => {
   const previous = process.env.PRO_ADMIN_PASSWORD;
   process.env.PRO_ADMIN_PASSWORD = "primera-contrasena";
