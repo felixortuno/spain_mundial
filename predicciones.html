@@ -1220,7 +1220,7 @@
       const picks = collectAllPicks(data);
       renderKpis(picks, data.analitica_mercado || {});
       renderPicks(picks);
-      renderCombis(data.combinadas || []);
+      renderCombis(collectAllCombis(data));
       renderSupercuota(data.supercuota || null);
       renderOverround(data.analitica_mercado || {});
       if (data.disclaimer) {/* mantenemos el aviso estático y enriquecido */}
@@ -1288,6 +1288,29 @@
       $("#picks").innerHTML = list.map(pickCard).join("");
     }
 
+    // Junta combinadas de ambas franjas; por tipo prioriza la disponible/mejor EV
+    // (el backend acota data.combinadas a "hoy"; la madrugada va aparte).
+    function collectAllCombis(data) {
+      const tag = (arr, franja) =>
+        (arr || []).filter(Boolean).map((c) => ({ ...c, _franja: franja }));
+      const hoyArr = (data.franja_hoy && data.franja_hoy.combinadas) || data.combinadas || [];
+      const all = [
+        ...tag(hoyArr, "hoy"),
+        ...tag(data.franja_madrugada && data.franja_madrugada.combinadas, "madrugada"),
+      ];
+      const byTipo = {};
+      for (const c of all) {
+        if (!byTipo[c.tipo] || isBetterCombi(c, byTipo[c.tipo])) byTipo[c.tipo] = c;
+      }
+      return COMBI_ORDER.map((t) => byTipo[t]).filter(Boolean);
+    }
+
+    function isBetterCombi(c, cur) {
+      if (!cur.disponible && c.disponible) return true;
+      if (cur.disponible && !c.disponible) return false;
+      return (c.ev ?? -Infinity) > (cur.ev ?? -Infinity);
+    }
+
     function renderCombis(combis) {
       const host = $("#combis");
       const list = (combis || []).filter(Boolean);
@@ -1303,11 +1326,14 @@
 
     function combiCard(c) {
       const meta = COMBI_META[c.tipo] || { label: c.tipo || "Combinada", cls: "valor" };
+      const franjaBadge = c._franja
+        ? ` <span class="franja-badge franja-badge--${c._franja}">${c._franja === "madrugada" ? "Madrugada" : "Hoy"}</span>`
+        : "";
 
       if (!c.disponible) {
         return `
           <article class="combi combi--${meta.cls} combi--off">
-            <div class="combi__head"><span class="combi__tipo">${meta.label}</span></div>
+            <div class="combi__head"><span class="combi__tipo">${meta.label}${franjaBadge}</span></div>
             <p class="combi__msg">${c.mensaje || "No disponible ahora mismo."}</p>
           </article>`;
       }
@@ -1324,7 +1350,7 @@
       return `
         <article class="combi combi--${meta.cls}">
           <div class="combi__head">
-            <span class="combi__tipo">${meta.label}</span>
+            <span class="combi__tipo">${meta.label}${franjaBadge}</span>
             <span class="combi__casa">${c.casa || "—"}</span>
           </div>
           <div class="combi__odds">

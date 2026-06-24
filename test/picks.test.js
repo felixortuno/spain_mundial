@@ -183,11 +183,26 @@ test("buildSupercuota cruza franjas y genera versiones segura/premium", () => {
   assert.ok(sc.version_premium.cuota_total > sc.cuota_total);
 });
 
-test("buildSupercuota no se construye si falta valor en una franja", () => {
-  const hoyLegs = [leg("Spain", "hoy", "alta_prob_75", 0.75, 1.40)];
-  const sc = buildSupercuota(hoyLegs, []); // sin madrugada
+test("buildSupercuota no se construye con menos de 3 selecciones con valor", () => {
+  const hoyLegs = [
+    leg("Spain", "hoy", "alta_prob_75", 0.75, 1.40),
+    leg("Italy", "hoy", "alta_prob_75", 0.74, 1.42),
+  ];
+  const sc = buildSupercuota(hoyLegs, []); // solo 2 con valor
   assert.equal(sc.disponible, false);
-  assert.match(sc.mensaje, /madrugada/);
+  assert.match(sc.mensaje, /mínimo 3/);
+});
+
+test("buildSupercuota se construye con una sola franja (cruza_franjas false)", () => {
+  const madrugadaLegs = [
+    leg("México vs Canadá", "madrugada", "alta_prob_75", 0.72, 1.45),
+    leg("USA vs Panamá", "madrugada", "alta_prob_75", 0.70, 1.50),
+    leg("Brasil vs Chile", "madrugada", "media_prob_55", 0.58, 1.95),
+  ];
+  const sc = buildSupercuota([], madrugadaLegs); // sin partidos de hoy
+  assert.equal(sc.disponible, true);
+  assert.equal(sc.cruza_franjas, false);
+  assert.equal(sc.selecciones.length, 3);
 });
 
 test("buildCombos arma combis jugables en una sola casa y avisa si faltan datos", () => {

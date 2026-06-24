@@ -590,37 +590,38 @@ function supercuotaObject(version, legs, house, stake) {
   };
 }
 
-// Elige hasta maxN patas de partidos distintos jugables en `house`, con al
-// menos una de hoy y una de la madrugada, priorizando banda alta/media + edge.
+// Elige hasta maxN patas de partidos distintos jugables en `house`, priorizando
+// cruzar franjas (una de hoy y una de madrugada) y banda alta/media + edge. Si
+// solo hay una franja con valor, la construye igual (cruza_franjas será false).
 function pickSupercuotaLegs(hoyValue, madValue, house, maxN) {
   const has = (l) => l.byHouse[house];
   const rank = (l) => (SUPERCUOTA_BAND_RANK[l.banda] ?? 3);
   const sortFn = (a, b) => rank(a) - rank(b) || legEdge(b) - legEdge(a);
   const hoyP = hoyValue.filter(has).sort(sortFn);
   const madP = madValue.filter(has).sort(sortFn);
-  if (!hoyP.length || !madP.length) return null;
 
   const chosen = [];
   const used = new Set();
   const take = (l) => { chosen.push(l); used.add(l.partido); };
-  take(hoyP[0]);
-  if (!used.has(madP[0].partido)) take(madP[0]);
-  for (const leg of [...hoyP.slice(1), ...madP.slice(1)].sort(sortFn)) {
+  // Semilla: una de cada franja si las hay, para intentar cruzarlas.
+  if (hoyP.length) take(hoyP[0]);
+  if (madP.length && !used.has(madP[0].partido)) take(madP[0]);
+  for (const leg of [...hoyP, ...madP].sort(sortFn)) {
     if (chosen.length >= maxN) break;
     if (used.has(leg.partido)) continue;
     take(leg);
   }
-  return chosen.length >= 2 ? chosen : null;
+  return chosen.length >= 3 ? chosen : null; // supercuota: 3–5 selecciones
 }
 
 function buildSupercuota(hoyLegs, madrugadaLegs) {
   const value = (arr) => arr.filter((l) => l.mejor_cuota && legEdge(l) >= EDGE_THRESHOLD);
   const hoyValue = value(hoyLegs);
   const madValue = value(madrugadaLegs);
-  if (!hoyValue.length || !madValue.length) {
+  if (hoyValue.length + madValue.length < 3) {
     return {
       disponible: false,
-      mensaje: "Necesita ≥1 selección con valor de hoy y ≥1 de la madrugada; falta valor en alguna franja.",
+      mensaje: "No hay suficientes selecciones con valor para una supercuota (mínimo 3 entre hoy y madrugada).",
     };
   }
 
@@ -635,7 +636,7 @@ function buildSupercuota(hoyLegs, madrugadaLegs) {
     if (!best || obj.ev > best.obj.ev) best = { house, legs, obj };
   }
   if (!best) {
-    return { disponible: false, mensaje: "Ninguna casa cubre selecciones de ambas franjas." };
+    return { disponible: false, mensaje: "Ninguna casa cubre 3+ selecciones con valor." };
   }
 
   // Versión segura: quita la pata de menor probabilidad (la más arriesgada).
