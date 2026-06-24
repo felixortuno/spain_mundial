@@ -473,6 +473,87 @@
       margin-top: 18px;
     }
 
+    /* ── Combinadas ───────────────────────────────────────────────────── */
+    .combis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .combi {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--accent, var(--muted));
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+    }
+    .combi--segura { --accent: var(--green); }
+    .combi--valor  { --accent: var(--blue); }
+    .combi--riesgo { --accent: var(--yellow); }
+    .combi--off { opacity: .55; }
+    .combi__head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-bottom: 10px;
+    }
+    .combi__tipo { font-family: var(--font-display); font-size: var(--fs-md); letter-spacing: .3px; }
+    .combi__casa {
+      font-size: var(--fs-xs); font-weight: 700; color: var(--muted);
+      border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px;
+    }
+    .combi__odds { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 12px; }
+    .combi__cuota { font-family: var(--font-display); font-size: var(--fs-2xl); color: var(--accent); line-height: 1; }
+    .combi__meta { font-size: var(--fs-sm); color: var(--muted); }
+    .combi__sel { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+    .combi__sel li {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+      font-size: var(--fs-sm); border-top: 1px solid var(--line); padding-top: 7px;
+    }
+    .combi__sel li:first-child { border-top: 0; padding-top: 0; }
+    .combi__selname { color: var(--text); min-width: 0; }
+    .combi__selmkt { display: block; color: var(--muted); font-size: var(--fs-xs); }
+    .combi__selodds { font-weight: 700; white-space: nowrap; }
+    .combi__warn { margin: 10px 0 0; font-size: var(--fs-xs); color: var(--yellow); }
+    .combi__msg { margin: 0; font-size: var(--fs-sm); color: var(--muted); }
+    .combi .pos { color: var(--green); }
+    .combi .neg { color: var(--red); }
+
+    /* ── Supercuota (combinada estrella) ──────────────────────────────── */
+    #supercuota { margin-top: 18px; }
+    .super {
+      padding: 20px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 92% -10%, rgba(255, 208, 0, .10), transparent 18rem),
+        var(--panel-2);
+      box-shadow: var(--shadow);
+    }
+    .super .pos { color: var(--green); }
+    .super .neg { color: var(--red); }
+    .super__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .super__title { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: var(--fs-lg); color: var(--yellow); }
+    .super__casa { font-size: var(--fs-xs); font-weight: 700; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; }
+    .super__big { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 14px; }
+    .super__cuota { font-family: var(--font-display); font-size: var(--fs-hero); color: var(--yellow); line-height: 1; }
+    .super__meta { font-size: var(--fs-base); color: var(--muted); }
+    .super__sel { margin-bottom: 4px; }
+    .super__versions {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line);
+    }
+    .super__alt { padding: 13px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--panel); }
+    .super__alt--segura { border-top: 2px solid var(--green); }
+    .super__alt--premium { border-top: 2px solid var(--violet); }
+    .super__alt-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 700; font-size: var(--fs-sm); margin-bottom: 8px; }
+    .super__alt-odds { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+    .super__alt-cuota { font-family: var(--font-display); font-size: var(--fs-xl); color: var(--text); }
+    .franja-badge {
+      display: inline-block; font-size: .62em; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; padding: 2px 6px; border-radius: 6px; margin-right: 6px; vertical-align: middle;
+    }
+    .franja-badge--hoy { color: var(--blue); background: rgba(0, 210, 255, .12); }
+    .franja-badge--madrugada { color: var(--violet); background: rgba(167, 139, 250, .15); }
+
     .pick {
       position: relative;
       display: flex;
@@ -947,6 +1028,18 @@
     </section>
 
     <div class="section-head">
+      <h2>Combinadas</h2>
+      <p>Combis jugables en una sola casa, ordenadas por riesgo</p>
+    </div>
+    <section class="combis" id="combis" aria-live="polite"></section>
+
+    <div class="section-head">
+      <h2>Supercuota</h2>
+      <p>La combinada estrella que cruza hoy y la madrugada</p>
+    </div>
+    <section id="supercuota" aria-live="polite"></section>
+
+    <div class="section-head">
       <h2>Analítica de mercado</h2>
       <p>Overround (margen) por casa — más bajo = cuotas más justas</p>
     </div>
@@ -1019,6 +1112,50 @@
           kelly_frac: 0.018, stake_kelly_eur: 18.0, stake_plano_eur: 10.0,
           banda_confianza: [0.27, 0.35], tiene_valor: true },
       ],
+      combinadas: [
+        { tipo: "combi_segura", disponible: true, casa: "Bet365", cuota_combinada: 2.04,
+          prob_conjunta: 0.5624, ev: 0.149, stake_sugerido_eur: 15, correlacion_advertencia: null,
+          selecciones: [
+            { partido: "España vs Marruecos", mercado: "1X2 — Gana España", cuota: 1.46, prob: 0.76 },
+            { partido: "Inglaterra vs Senegal", mercado: "1X2 — Gana Inglaterra", cuota: 1.40, prob: 0.74 } ] },
+        { tipo: "combi_valor", disponible: true, casa: "Winamax", cuota_combinada: 4.62,
+          prob_conjunta: 0.286, ev: 0.321, stake_sugerido_eur: 8, correlacion_advertencia: null,
+          selecciones: [
+            { partido: "Francia vs Bélgica", mercado: "1X2 — Gana Francia", cuota: 2.10, prob: 0.55 },
+            { partido: "Brasil vs México", mercado: "1X2 — Gana Brasil", cuota: 2.20, prob: 0.52 } ] },
+        { tipo: "combi_riesgo", disponible: true, casa: "Bet365", cuota_combinada: 11.04,
+          prob_conjunta: 0.1254, ev: 0.384, stake_sugerido_eur: 5, correlacion_advertencia: null,
+          selecciones: [
+            { partido: "España vs Marruecos", mercado: "1X2 — Gana España", cuota: 1.46, prob: 0.76 },
+            { partido: "Francia vs Bélgica", mercado: "1X2 — Gana Francia", cuota: 2.10, prob: 0.55 },
+            { partido: "Portugal vs Uruguay", mercado: "1X2 — Empate", cuota: 3.60, prob: 0.30 } ] },
+      ],
+      supercuota: {
+        disponible: true, version: "estrella", casa: "Bet365", cuota_total: 3.18,
+        prob_conjunta: 0.41, ev: 0.302, con_valor: true, cruza_franjas: true,
+        stake_sugerido_eur: 5, correlacion_advertencia: null,
+        selecciones: [
+          { franja: "hoy", hora_es: "21:00", partido: "España vs Marruecos", mercado: "1X2 — Gana España", cuota: 1.46, prob: 0.76 },
+          { franja: "madrugada", hora_es: "02:00", partido: "México vs Canadá", mercado: "1X2 — Gana México", cuota: 1.55, prob: 0.70 },
+          { franja: "hoy", hora_es: "18:00", partido: "Francia vs Bélgica", mercado: "Over/Under 2.5 — Más de 2.5 goles", cuota: 1.40, prob: 0.62 },
+        ],
+        version_segura: {
+          version: "segura", casa: "Bet365", cuota_total: 2.26, prob_conjunta: 0.53, ev: 0.198,
+          con_valor: true, cruza_franjas: true, stake_sugerido_eur: 8, correlacion_advertencia: null,
+          selecciones: [
+            { franja: "hoy", hora_es: "21:00", partido: "España vs Marruecos", mercado: "1X2 — Gana España", cuota: 1.46, prob: 0.76 },
+            { franja: "madrugada", hora_es: "02:00", partido: "México vs Canadá", mercado: "1X2 — Gana México", cuota: 1.55, prob: 0.70 } ],
+        },
+        version_premium: {
+          version: "premium", casa: "Bet365", cuota_total: 11.45, prob_conjunta: 0.124, ev: 0.373,
+          con_valor: true, cruza_franjas: true, stake_sugerido_eur: 3, correlacion_advertencia: null,
+          selecciones: [
+            { franja: "hoy", hora_es: "21:00", partido: "España vs Marruecos", mercado: "1X2 — Gana España", cuota: 1.46, prob: 0.76 },
+            { franja: "madrugada", hora_es: "02:00", partido: "México vs Canadá", mercado: "1X2 — Gana México", cuota: 1.55, prob: 0.70 },
+            { franja: "hoy", hora_es: "18:00", partido: "Francia vs Bélgica", mercado: "Over/Under 2.5 — Más de 2.5 goles", cuota: 1.40, prob: 0.62 },
+            { franja: "madrugada", hora_es: "04:00", partido: "Brasil vs Argentina", mercado: "1X2 — Empate", cuota: 3.60, prob: 0.30 } ],
+        },
+      },
       analitica_mercado: {
         overround_por_casa: { Bet365: 0.051, Pinnacle: 0.023, Bwin: 0.058, WilliamHill: 0.063 },
         mejor_casa_precio: "Pinnacle",
@@ -1032,6 +1169,15 @@
       baja_prob_30:  { letter: "A", cls: "A", name: "Banda A", target: "~30% prob." },
     };
     const BAND_ORDER = ["alta_prob_75", "media_prob_55", "baja_prob_30"];
+
+    const COMBI_META = {
+      combi_segura: { label: "Combi segura", cls: "segura" },
+      combi_valor:  { label: "Combi valor",  cls: "valor" },
+      combi_riesgo: { label: "Combi riesgo", cls: "riesgo" },
+    };
+    const COMBI_ORDER = ["combi_segura", "combi_valor", "combi_riesgo"];
+
+    const STAR_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><path d="m12 17.3-6.18 3.7 1.64-7.03L2 9.24l7.19-.61L12 2l2.81 6.63 7.19.61-5.46 4.73L18.18 21z"/></svg>';
 
     const SOURCE_LABEL = {
       ml_model: "Modelo ML", live_market: "Mercado en vivo", demo: "Demo",
@@ -1071,9 +1217,11 @@
         ? "Generado " + ts.toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" })
         : "";
 
-      const picks = (data.picks || []).filter(Boolean);
+      const picks = collectAllPicks(data);
       renderKpis(picks, data.analitica_mercado || {});
       renderPicks(picks);
+      renderCombis(data.combinadas || []);
+      renderSupercuota(data.supercuota || null);
       renderOverround(data.analitica_mercado || {});
       if (data.disclaimer) {/* mantenemos el aviso estático y enriquecido */}
     }
@@ -1110,9 +1258,26 @@
         </article>`).join("");
     }
 
+    // Junta los picks de hoy y de la madrugada (el backend acota data.picks a
+    // "hoy"; en el Mundial 2026 casi todo cae de madrugada en España).
+    function collectAllPicks(data) {
+      const hoy = (data.picks && data.picks.length) ? data.picks : (data.franja_hoy?.picks || []);
+      const mad = data.franja_madrugada?.picks || [];
+      return [...hoy, ...mad].filter(Boolean);
+    }
+
+    // Mejor pick por banda: prioriza los que tienen datos (no sin_valor) y mayor EV.
+    function isBetterPick(p, cur) {
+      if (cur.sin_valor && !p.sin_valor) return true;
+      if (!cur.sin_valor && p.sin_valor) return false;
+      return (p.ev ?? -Infinity) > (cur.ev ?? -Infinity);
+    }
+
     function renderPicks(picks) {
       const byBand = {};
-      for (const p of picks) byBand[p.banda] = p;
+      for (const p of picks) {
+        if (!byBand[p.banda] || isBetterPick(p, byBand[p.banda])) byBand[p.banda] = p;
+      }
       const ordered = BAND_ORDER.map((b) => byBand[b]).filter(Boolean);
       const list = ordered.length ? ordered : picks;
 
@@ -1121,6 +1286,113 @@
         return;
       }
       $("#picks").innerHTML = list.map(pickCard).join("");
+    }
+
+    function renderCombis(combis) {
+      const host = $("#combis");
+      const list = (combis || []).filter(Boolean);
+      // Orden estable (segura → valor → riesgo); deja al final las desconocidas.
+      list.sort((a, b) =>
+        (COMBI_ORDER.indexOf(a.tipo) + 1 || 99) - (COMBI_ORDER.indexOf(b.tipo) + 1 || 99));
+      if (!list.length) {
+        host.innerHTML = '<div class="error-box">No hay combinadas disponibles ahora mismo.</div>';
+        return;
+      }
+      host.innerHTML = list.map(combiCard).join("");
+    }
+
+    function combiCard(c) {
+      const meta = COMBI_META[c.tipo] || { label: c.tipo || "Combinada", cls: "valor" };
+
+      if (!c.disponible) {
+        return `
+          <article class="combi combi--${meta.cls} combi--off">
+            <div class="combi__head"><span class="combi__tipo">${meta.label}</span></div>
+            <p class="combi__msg">${c.mensaje || "No disponible ahora mismo."}</p>
+          </article>`;
+      }
+
+      const evPos = (c.ev ?? 0) >= 0;
+      const sels = (c.selecciones || []).map((s) => `
+        <li>
+          <span class="combi__selname">${s.partido}<small class="combi__selmkt">${s.mercado || ""}</small></span>
+          <span class="combi__selodds">${(s.cuota ?? 0).toFixed(2)} · ${pct(s.prob).toFixed(0)}%</span>
+        </li>`).join("");
+      const warn = c.correlacion_advertencia
+        ? `<p class="combi__warn">${c.correlacion_advertencia}</p>` : "";
+
+      return `
+        <article class="combi combi--${meta.cls}">
+          <div class="combi__head">
+            <span class="combi__tipo">${meta.label}</span>
+            <span class="combi__casa">${c.casa || "—"}</span>
+          </div>
+          <div class="combi__odds">
+            <span class="combi__cuota">${(c.cuota_combinada ?? 0).toFixed(2)}</span>
+            <span class="combi__meta">${pct(c.prob_conjunta).toFixed(0)}% prob · EV <b class="${evPos ? "pos" : "neg"}">${c.ev != null ? fmtSigned(c.ev, 3) : "—"}</b> · ${c.stake_sugerido_eur ?? 10}€</span>
+          </div>
+          <ul class="combi__sel">${sels}</ul>
+          ${warn}
+        </article>`;
+    }
+
+    function superSelList(sels) {
+      return (sels || []).map((s) => {
+        const fr = s.franja === "madrugada" ? "madrugada" : "hoy";
+        const frLabel = (fr === "madrugada" ? "Madrugada" : "Hoy") + (s.hora_es ? " " + s.hora_es : "");
+        return `
+          <li>
+            <span class="combi__selname">
+              <span class="franja-badge franja-badge--${fr}">${frLabel}</span>
+              ${s.partido}<small class="combi__selmkt">${s.mercado || ""}</small>
+            </span>
+            <span class="combi__selodds">${(s.cuota ?? 0).toFixed(2)} · ${pct(s.prob).toFixed(0)}%</span>
+          </li>`;
+      }).join("");
+    }
+
+    function superAltCard(v) {
+      const label = v.version === "segura" ? "Versión segura"
+        : v.version === "premium" ? "Versión premium" : (v.version || "Alternativa");
+      const evPos = (v.ev ?? 0) >= 0;
+      return `
+        <div class="super__alt super__alt--${v.version}">
+          <div class="super__alt-head"><span>${label}</span><span class="super__casa">${v.casa || "—"}</span></div>
+          <div class="super__alt-odds">
+            <b class="super__alt-cuota">${(v.cuota_total ?? 0).toFixed(2)}</b>
+            <span class="combi__meta">${pct(v.prob_conjunta).toFixed(0)}% · EV <b class="${evPos ? "pos" : "neg"}">${v.ev != null ? fmtSigned(v.ev, 3) : "—"}</b></span>
+          </div>
+          <ul class="combi__sel">${superSelList(v.selecciones)}</ul>
+        </div>`;
+    }
+
+    function renderSupercuota(sc) {
+      const host = $("#supercuota");
+      if (!sc || sc.disponible === false) {
+        host.innerHTML = `<div class="error-box">${(sc && sc.mensaje) || "No hay supercuota disponible ahora mismo."}</div>`;
+        return;
+      }
+      const evPos = (sc.ev ?? 0) >= 0;
+      const valuePill = sc.con_valor
+        ? `<span class="value-pill">Valor</span>`
+        : `<span class="value-pill value-pill--off">Sin valor</span>`;
+      const warn = sc.correlacion_advertencia ? `<p class="combi__warn">${sc.correlacion_advertencia}</p>` : "";
+      const versions = [sc.version_segura, sc.version_premium].filter(Boolean).map(superAltCard).join("");
+
+      host.innerHTML = `
+        <article class="super">
+          <div class="super__head">
+            <span class="super__title">${STAR_SVG} Supercuota <span class="super__casa">${sc.casa || "—"}</span></span>
+            ${valuePill}
+          </div>
+          <div class="super__big">
+            <span class="super__cuota">${(sc.cuota_total ?? 0).toFixed(2)}</span>
+            <span class="super__meta">${pct(sc.prob_conjunta).toFixed(1)}% prob · EV <b class="${evPos ? "pos" : "neg"}">${sc.ev != null ? fmtSigned(sc.ev, 3) : "—"}</b> · stake ${sc.stake_sugerido_eur ?? 5}€</span>
+          </div>
+          <ul class="combi__sel super__sel">${superSelList(sc.selecciones)}</ul>
+          ${warn}
+          ${versions ? `<div class="super__versions">${versions}</div>` : ""}
+        </article>`;
     }
 
     function pickCard(p) {
@@ -1158,7 +1430,7 @@
           </div>
 
           <h3 class="pick__match">${p.partido}</h3>
-          <p class="pick__sub">${p.mercado} · ${p.fecha || ""}</p>
+          <p class="pick__sub">${p.franja ? `<span class="franja-badge franja-badge--${p.franja === "madrugada" ? "madrugada" : "hoy"}">${p.franja === "madrugada" ? "Madrugada" : "Hoy"}${p.hora_es ? " " + p.hora_es : ""}</span> ` : ""}${p.mercado} · ${p.fecha || ""}</p>
 
           <div class="duel">
             <div class="duel__labels">
