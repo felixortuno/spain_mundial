@@ -10,6 +10,7 @@ const {
   localDate,
   playerLeader
 } = require("../lib/tournamentStats");
+const { collectWebStats } = require("../lib/webStats");
 
 const TIME_ZONE = "Europe/Madrid";
 const MAX_DAILY_PLAYER_FIXTURES = 8;
@@ -56,6 +57,44 @@ module.exports = async function handler(request, response) {
       playerStatsAvailable = fixtures.length > 0;
     } catch (error) {
       console.warn("[tournament-stats] API-Football no disponible:", error.message);
+    }
+  }
+
+  // Fallback web (Wikipedia): cuando no hay API-Football, recolecta resultados
+  // de fuentes públicas y devuelve el contrato con fuentes/no_encontrados.
+  if (!fixtures.length) {
+    try {
+      const web = await collectWebStats({
+        today,
+        timeZone: TIME_ZONE,
+        expectedTotalFixtures: TOURNAMENT_FIXTURES
+      });
+      if (web.status === "ok") {
+        response.setHeader("Cache-Control", "private, max-age=0, must-revalidate");
+        return response.status(200).json({
+          generated_at: new Date().toISOString(),
+          source: "web",
+          timezone: TIME_ZONE,
+          date: today,
+          summary: web.summary,
+          leaders: web.leaders,
+          fuentes: web.fuentes,
+          no_encontrados: web.no_encontrados,
+          discrepancias: web.discrepancias,
+          availability: {
+            playerStats: false,
+            message:
+              "Datos recolectados de fuentes públicas (Wikipedia + ESPN). " +
+              "topAssist y bestGoalkeeper no están disponibles por esta vía."
+          },
+          notes: {
+            bestMatchToday: "Partido con más goles del día; en empate, prima el marcador más ajustado.",
+            confianza: "alta = marcador confirmado por Wikipedia y ESPN; media = una sola fuente; baja = discrepancia (ver discrepancias)."
+          }
+        });
+      }
+    } catch (webError) {
+      console.warn("[tournament-stats] fallback web no disponible:", webError.message);
     }
   }
 

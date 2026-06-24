@@ -25,7 +25,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-pink-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     /* ── Football Broadcast Design System ─────────────────────────────── */
     :root {
@@ -71,10 +71,24 @@
       --line:   rgba(245,245,240,0.08);
       --line-2: rgba(245,245,240,0.04);
 
-      /* Typography */
-      --font-sport: 'Anton', Impact, 'Arial Narrow', sans-serif;
-      --font-ui:    'Barlow Condensed', 'Barlow', system-ui, sans-serif;
-      --font-body:  'Barlow', system-ui, sans-serif;
+      /* Typography — una sola familia base (Barlow) + display solo para titulares (Anton) */
+      --font-base:    'Barlow', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-display: 'Anton', 'Barlow', Impact, sans-serif;
+
+      /* Escala tipográfica fluida (clamp): suave entre móvil y desktop.
+         Base 14→16px. html sigue a 16px como base de rem. */
+      --fs-xs:   clamp(0.625rem, 0.59rem + 0.15vw, 0.6875rem); /* ~10 → 11 */
+      --fs-sm:   clamp(0.75rem,  0.71rem + 0.18vw, 0.8125rem); /* ~12 → 13 */
+      --fs-base: clamp(0.875rem, 0.83rem + 0.22vw, 1rem);      /* 14 → 16 */
+      --fs-md:   clamp(1rem,     0.95rem + 0.28vw, 1.125rem);  /* 16 → 18 */
+      --fs-lg:   clamp(1.125rem, 1.04rem + 0.45vw, 1.375rem);  /* 18 → 22 */
+      --fs-xl:   clamp(1.375rem, 1.18rem + 0.9vw, 1.875rem);   /* 22 → 30 */
+      --fs-2xl:  clamp(1.75rem,  1.40rem + 1.5vw, 2.5rem);     /* 28 → 40 */
+      --fs-hero: clamp(2.25rem,  1.55rem + 3vw, 3.5rem);       /* 36 → 56 */
+
+      /* Interlineado normalizado */
+      --lh-tight: 1.2;  /* titulares */
+      --lh-base:  1.5;  /* cuerpo */
 
       /* Border radii — sharp for scoreboards, round for buttons */
       --r-sharp: 2px;
@@ -97,8 +111,9 @@
     html { height: 100%; font-size: 16px; -webkit-text-size-adjust: 100%; }
     body {
       min-height: 100vh;
-      font-family: var(--font-body);
-      font-size: 14px;
+      font-family: var(--font-base);
+      font-size: var(--fs-base);
+      line-height: var(--lh-base);
       color: var(--txt);
       background-color: var(--bg-0);
       background-image: repeating-linear-gradient(
@@ -113,17 +128,18 @@
 
     /* ── Typography ─────────────────────────────────────────────────────── */
     h1, h2, h3 {
-      font-family: var(--font-sport);
+      font-family: var(--font-display);
       font-weight: 400;
       letter-spacing: 0.02em;
-      line-height: 1.1;
+      line-height: var(--lh-tight);
     }
-    h2 { font-size: 20px; }
-    h3 { font-size: 17px; }
+    h2 { font-size: var(--fs-lg); }
+    h3 { font-size: var(--fs-md); }
     a  { color: var(--g3); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    button { cursor: pointer; font-family: var(--font-ui); }
+    button { cursor: pointer; font-family: var(--font-base); }
     img    { display: inline-block; vertical-align: middle; }
+    svg    { vertical-align: middle; }
     [hidden] { display: none !important; }
 
     /* ── Page layout ───────────────────────────────────────────────────── */
@@ -162,15 +178,15 @@
       flex-shrink: 0;
     }
     .brand__badge {
-      font-family: var(--font-sport);
-      font-size: 20px;
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
       color: var(--gold);
       letter-spacing: 0.04em;
       line-height: 1;
     }
     .brand__name {
-      font-family: var(--font-sport);
-      font-size: 18px;
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
       letter-spacing: 0.06em;
       color: var(--txt);
       text-transform: uppercase;
@@ -191,8 +207,8 @@
       border: none;
       background: transparent;
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -229,8 +245,8 @@
       border-radius: var(--r-full);
       background: var(--bg-3);
       color: var(--txt);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 0.04em;
       white-space: nowrap;
@@ -270,8 +286,8 @@
       border: none;
       background: transparent;
       color: var(--txt-3);
-      font-family: var(--font-ui);
-      font-size: 10px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 700;
       letter-spacing: 0.07em;
       text-transform: uppercase;
@@ -294,8 +310,8 @@
       display: flex;
       align-items: center;
       gap: 7px;
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-2);
       letter-spacing: 0.03em;
     }
@@ -319,8 +335,8 @@
       border-radius: var(--r-full);
       background: var(--bg-2);
       color: var(--txt);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 0.04em;
       white-space: nowrap;
@@ -350,16 +366,16 @@
     }
     .chip--accent { border-color: var(--g1); background: var(--g-dim); }
     .chip__label {
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 700;
       letter-spacing: 0.10em;
       text-transform: uppercase;
       color: var(--txt-3);
     }
     .chip__value {
-      font-family: var(--font-sport);
-      font-size: 22px;
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
       letter-spacing: 0.02em;
       color: var(--txt);
       line-height: 1;
@@ -376,8 +392,8 @@
       flex-wrap: wrap;
     }
     .subscribe-row > p {
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-3);
       letter-spacing: 0.03em;
     }
@@ -391,8 +407,8 @@
       border-radius: var(--r-full);
       background: var(--bg-2);
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 600;
       letter-spacing: 0.03em;
       text-decoration: none;
@@ -406,7 +422,7 @@
       width: 18px;
       height: 18px;
       border-radius: 3px;
-      font-size: 11px;
+      font-size: var(--fs-sm);
       font-weight: 800;
       line-height: 1;
       color: #fff;
@@ -420,8 +436,8 @@
       border-radius: var(--r-full);
       background: transparent;
       color: var(--txt-3);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 600;
       letter-spacing: 0.03em;
       transition: color 0.15s, border-color 0.15s;
@@ -486,25 +502,25 @@
       border-radius: 50%;
       background: var(--bg-2);
       border: 2px solid var(--line);
-      font-family: var(--font-sport);
-      font-size: 22px;
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
       color: var(--txt-2);
     }
     .state-card h2 {
       max-width: 280px;
       padding: 0 8px;
-      font-size: 22px;
+      font-size: var(--fs-lg);
       color: var(--txt);
       margin-top: 4px;
       overflow-wrap: anywhere;
     }
-    .state-card p  { font-size: 13px; color: var(--txt-2); max-width: 280px; line-height: 1.6; }
+    .state-card p  { font-size: var(--fs-sm); color: var(--txt-2); max-width: 280px; line-height: 1.6; }
     .no-matches {
       padding: 24px;
       text-align: center;
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 13px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
     }
 
     /* ── Hero card (next match) ─────────────────────────────────────────── */
@@ -575,15 +591,15 @@
       margin-bottom: 2px;
     }
     .hero-card #hero-title {
-      font-family: var(--font-sport);
-      font-size: 26px;
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
       letter-spacing: 0.02em;
       color: var(--txt);
       line-height: 1.1;
     }
     .hero-meta {
-      font-family: var(--font-ui);
-      font-size: 13px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-2);
       letter-spacing: 0.02em;
     }
@@ -593,8 +609,8 @@
       display: inline-block;
       padding: 2px 7px;
       border-radius: var(--r-sharp);
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -615,8 +631,8 @@
       background: var(--g-dim);
       border: 1px solid var(--g1);
       border-radius: var(--r-full);
-      font-family: var(--font-sport);
-      font-size: 13px;
+      font-family: var(--font-display);
+      font-size: var(--fs-sm);
       letter-spacing: 0.05em;
       color: var(--g3);
     }
@@ -638,8 +654,8 @@
       border-radius: var(--r-full);
       background: transparent;
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 0.05em;
       white-space: nowrap;
@@ -655,10 +671,10 @@
       gap: 10px;
       padding: 14px 0 8px;
     }
-    .section-head h2 { font-size: 15px; color: var(--txt); }
+    .section-head h2 { font-size: var(--fs-base); color: var(--txt); }
     .section-head > span {
-      font-family: var(--font-ui);
-      font-size: 10px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       color: var(--txt-3);
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -695,15 +711,15 @@
       flex-shrink: 0;
     }
     .mdate__d {
-      font-family: var(--font-sport);
-      font-size: 22px;
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
       color: var(--txt);
       letter-spacing: 0.02em;
       line-height: 1;
     }
     .mdate__m {
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.10em;
       text-transform: uppercase;
@@ -727,8 +743,8 @@
     .minfo__flags { display: inline-flex; align-items: center; gap: 3px; margin-left: auto; }
     .minfo__flags img { height: 14px; width: auto; border-radius: 2px; }
     .minfo h3 {
-      font-family: var(--font-ui);
-      font-size: 14px;
+      font-family: var(--font-base);
+      font-size: var(--fs-base);
       font-weight: 700;
       letter-spacing: 0.01em;
       color: var(--txt);
@@ -737,8 +753,8 @@
       text-overflow: ellipsis;
     }
     .minfo__time {
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-2);
       letter-spacing: 0.02em;
     }
@@ -746,7 +762,7 @@
       margin-top: 4px;
       padding-top: 6px;
       border-top: 1px solid var(--line-2);
-      font-size: 11px;
+      font-size: var(--fs-sm);
       color: var(--txt-3);
       line-height: 1.5;
     }
@@ -765,8 +781,8 @@
       align-items: center;
       gap: 8px;
       color: #86efac;
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -799,8 +815,8 @@
       border-radius: var(--r-full);
       background: var(--bg-1);
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       white-space: nowrap;
     }
@@ -836,8 +852,8 @@
       gap: 8px;
       min-height: 20px;
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 10px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 700;
       letter-spacing: 0.08em;
       text-align: center;
@@ -883,8 +899,8 @@
     .live-team__name {
       max-width: 100%;
       color: var(--txt);
-      font-family: var(--font-ui);
-      font-size: 14px;
+      font-family: var(--font-base);
+      font-size: var(--fs-base);
       font-weight: 800;
       line-height: 1.05;
     }
@@ -896,8 +912,8 @@
       min-width: 112px;
     }
     .live-score__goals {
-      font-family: var(--font-sport);
-      font-size: 52px;
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
       line-height: 0.9;
       letter-spacing: 0.06em;
       color: #fff;
@@ -906,8 +922,8 @@
     }
     .live-score__clock {
       color: var(--live);
-      font-family: var(--font-sport);
-      font-size: 16px;
+      font-family: var(--font-display);
+      font-size: var(--fs-md);
       letter-spacing: 0.08em;
     }
     .live-scoreboard__foot {
@@ -919,8 +935,8 @@
       padding-top: 11px;
       border-top: 1px solid var(--line);
       color: var(--txt-3);
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       text-align: center;
     }
     .live-kpis {
@@ -940,8 +956,8 @@
       display: block;
       margin-bottom: 5px;
       color: var(--txt-3);
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.09em;
       text-transform: uppercase;
@@ -950,8 +966,8 @@
       display: block;
       overflow: hidden;
       color: var(--txt);
-      font-family: var(--font-sport);
-      font-size: 18px;
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
       line-height: 1.05;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -960,8 +976,8 @@
       display: block;
       margin-top: 4px;
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 10px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       line-height: 1.25;
     }
     .live-panel {
@@ -978,11 +994,11 @@
       gap: 10px;
       margin-bottom: 12px;
     }
-    .live-panel__head h2 { font-size: 15px; }
+    .live-panel__head h2 { font-size: var(--fs-base); }
     .live-panel__head span {
       color: var(--txt-3);
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -996,15 +1012,15 @@
     }
     .live-stat__value {
       color: var(--txt);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 800;
       text-align: center;
     }
     .live-stat__label {
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 10px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 700;
       text-align: center;
     }
@@ -1035,8 +1051,8 @@
     .live-event:first-child { border-top: none; padding-top: 0; }
     .live-event__minute {
       color: var(--live);
-      font-family: var(--font-sport);
-      font-size: 14px;
+      font-family: var(--font-display);
+      font-size: var(--fs-base);
       text-align: center;
     }
     .live-event__type {
@@ -1044,30 +1060,30 @@
       border-radius: var(--r-sharp);
       background: var(--bg-3);
       color: var(--gold);
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       text-align: center;
     }
     .live-event__text {
       min-width: 0;
       color: var(--txt);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
     }
     .live-event__text span {
       display: block;
       margin-top: 2px;
       color: var(--txt-3);
-      font-size: 10px;
+      font-size: var(--fs-xs);
       font-weight: 500;
     }
     .live-empty-note {
       padding: 12px 0 2px;
       color: var(--txt-3);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       text-align: center;
     }
 
@@ -1094,14 +1110,14 @@
       border-bottom: 1px solid var(--line);
     }
     .grupo-letter {
-      font-family: var(--font-sport);
-      font-size: 14px;
+      font-family: var(--font-display);
+      font-size: var(--fs-base);
       letter-spacing: 0.05em;
       color: var(--txt);
     }
     .grupo-badge {
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.10em;
       text-transform: uppercase;
@@ -1117,15 +1133,15 @@
       gap: 10px;
       padding: 7px 14px;
       border-bottom: 1px solid var(--line-2);
-      font-family: var(--font-ui);
-      font-size: 13px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-2);
     }
     .grupo-team:last-child { border-bottom: none; }
     .grupo-team--selected { color: var(--txt); background: rgba(11,107,58,0.07); }
     .grupo-flag img { height: 18px; width: auto; border-radius: 2px; }
     .grupo-name { flex: 1; }
-    .grupo-check { font-size: 11px; color: var(--g3); font-weight: 700; }
+    .grupo-check { font-size: var(--fs-sm); color: var(--g3); font-weight: 700; }
 
     /* ── PRO: Auth gate ─────────────────────────────────────────────────── */
     .auth-gate {
@@ -1165,7 +1181,7 @@
       border-radius: var(--r-full);
       background: var(--bg-2);
       color: var(--txt-2);
-      font-size: 18px;
+      font-size: var(--fs-lg);
       line-height: 1;
       transition: color 0.15s, border-color 0.15s;
     }
@@ -1183,11 +1199,11 @@
       color: var(--g3);
     }
     .auth-gate__icon svg { width: 28px; height: 28px; }
-    .auth-gate__card h2 { text-align: center; font-size: 24px; color: var(--txt); }
+    .auth-gate__card h2 { text-align: center; font-size: var(--fs-xl); color: var(--txt); }
     .auth-payment {
       text-align: center;
-      font-family: var(--font-ui);
-      font-size: 13px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-2);
       line-height: 1.65;
     }
@@ -1205,16 +1221,16 @@
       border: none;
       background: transparent;
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 0.04em;
       transition: color 0.15s, background 0.15s;
     }
     .auth-mode.active { background: var(--bg-3); color: var(--txt); }
     .auth-instruction {
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-2);
       text-align: center;
       line-height: 1.55;
@@ -1227,16 +1243,16 @@
       border: 1px solid var(--line);
       border-radius: var(--r-sm);
       color: var(--txt);
-      font-family: var(--font-body);
-      font-size: 14px;
+      font-family: var(--font-base);
+      font-size: var(--fs-base);
       outline: none;
       transition: border-color 0.15s;
     }
     .auth-input:focus { border-color: var(--g2); }
     .auth-input::placeholder { color: var(--txt-3); }
     .auth-error {
-      font-family: var(--font-ui);
-      font-size: 12px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--red);
       text-align: center;
       min-height: 16px;
@@ -1249,8 +1265,8 @@
       border: none;
       border-radius: var(--r-full);
       color: #fff;
-      font-family: var(--font-ui);
-      font-size: 14px;
+      font-family: var(--font-base);
+      font-size: var(--fs-base);
       font-weight: 800;
       letter-spacing: 0.06em;
       transition: background 0.15s, transform 0.1s;
@@ -1269,15 +1285,15 @@
       flex-wrap: wrap;
     }
     .pro-head__left { display: flex; align-items: center; gap: 10px; }
-    .pro-head__left h2 { font-size: 22px; }
+    .pro-head__left h2 { font-size: var(--fs-lg); }
     .pro-badge {
       display: inline-block;
       padding: 2px 8px;
       background: var(--gold-dim);
       border: 1px solid rgba(240,192,64,0.38);
       border-radius: var(--r-sharp);
-      font-family: var(--font-ui);
-      font-size: 10px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.12em;
       color: var(--gold);
@@ -1293,8 +1309,8 @@
       border-radius: var(--r-full);
       background: var(--bg-2);
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 0.04em;
       text-decoration: none;
@@ -1303,23 +1319,23 @@
     .admin-link svg { width: 14px; height: 14px; }
     .admin-link:hover { color: var(--txt); border-color: var(--txt-3); text-decoration: none; }
     .pro-ts {
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-3);
       letter-spacing: 0.03em;
       margin: -4px 0 8px;
     }
     .pro-filters { display: flex; gap: 6px; margin-bottom: 14px; }
-    .pro-section-title { font-size: 15px; margin-bottom: 12px; }
+    .pro-section-title { font-size: var(--fs-base); margin-bottom: 12px; }
 
     /* Stats section */
     .stats-section { margin-bottom: 20px; }
     .stats-section__head { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
-    .stats-section__head h3 { font-size: 15px; }
-    .stats-section__head p { font-family: var(--font-ui); font-size: 11px; color: var(--txt-3); }
+    .stats-section__head h3 { font-size: var(--fs-base); }
+    .stats-section__head p { font-family: var(--font-base); font-size: var(--fs-sm); color: var(--txt-3); }
     .stats-source-note {
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-3);
       margin-bottom: 8px;
       padding: 6px 10px;
@@ -1344,16 +1360,16 @@
       gap: 4px;
     }
     .t-kpi__label {
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.10em;
       text-transform: uppercase;
       color: var(--txt-3);
     }
     .t-kpi__value {
-      font-family: var(--font-sport);
-      font-size: 20px;
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
       letter-spacing: 0.02em;
       color: var(--txt);
       white-space: nowrap;
@@ -1362,8 +1378,8 @@
       line-height: 1.1;
     }
     .t-kpi__sub {
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-2);
       line-height: 1.4;
     }
@@ -1377,8 +1393,8 @@
       padding: 16px;
       text-align: center;
       color: var(--red);
-      font-family: var(--font-ui);
-      font-size: 13px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       background: var(--red-dim);
       border-radius: var(--r-sm);
       border: 1px solid rgba(229,62,62,0.2);
@@ -1404,8 +1420,8 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -1416,29 +1432,29 @@
     .pick-card--B .pick-band { color: var(--gold); }
     .pick-card--C .pick-band { color: var(--red); }
     .pick-match {
-      font-family: var(--font-ui);
-      font-size: 15px;
+      font-family: var(--font-base);
+      font-size: var(--fs-base);
       font-weight: 700;
       color: var(--txt);
       letter-spacing: 0.01em;
     }
-    .pick-market { font-family: var(--font-ui); font-size: 12px; color: var(--txt-2); }
+    .pick-market { font-family: var(--font-base); font-size: var(--fs-sm); color: var(--txt-2); }
     .prob-track { height: 5px; background: var(--bg-3); border-radius: var(--r-full); overflow: hidden; }
     .prob-fill  { height: 100%; background: var(--g2); border-radius: var(--r-full); transition: width 0.4s ease; }
     .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 8px; }
     .metric  { display: flex; flex-direction: column; gap: 2px; }
     .metric__l {
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--txt-3);
     }
-    .metric__v { font-family: var(--font-sport); font-size: 15px; color: var(--txt); }
+    .metric__v { font-family: var(--font-display); font-size: var(--fs-base); color: var(--txt); }
     .metric__v--pos { color: var(--live); }
     .metric__v--neg { color: var(--red); }
-    .pick-ci { font-family: var(--font-ui); font-size: 11px; color: var(--txt-2); }
+    .pick-ci { font-family: var(--font-base); font-size: var(--fs-sm); color: var(--txt-2); }
     .pick-stake {
       display: flex;
       gap: 16px;
@@ -1447,21 +1463,21 @@
     }
     .pick-stake div { display: flex; flex-direction: column; gap: 2px; }
     .pick-stake span {
-      font-family: var(--font-ui);
-      font-size: 9px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
       font-weight: 800;
       letter-spacing: 0.10em;
       text-transform: uppercase;
       color: var(--txt-3);
     }
-    .pick-stake strong { font-family: var(--font-sport); font-size: 18px; color: var(--txt); }
+    .pick-stake strong { font-family: var(--font-display); font-size: var(--fs-lg); color: var(--txt); }
     .rg-notice {
       padding: 12px 14px;
       background: var(--bg-2);
       border: 1px solid var(--line);
       border-radius: var(--r-sm);
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-3);
       line-height: 1.65;
       margin-bottom: 20px;
@@ -1496,8 +1512,8 @@
       border-bottom: 1px solid var(--line);
       flex-shrink: 0;
     }
-    .picker__head h2 { font-size: 22px; }
-    .picker__head p { font-family: var(--font-ui); font-size: 13px; color: var(--txt-2); margin-top: 4px; }
+    .picker__head h2 { font-size: var(--fs-lg); }
+    .picker__head p { font-family: var(--font-base); font-size: var(--fs-sm); color: var(--txt-2); margin-top: 4px; }
     .close-btn {
       width: 32px;
       height: 32px;
@@ -1508,7 +1524,7 @@
       border-radius: var(--r-full);
       background: var(--bg-2);
       color: var(--txt-2);
-      font-size: 20px;
+      font-size: var(--fs-lg);
       line-height: 1;
       flex-shrink: 0;
       transition: color 0.15s, border-color 0.15s;
@@ -1521,8 +1537,8 @@
       border: none;
       border-bottom: 1px solid var(--line);
       color: var(--txt);
-      font-family: var(--font-body);
-      font-size: 14px;
+      font-family: var(--font-base);
+      font-size: var(--fs-base);
       outline: none;
       flex-shrink: 0;
     }
@@ -1544,8 +1560,8 @@
       background: var(--bg-0);
       border: none;
       color: var(--txt-2);
-      font-family: var(--font-ui);
-      font-size: 13px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 500;
       text-align: left;
       transition: background 0.12s, color 0.12s;
@@ -1554,7 +1570,7 @@
     .team-opt.sel  { background: var(--bg-2); color: var(--txt); }
     .team-flag img { height: 20px; width: auto; border-radius: 2px; }
     .team-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .team-check { font-size: 12px; color: var(--g3); font-weight: 700; opacity: 0; transition: opacity 0.12s; }
+    .team-check { font-size: var(--fs-sm); color: var(--g3); font-weight: 700; opacity: 0; transition: opacity 0.12s; }
     .team-opt.sel .team-check { opacity: 1; }
     .picker__foot {
       display: flex;
@@ -1566,13 +1582,13 @@
       border-top: 1px solid var(--line);
       flex-shrink: 0;
     }
-    .picker__count { font-family: var(--font-ui); font-size: 12px; color: var(--txt-2); letter-spacing: 0.03em; }
+    .picker__count { font-family: var(--font-base); font-size: var(--fs-sm); color: var(--txt-2); letter-spacing: 0.03em; }
     .picker__actions { display: flex; gap: 8px; }
     .btn {
       padding: 9px 18px;
       border-radius: var(--r-full);
-      font-family: var(--font-ui);
-      font-size: 13px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 0.05em;
       border: 1px solid var(--line);
@@ -1595,8 +1611,8 @@
       border: 1px solid var(--line);
       border-radius: var(--r-full);
       color: var(--txt);
-      font-family: var(--font-ui);
-      font-size: 13px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 0.03em;
       z-index: 400;
@@ -1610,8 +1626,8 @@
     /* ── Footer ─────────────────────────────────────────────────────────── */
     footer {
       padding: 16px 0 8px;
-      font-family: var(--font-ui);
-      font-size: 11px;
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
       color: var(--txt-3);
       text-align: center;
       letter-spacing: 0.03em;
@@ -1644,22 +1660,22 @@
 
       /* Chips: 2×2 grid */
       .chips { grid-template-columns: repeat(2, 1fr); }
-      .chip__value { font-size: 20px; }
+      .chip__value { font-size: var(--fs-lg); }
 
       /* Subscribe row */
       .subscribe-row { flex-direction: column; align-items: flex-start; gap: 8px; }
 
       /* Match cards */
       .mdate { min-width: 46px; padding: 10px 10px; }
-      .mdate__d { font-size: 20px; }
+      .mdate__d { font-size: var(--fs-lg); }
       .minfo { padding: 8px 10px; }
-      .minfo h3 { font-size: 13px; }
+      .minfo h3 { font-size: var(--fs-sm); }
 
       /* Groups */
       .grupos-grid { grid-template-columns: 1fr; }
 
       /* Hero */
-      .hero-card #hero-title { font-size: 22px; }
+      .hero-card #hero-title { font-size: var(--fs-lg); }
 
       /* Metrics in picks */
       .metrics { grid-template-columns: repeat(2, 1fr); }
@@ -1668,9 +1684,9 @@
       .live-kpis { grid-template-columns: repeat(2, 1fr); }
       .live-teams { gap: 7px; }
       .live-team__flag { width: 45px; height: 30px; }
-      .live-team__name { font-size: 12px; }
+      .live-team__name { font-size: var(--fs-sm); }
       .live-score { min-width: 92px; }
-      .live-score__goals { font-size: 43px; }
+      .live-score__goals { font-size: var(--fs-hero); }
       .live-stat { grid-template-columns: 29px 1fr 72px 1fr 29px; gap: 5px; }
     }
 
@@ -1684,9 +1700,9 @@
     }
 
     @media (max-width: 400px) {
-      .cal-btn { padding: 5px 8px; font-size: 10px; }
-      .cal-btn__ico { width: 15px; height: 15px; font-size: 9px; }
-      .hero-card #hero-title { font-size: 19px; }
+      .cal-btn { padding: 5px 8px; font-size: var(--fs-xs); }
+      .cal-btn__ico { width: 15px; height: 15px; font-size: var(--fs-xs); }
+      .hero-card #hero-title { font-size: var(--fs-lg); }
     }
   </style>
 </head>
@@ -2134,9 +2150,27 @@ for (const team of TEAMS) TEAM_NAME_MAP.set(normalizeTeamName(team.name), team.c
   ["United States","USA"], ["USA","USA"], ["Uruguay","URU"], ["Uzbekistan","UZB"]
 ].forEach(([name, code]) => TEAM_NAME_MAP.set(normalizeTeamName(name), code));
 
-function flagImg(team, h = 18) {
+function flagImg(team, h = 18, alt = null) {
   const w = Math.round(h * 1.5);
-  return `<img src="https://flagcdn.com/${team.iso2}.svg" width="${w}" height="${h}" loading="lazy" alt="" aria-hidden="true">`;
+  // Bandera informativa (alt con el país) o decorativa (alt vacío + aria-hidden,
+  // cuando el nombre del equipo va al lado).
+  const a11y = alt ? `alt="Bandera de ${alt}"` : `alt="" aria-hidden="true"`;
+  return `<img src="https://flagcdn.com/${team.iso2}.svg" width="${w}" height="${h}" loading="lazy" ${a11y}>`;
+}
+
+// ── Iconos SVG en línea (estilo línea Lucide, heredan currentColor) ───────────
+const ICONS = {
+  check:        '<path d="M20 6 9 17l-5-5"/>',
+  star:         '<path d="m12 17.3-6.18 3.7 1.64-7.03L2 9.24l7.19-.61L12 2l2.81 6.63 7.19.61-5.46 4.73L18.18 21z"/>',
+  "arrow-left": '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  "alert-triangle": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+};
+// Devuelve un <svg> del set. Las estrellas van rellenas; el resto, trazo.
+function icon(name, size = 16) {
+  const path = ICONS[name];
+  if (!path) return "";
+  const fill = name === "star" ? "currentColor" : "none";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
 }
 
 const GROUPS = [
@@ -2324,7 +2358,7 @@ function updateCalLinks() {
 function updateBarFlags() {
   E.barFlags.innerHTML = selectedCodes.map(c => {
     const t = TEAM_MAP.get(c);
-    return t ? flagImg(t) : "";
+    return t ? flagImg(t, 18, t.name) : "";
   }).join("") + " ";
   E.statTeams.textContent = selectedCodes.length;
 }
@@ -2544,7 +2578,7 @@ function buildTeamGrid() {
     btn.dataset.code = team.code;
     btn.className = `team-opt${draftCodes.has(team.code) ? " sel" : ""}`;
     btn.setAttribute("aria-pressed", String(draftCodes.has(team.code)));
-    btn.innerHTML = `<span class="team-flag">${flagImg(team)}</span><span class="team-name">${team.name}</span><span class="team-check" aria-hidden="true">✓</span>`;
+    btn.innerHTML = `<span class="team-flag">${flagImg(team)}</span><span class="team-name">${team.name}</span><span class="team-check" aria-hidden="true">${icon("check", 14)}</span>`;
     btn.addEventListener("click", () => toggleTeam(team.code, btn));
     E.teamGrid.appendChild(btn);
   }
@@ -2997,7 +3031,7 @@ function renderGroups() {
       const isSel = selectedCodes.includes(code);
       const row = document.createElement("div");
       row.className = `grupo-team${isSel ? " grupo-team--selected" : ""}`;
-      row.innerHTML = `<span class="grupo-flag">${flagImg(team)}</span><span class="grupo-name">${team.name}</span>${isSel ? '<span class="grupo-check">✓</span>' : ""}`;
+      row.innerHTML = `<span class="grupo-flag">${flagImg(team)}</span><span class="grupo-name">${team.name}</span>${isSel ? `<span class="grupo-check">${icon("check", 14)}</span>` : ""}`;
       card.appendChild(row);
     }
 
@@ -3222,7 +3256,7 @@ async function loadAnalysis() {
     proData = picksResult.value;
     renderPicks(proData);
   } else if (isProUnlocked()) {
-    E.picksGrid.innerHTML = `<p style="color:var(--pri);font-size:13px">Error al cargar: ${escapeHtml(picksResult.reason.message)}</p>`;
+    E.picksGrid.innerHTML = `<p style="color:var(--pri);font-size: var(--fs-sm)">Error al cargar: ${escapeHtml(picksResult.reason.message)}</p>`;
   }
 
   if (statsResult.status === "fulfilled") {
@@ -3391,7 +3425,7 @@ function buildPickCard(pick) {
       <div class="metric"><span class="metric__l">Edge</span><span class="metric__v metric__v--${edgeCls}">${(pick.edge_pp||0)>=0?"+":""}${(pick.edge_pp||0).toFixed(1)}pp</span></div>
       <div class="metric"><span class="metric__l">Impl.</span><span class="metric__v">${((pick.prob_implicita_justa||0)*100).toFixed(0)}%</span></div>
       <div class="metric"><span class="metric__l">EV</span><span class="metric__v metric__v--${evCls}">${(pick.ev||0)>=0?"+":""}${(pick.ev||0).toFixed(3)}</span></div>
-      <div class="metric"><span class="metric__l">Casa</span><span class="metric__v" style="font-size:11px;letter-spacing:0">${escapeHtml(pick.casa || "—")}</span></div>
+      <div class="metric"><span class="metric__l">Casa</span><span class="metric__v" style="font-size: var(--fs-sm);letter-spacing:0">${escapeHtml(pick.casa || "—")}</span></div>
     </div>
     ${ciStr ? `<p class="pick-ci">IC 95%: <strong>${ciStr}</strong></p>` : ""}
     <div class="pick-stake">
