@@ -24,7 +24,11 @@ function fixture(id, date, home, away, homeGoals, awayGoals, status = "FT") {
 test("mantiene los líderes vacíos antes del primer partido", () => {
   const result = aggregateFixtures([
     fixture(1, "2026-06-12T18:00:00Z", "España", "Marruecos", null, null, "NS")
-  ], { today: "2026-06-11", expectedTotalFixtures: 104 });
+  ], {
+    today: "2026-06-11",
+    expectedTotalFixtures: 104,
+    now: new Date("2026-06-11T10:00:00Z")
+  });
 
   assert.equal(result.summary.totalFixtures, 104);
   assert.equal(result.summary.publishedFixtures, 1);
@@ -33,6 +37,7 @@ test("mantiene los líderes vacíos antes del primer partido", () => {
   assert.equal(result.summary.averageGoals, null);
   assert.equal(result.leaders.teamGoalsPerGame, null);
   assert.equal(result.leaders.bestMatchToday, null);
+  assert.equal(result.leaders.nextMatch.match, "España vs Marruecos");
 });
 
 test("calcula rankings de equipos y partidos con resultados", () => {
@@ -48,6 +53,9 @@ test("calcula rankings de equipos y partidos con resultados", () => {
   assert.equal(result.leaders.teamGoalsPerGame.name, "España");
   assert.equal(result.leaders.bestAttack.name, "España");
   assert.equal(result.leaders.bestDefense.name, "España");
+  assert.equal(result.leaders.cleanSheetLeader.name, "España");
+  assert.equal(result.leaders.mostWins.name, "España");
+  assert.equal(result.leaders.latestResult.match, "España vs Alemania");
   assert.equal(result.leaders.bestMatchToday.match, "Francia vs Bélgica");
   assert.equal(result.leaders.biggestWin.match, "España vs Marruecos");
   assert.deepEqual(result.todayFixtureIds, ["1", "2"]);

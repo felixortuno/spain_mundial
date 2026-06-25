@@ -1,11 +1,21 @@
 "use strict";
 
 const { loadConfig } = require("../lib/config");
-const { isLiveStatus, buildLiveMatch } = require("../lib/liveMatches");
-const { FootballProvider } = require("../lib/providers/footballProvider");
+const { BallDontLieFifaProvider } = require("../lib/providers/ballDontLieFifaProvider");
+const { fetchEspnLiveMatches } = require("../lib/sources/espnLiveMatches");
 
-const TIME_ZONE = "Europe/Madrid";
 const MAX_LIVE_MATCHES = 6;
+
+async function fetchBallDontLieLiveMatches() {
+  const config = loadConfig();
+  if (!config.ballDontLieApiKey) return null;
+
+  const provider = new BallDontLieFifaProvider({
+    apiKey: config.ballDontLieApiKey,
+    ...config.ballDontLie
+  });
+  return provider.getLiveMatches({ maxMatches: MAX_LIVE_MATCHES });
+}
 
 module.exports = async function handler(request, response) {
   if (request.method !== "GET" && request.method !== "HEAD") {
@@ -21,47 +31,25 @@ module.exports = async function handler(request, response) {
 
   if (request.method === "HEAD") return response.status(200).end();
 
-  const config = loadConfig();
-  if (!config.apiSportsKey) {
-    response.setHeader("Cache-Control", "no-store");
-    return response.status(503).json({
-      error: "Los datos en directo no están configurados."
-    });
+  let ballDontLieError = null;
+  try {
+    const data = await fetchBallDontLieLiveMatches();
+    if (data) return response.status(200).json(data);
+  } catch (error) {
+    ballDontLieError = error;
+    console.warn("[live-matches] balldontlie no disponible; usando ESPN:", error.message);
   }
 
-  const provider = new FootballProvider({
-    apiKey: config.apiSportsKey,
-    ...config.football,
-    fixturesTtlMs: config.football.liveStatsTtlMs,
-    detailTtlMs: config.football.liveStatsTtlMs
-  });
-
   try {
-    const fixtureResult = await provider.getFixtures({
-      league: config.football.league,
-      live: "all",
-      timezone: TIME_ZONE
-    });
-    const liveFixtures = fixtureResult.data
-      .filter((fixture) => isLiveStatus(fixture.features?.status?.short))
-      .slice(0, MAX_LIVE_MATCHES);
-
-    const matches = await Promise.all(liveFixtures.map(async (fixture) => {
-      const [statisticsResult, eventsResult] = await Promise.allSettled([
-        provider.getStatistics(fixture.id),
-        provider.getEvents(fixture.id)
-      ]);
-      return buildLiveMatch(
-        fixture,
-        statisticsResult.status === "fulfilled" ? statisticsResult.value.data : [],
-        eventsResult.status === "fulfilled" ? eventsResult.value.data : []
-      );
-    }));
-
+    const data = await fetchEspnLiveMatches({ maxMatches: MAX_LIVE_MATCHES });
     return response.status(200).json({
-      generated_at: new Date().toISOString(),
-      active: matches.length > 0,
-      matches
+      ...data,
+      fallback: ballDontLieError
+        ? {
+            from: "balldontlie",
+            reason: ballDontLieError.message
+          }
+        : undefined
     });
   } catch (error) {
     console.error("[live-matches]", error);

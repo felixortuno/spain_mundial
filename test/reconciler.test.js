@@ -93,7 +93,7 @@ test("no casa partidos fuera de la ventana y conserva ambos unmatched", () => {
   );
 
   assert.equal(result.matches.length, 0);
-  assert.equal(result.unmatched.football.length, 1);
+  assert.equal(result.unmatched.fixtures.length, 1);
   assert.equal(result.unmatched.odds.length, 1);
 });
 

@@ -1,15 +1,16 @@
-# Mundial 2026: fixtures y cuotas unificados
+# Mundial 2026: fixtures, directo y cuotas
 
-Backend serverless para cruzar los partidos de API-Football v3 con las cuotas
-1X2 de The Odds API v4. El frontend y el calendario ICS existentes siguen
-funcionando de forma independiente.
+Backend serverless para cruzar partidos, directo, estadísticas y cuotas del
+Mundial 2026. El proveedor principal es la API FIFA World Cup de balldontlie;
+si no hay clave o el plan no permite un endpoint, el sistema degrada a
+Fixtur.es, ESPN, Wikipedia y The Odds API según el caso.
 
 La pestaña PRO también incluye KPIs deportivos del torneo y está protegida por
 una sesión HTTP-only que se destruye al abandonar el apartado.
 
-Los KPIs de equipos y partidos usan API-Football y degradan al feed Fixtur.es
-si el plan configurado no da acceso a la temporada 2026. Los líderes de
-jugadores requieren acceso de API-Football a esa temporada.
+Los KPIs de equipos y partidos usan balldontlie cuando está configurado. Las
+fuentes públicas siguen como respaldo y dejan marcadas como no disponibles las
+métricas de jugador que no publiquen.
 
 ## Endpoint
 
@@ -17,14 +18,13 @@ jugadores requieren acceso de API-Football a esa temporada.
 
 Parámetros opcionales:
 
-- `league`, `season`, `from`, `to`: filtros de API-Football.
+- `from`, `to`: filtros por fecha del feed de fixtures.
 - `sportKey`: fuerza una clave, pero se valida contra `/v4/sports`.
-- `enrichment`: `none`, `basic` o `full`.
 
 La respuesta incluye:
 
-- IDs de ambos proveedores.
-- Features de API-Football.
+- IDs del fixture y del evento de cuotas.
+- Features disponibles en el feed de fixtures.
 - Cuotas 1X2 por casa.
 - Overround por casa, probabilidades implícitas sin margen y mejor precio.
 - Método y confianza de la reconciliación.
@@ -43,16 +43,13 @@ Otros endpoints:
 Configura en Vercel, nunca en el navegador:
 
 ```dotenv
-APISPORTS_KEY=...
+BALLDONTLIE_API_KEY=...
+BALLDONTLIE_SEASON=2026
 ODDS_API_KEY=...
-API_FOOTBALL_LEAGUE_ID=1
-API_FOOTBALL_SEASON=2026
-API_FOOTBALL_SEASON_DATA_ENABLED=false
 ODDS_SPORT_TITLE_HINTS=FIFA World Cup,World Cup,soccer_fifa_world_cup
 ODDS_REGIONS=eu,uk
 ODDS_MARKETS=h2h
-FOOTBALL_ENRICHMENT=basic
-API_FOOTBALL_LIVE_STATS_TTL_MS=300000
+ESPN_WORLDCUP_LEAGUE=fifa.world
 FIREBASE_PROJECT_ID=...
 FIREBASE_CLIENT_EMAIL=...
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
@@ -61,12 +58,12 @@ ANALYSIS_SESSION_SECRET=...
 PRO_ADMIN_PASSWORD=...
 ```
 
-`API_FOOTBALL_KEY` continúa admitido como alias de `APISPORTS_KEY` para que el
-endpoint ICS existente no pierda su configuración.
-
-Con el plan gratuito actual, usa `API_FOOTBALL_SEASON_DATA_ENABLED=false` para
-evitar consultas de temporada 2026 que serán rechazadas. Esto no desactiva el
-endpoint de partidos en directo.
+`BALLDONTLIE_API_KEY` también puede llamarse `BDL_API_KEY`. Para este proyecto
+se usan endpoints de balldontlie como `matches`, `odds`, `rosters`,
+`match_events` y `team_match_stats`; según su documentación, esos endpoints de
+Mundial requieren clave y los de partidos/cuotas/stats están en el tier GOAT.
+Si la clave falta o el plan responde 401/429/5xx, el backend intenta los
+respaldos sin romper la respuesta pública.
 
 ## Acceso PRO con Firebase
 
@@ -106,13 +103,19 @@ lib/
   merger.js
   reconciler.js
   providers/
-    footballProvider.js
+    ballDontLieFifaProvider.js
     oddsProvider.js
+    fixturesIcsProvider.js
+  sources/
+    espnLiveMatches.js
+    espnScoreboard.js
+    wikipediaWorldCup.js
 ```
 
-Los proveedores son los únicos módulos que conocen URLs, autenticación y forma
-de respuesta externa. El orquestador obtiene el catálogo de deportes, resuelve
-el `sport_key`, descarga fixtures/cuotas, reconcilia y fusiona.
+Los proveedores/fuentes son los únicos módulos que conocen URLs, autenticación
+y forma de respuesta externa. El orquestador prioriza balldontlie para
+fixtures/cuotas y, si no está disponible, resuelve el `sport_key` de The Odds
+API, descarga fixtures/cuotas de respaldo, reconcilia y fusiona.
 
 ## Reconciliación
 
@@ -134,10 +137,14 @@ dependencias externas.
 
 ## Caché y límites
 
-- API-Football free: 100 peticiones al día; las temporadas disponibles están
-  limitadas por el plan.
-- The Odds API Starter: 500 créditos al mes, con reinicio el día 1.
-- API-Football fixtures: 6 horas; detalles: 12 horas.
+- balldontlie FIFA World Cup: requiere `Authorization: <api key>`; los
+  endpoints de partidos, cuotas, plantillas y estadísticas usados aquí son de
+  tier GOAT según la documentación actual.
+- The Odds API Starter: 500 créditos al mes, con reinicio el día 1; queda como
+  respaldo de cuotas.
+- Fixtur.es/ESPN/Wikipedia: fuentes públicas sin secreto propio; se consultan
+  con caché HTTP/serverless y degradación segura si alguna cae.
+- balldontlie fixtures/directo/cuotas: 5 minutos.
 - Catálogo de The Odds API: 24 horas.
 - Cuotas: 1 hora.
 - Si una actualización falla o devuelve límite, se usa el último dato stale
@@ -147,10 +154,6 @@ The Odds API no cobra créditos por `/v4/sports`. La consulta configurada con
 `regions=eu,uk` y `markets=h2h` cuesta normalmente 2 créditos: una región por
 un mercado. Las cabeceras de cuota de ambos proveedores se exponen en
 `sources` y se escriben en los logs de Vercel.
-
-El modo `basic` solo añade clasificación. `full` puede realizar hasta cuatro
-peticiones extra por partido (predicción, estadísticas, alineaciones y
-lesiones), limitado por `FOOTBALL_ENRICH_LIMIT`.
 
 La caché en memoria es deliberadamente best-effort en Vercel. Para conservar
 stale entre arranques en frío, sustituye `CacheStore` por Vercel KV, Redis o
@@ -172,5 +175,5 @@ curl "http://localhost:3000/api/unified-matches?enrichment=none"
 
 Documentación oficial:
 
-- [API-Football v3](https://www.api-football.com/documentation-v3)
+- [balldontlie FIFA World Cup API](https://fifa.balldontlie.io/)
 - [The Odds API v4](https://the-odds-api.com/liveapi/guides/v4/)

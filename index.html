@@ -1471,6 +1471,80 @@
       color: var(--txt-3);
     }
     .pick-stake strong { font-family: var(--font-display); font-size: var(--fs-lg); color: var(--txt); }
+    .market-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .market-section__title {
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--txt-3);
+      padding: 4px 2px 0;
+    }
+    .market-card {
+      background:
+        radial-gradient(circle at top right, rgba(244, 179, 80, 0.10), transparent 42%),
+        var(--bg-1);
+    }
+    .market-card--super {
+      border-left-color: var(--gold);
+      background:
+        radial-gradient(circle at top right, rgba(244, 179, 80, 0.18), transparent 48%),
+        var(--bg-1);
+    }
+    .market-card--combo { border-left-color: var(--blue); }
+    .market-card__head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .market-card__title {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      color: var(--txt);
+      letter-spacing: 0.01em;
+    }
+    .market-card__tag {
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-full);
+      padding: 4px 8px;
+      font-family: var(--font-base);
+      font-size: var(--fs-xs);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--gold);
+      background: var(--bg-2);
+    }
+    .market-card__note {
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
+      color: var(--txt-2);
+      line-height: 1.45;
+    }
+    .market-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      margin: 0;
+      list-style: none;
+    }
+    .market-list li {
+      font-family: var(--font-base);
+      font-size: var(--fs-sm);
+      color: var(--txt-2);
+      line-height: 1.45;
+    }
+    .market-list strong { color: var(--txt); }
     .rg-notice {
       padding: 12px 14px;
       background: var(--bg-2);
@@ -2550,8 +2624,9 @@ async function loadCalendar({ initial = false } = {}) {
       renderSchedule();
     }
     E.syncDot.classList.add("sync-dot--ok");
-    const src = calSource === "api-football" ? " · API-Football" :
-                calSource === "ics-fallback"  ? " · directo" : "";
+    const src = calSource === "fixtur.es" || calSource === "ics-fallback"
+      ? " · calendario"
+      : "";
     E.syncText.textContent = `Actualizado ${fmtTime.format(lastRefresh)}${src}`;
   } catch (err) {
     console.error(err);
@@ -3287,6 +3362,20 @@ function renderPicks(data) {
   for (const pick of (data.picks || [])) {
     E.picksGrid.appendChild(buildPickCard(pick));
   }
+
+  const supercuota = data.supercuota;
+  if (supercuota) {
+    E.picksGrid.appendChild(sectionTitle("Supercuota"));
+    E.picksGrid.appendChild(buildSupercuotaCard(supercuota));
+  }
+
+  const combos = data.combinadas || data.franja_hoy?.combinadas || [];
+  if (combos.length) {
+    E.picksGrid.appendChild(sectionTitle("Combinadas"));
+    for (const combo of combos) {
+      E.picksGrid.appendChild(buildComboCard(combo));
+    }
+  }
 }
 
 function escapeHtml(value) {
@@ -3305,13 +3394,23 @@ function renderTournamentStats(data) {
   const assist = leaders.topAssist;
   const attack = leaders.bestAttack;
   const defense = leaders.bestDefense;
+  const cleanSheetLeader = leaders.cleanSheetLeader;
+  const mostWins = leaders.mostWins;
   const highMatch = leaders.highestScoringMatch;
   const bigWin = leaders.biggestWin;
+  const latestResult = leaders.latestResult;
+  const nextToday = leaders.nextMatchToday;
+  const nextMatch = leaders.nextMatch;
   const played = Number(summary.playedMatches) || 0;
   const total = Number(summary.totalFixtures) || 0;
   const playerStatsAvailable = data.availability?.playerStats !== false;
   E.statsSourceNote.hidden = !data.availability?.message;
   E.statsSourceNote.textContent = data.availability?.message || "";
+
+  const scorerFallback = !scorer && attack;
+  const keeperFallback = !keeper && (cleanSheetLeader || defense);
+  const assistFallback = !assist && mostWins;
+  const dayFallback = !todayMatch && (nextToday || latestResult || nextMatch || highMatch);
 
   const cards = [
     {
@@ -3320,23 +3419,46 @@ function renderTournamentStats(data) {
       sub: gpg ? `${gpg.goalsPerGame.toFixed(2)} goles/partido · ${gpg.goalsFor} en ${gpg.games}` : "Aún sin partidos"
     },
     {
-      cls: "t-kpi--yellow", label: "Máximo goleador",
-      value: scorer?.name || "—",
+      cls: "t-kpi--yellow",
+      label: scorer ? "Máximo goleador" : scorerFallback ? "Equipo más goleador" : "Máximo goleador",
+      value: scorer?.name || scorerFallback?.name || "Sin dato",
       sub: scorer
         ? `${scorer.value} gol${scorer.value === 1 ? "" : "es"} · ${scorer.team}`
-        : (playerStatsAvailable ? "Aún sin goles" : "Estadística de jugadores no disponible")
+        : scorerFallback
+          ? `${scorerFallback.goalsFor} goles de equipo · dato alternativo`
+          : (playerStatsAvailable ? "Aún sin goles" : "Proveedor sin goleadores")
     },
     {
-      cls: "t-kpi--blue", label: "Mejor portero del día",
-      value: keeper?.name || "—",
+      cls: "t-kpi--blue",
+      label: keeper ? "Mejor portero del día" : keeperFallback ? "Más porterías a cero" : "Mejor portero del día",
+      value: keeper?.name || keeperFallback?.name || "Sin dato",
       sub: keeper
         ? `${keeper.rating?.toFixed(1) || "s/n"} valoración · ${keeper.saves} paradas`
-        : (playerStatsAvailable ? "Sin porteros evaluados hoy" : "Estadística de jugadores no disponible")
+        : keeperFallback
+          ? `${keeperFallback.cleanSheets} porterías a cero · ${keeperFallback.concededPerGame.toFixed(2)} encajados/partido`
+          : (playerStatsAvailable ? "Sin porteros evaluados hoy" : "Proveedor sin stats de portero")
     },
     {
-      cls: "t-kpi--red", label: "Mejor partido del día",
-      value: todayMatch?.match || "—",
-      sub: todayMatch ? `${todayMatch.score} · ${todayMatch.totalGoals} goles` : "Todavía no hay resultados hoy"
+      cls: "t-kpi--red",
+      label: todayMatch
+        ? "Mejor partido del día"
+        : nextToday
+          ? "Próximo partido de hoy"
+          : latestResult
+            ? "Último resultado"
+            : nextMatch
+              ? "Próximo partido"
+              : "Mejor partido del día",
+      value: todayMatch?.match || dayFallback?.match || "Sin dato",
+      sub: todayMatch
+        ? `${todayMatch.score} · ${todayMatch.totalGoals} goles`
+        : nextToday
+          ? shortDateTime(nextToday.date)
+          : latestResult
+            ? `${latestResult.score} · ${latestResult.totalGoals} goles`
+            : nextMatch
+              ? shortDateTime(nextMatch.date)
+              : "Sin resultados ni próximos partidos publicados"
     },
     {
       cls: "t-kpi--orange", label: "Goles del torneo",
@@ -3349,11 +3471,14 @@ function renderTournamentStats(data) {
       sub: "goles por partido"
     },
     {
-      cls: "t-kpi--yellow", label: "Máximo asistente",
-      value: assist?.name || "—",
+      cls: "t-kpi--yellow",
+      label: assist ? "Máximo asistente" : assistFallback ? "Equipo con más victorias" : "Máximo asistente",
+      value: assist?.name || assistFallback?.name || "Sin dato",
       sub: assist
         ? `${assist.value} asistencia${assist.value === 1 ? "" : "s"} · ${assist.team}`
-        : (playerStatsAvailable ? "Aún sin asistencias" : "Estadística de jugadores no disponible")
+        : assistFallback
+          ? `${assistFallback.wins} victorias · ${assistFallback.goalsFor} goles a favor`
+          : (playerStatsAvailable ? "Aún sin asistencias" : "Proveedor sin asistencias")
     },
     {
       cls: "t-kpi--red", label: "Mejor ataque",
@@ -3432,6 +3557,131 @@ function buildPickCard(pick) {
       <div><span>Plano</span><strong>${(pick.stake_plano_eur||10).toFixed(0)}€</strong></div>
       <div><span>Kelly ¼ (${((pick.kelly_frac||0)*100).toFixed(1)}%)</span><strong>${(pick.stake_kelly_eur||0).toFixed(0)}€</strong></div>
     </div>`;
+  return card;
+}
+
+function sectionTitle(label) {
+  const wrap = document.createElement("div");
+  wrap.className = "market-section__title";
+  wrap.textContent = label;
+  return wrap;
+}
+
+function pct(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? `${(number * 100).toFixed(0)}%` : "—";
+}
+
+function signed(value, decimals = 3) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "—";
+  return `${number >= 0 ? "+" : ""}${number.toFixed(decimals)}`;
+}
+
+function shortDateTime(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString("es-ES", {
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function moneyOdd(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(2) : "—";
+}
+
+function buildSupercuotaCard(supercuota) {
+  const card = document.createElement("article");
+  card.className = `pick-card market-card market-card--super ${supercuota.disponible ? "" : "pick-card--empty"}`;
+
+  if (!supercuota.disponible) {
+    card.innerHTML = `
+      <div class="market-card__head">
+        <div>
+          <div class="pick-band"><span class="pick-band__dot"></span>Supercuota</div>
+          <h3 class="market-card__title">No disponible todavía</h3>
+        </div>
+        <span class="market-card__tag">PRO</span>
+      </div>
+      <p class="market-card__note">${escapeHtml(supercuota.mensaje || "No hay suficientes selecciones con valor.")}</p>`;
+    return card;
+  }
+
+  const selections = supercuota.selecciones || [];
+  card.innerHTML = `
+    <div class="market-card__head">
+      <div>
+        <div class="pick-band"><span class="pick-band__dot"></span>Supercuota ${escapeHtml(supercuota.version || "estrella")}</div>
+        <h3 class="market-card__title">${escapeHtml(supercuota.casa || "Casa")} · cuota ${moneyOdd(supercuota.cuota_total)}</h3>
+      </div>
+      <span class="market-card__tag">${supercuota.cruza_franjas ? "Hoy + madrugada" : "Valor"}</span>
+    </div>
+    <div class="metrics">
+      <div class="metric"><span class="metric__l">Prob.</span><span class="metric__v">${pct(supercuota.prob_conjunta)}</span></div>
+      <div class="metric"><span class="metric__l">EV</span><span class="metric__v metric__v--${Number(supercuota.ev) >= 0 ? "pos" : "neg"}">${signed(supercuota.ev)}</span></div>
+      <div class="metric"><span class="metric__l">Stake</span><span class="metric__v">${Number(supercuota.stake_sugerido_eur || 0).toFixed(0)}€</span></div>
+    </div>
+    ${supercuota.correlacion_advertencia ? `<p class="market-card__note">${escapeHtml(supercuota.correlacion_advertencia)}</p>` : ""}
+    <ul class="market-list">
+      ${selections.map((selection) => `
+        <li><strong>${escapeHtml(selection.partido)}</strong> · ${escapeHtml(selection.mercado)} · ${moneyOdd(selection.cuota)} · ${escapeHtml(selection.franja || "")}</li>
+      `).join("")}
+    </ul>
+    ${supercuota.version_segura || supercuota.version_premium ? `
+      <p class="market-card__note">
+        ${supercuota.version_segura ? `Segura: cuota ${moneyOdd(supercuota.version_segura.cuota_total)} · stake ${Number(supercuota.version_segura.stake_sugerido_eur || 0).toFixed(0)}€` : ""}
+        ${supercuota.version_segura && supercuota.version_premium ? " · " : ""}
+        ${supercuota.version_premium ? `Premium: cuota ${moneyOdd(supercuota.version_premium.cuota_total)} · stake ${Number(supercuota.version_premium.stake_sugerido_eur || 0).toFixed(0)}€` : ""}
+      </p>` : ""}`;
+  return card;
+}
+
+function comboLabel(tipo) {
+  return ({
+    combi_segura: "Combi segura",
+    combi_valor: "Combi valor",
+    combi_riesgo: "Combi riesgo"
+  })[tipo] || String(tipo || "Combinada").replace(/_/g, " ");
+}
+
+function buildComboCard(combo) {
+  const card = document.createElement("article");
+  card.className = `pick-card market-card market-card--combo ${combo.disponible ? "" : "pick-card--empty"}`;
+  const title = comboLabel(combo.tipo);
+
+  if (!combo.disponible) {
+    card.innerHTML = `
+      <div class="pick-band"><span class="pick-band__dot"></span>${escapeHtml(title)}</div>
+      <h3 class="market-card__title">No jugable ahora</h3>
+      <p class="market-card__note">${escapeHtml(combo.mensaje || "Faltan selecciones suficientes.")}</p>`;
+    return card;
+  }
+
+  const selections = combo.selecciones || [];
+  card.innerHTML = `
+    <div class="market-card__head">
+      <div>
+        <div class="pick-band"><span class="pick-band__dot"></span>${escapeHtml(title)}</div>
+        <h3 class="market-card__title">${escapeHtml(combo.casa || "Casa")} · cuota ${moneyOdd(combo.cuota_combinada)}</h3>
+      </div>
+      <span class="market-card__tag">${Number(combo.stake_sugerido_eur || 0).toFixed(0)}€</span>
+    </div>
+    <div class="metrics">
+      <div class="metric"><span class="metric__l">Prob.</span><span class="metric__v">${pct(combo.prob_conjunta)}</span></div>
+      <div class="metric"><span class="metric__l">EV</span><span class="metric__v metric__v--${Number(combo.ev) >= 0 ? "pos" : "neg"}">${signed(combo.ev)}</span></div>
+      <div class="metric"><span class="metric__l">Patas</span><span class="metric__v">${selections.length}</span></div>
+    </div>
+    ${combo.correlacion_advertencia ? `<p class="market-card__note">${escapeHtml(combo.correlacion_advertencia)}</p>` : ""}
+    <ul class="market-list">
+      ${selections.map((selection) => `
+        <li><strong>${escapeHtml(selection.partido)}</strong> · ${escapeHtml(selection.mercado)} · ${moneyOdd(selection.cuota)}</li>
+      `).join("")}
+    </ul>`;
   return card;
 }
 

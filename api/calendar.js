@@ -1,15 +1,11 @@
-const API_FOOTBALL_URL = "https://v3.football.api-sports.io/fixtures";
-const WORLD_CUP_LEAGUE_ID = "1";
-const WORLD_CUP_SEASON = "2026";
+const { loadConfig } = require("../lib/config");
+const { BallDontLieFifaProvider } = require("../lib/providers/ballDontLieFifaProvider");
+
 const FALLBACK_FEED_URL =
   "https://ics.fixtur.es/v2/league/fifa-world-cup-2026.ics";
 const TOURNAMENT_START = Date.UTC(2026, 5, 11);
 const TOURNAMENT_END = Date.UTC(2026, 6, 20);
-const MATCH_DURATION_MS = 2 * 60 * 60 * 1000;
 const MAX_SELECTED_TEAMS = 8;
-const API_RETRY_DELAY_MS = 6 * 60 * 60 * 1000;
-
-let apiDisabledUntil = 0;
 
 const TEAMS = [
   ["ALG", "Argelia", ["Algeria"]],
@@ -63,21 +59,6 @@ const TEAMS = [
 ].map(([code, name, aliases]) => ({ code, name, aliases }));
 
 const TEAM_BY_CODE = new Map(TEAMS.map((team) => [team.code, team]));
-const MATCH_STATUS_ES = new Map([
-  ["Not Started", "Por comenzar"],
-  ["First Half", "Primera parte"],
-  ["Halftime", "Descanso"],
-  ["Second Half", "Segunda parte"],
-  ["Extra Time", "Prórroga"],
-  ["Penalty In Progress", "Penaltis"],
-  ["Match Finished", "Finalizado"],
-  ["Match Finished After Extra Time", "Finalizado tras prórroga"],
-  ["Match Finished After Penalty", "Finalizado tras penaltis"],
-  ["Match Postponed", "Aplazado"],
-  ["Match Cancelled", "Cancelado"],
-  ["Time to be defined", "Hora por confirmar"]
-]);
-
 function normalize(value) {
   return String(value || "")
     .normalize("NFD")
@@ -99,8 +80,9 @@ function escapeIcsText(value) {
 }
 
 function formatIcsDate(value) {
-  return new Date(value)
-    .toISOString()
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString()
     .replace(/[-:]/g, "")
     .replace(/\.\d{3}Z$/, "Z");
 }
@@ -156,18 +138,6 @@ function localizeSummary(summary) {
   return localized;
 }
 
-function translateRound(round) {
-  const normalized = normalize(round);
-  if (normalized.includes("group")) return "Fase de grupos";
-  if (normalized.includes("round of 32")) return "Dieciseisavos de final";
-  if (normalized.includes("round of 16")) return "Octavos de final";
-  if (normalized.includes("quarter")) return "Cuartos de final";
-  if (normalized.includes("semi")) return "Semifinal";
-  if (normalized.includes("third")) return "Tercer puesto";
-  if (normalized.includes("final")) return "Final";
-  return round || "Copa Mundial de la FIFA 2026";
-}
-
 function phaseForDate(start) {
   if (start < Date.UTC(2026, 5, 28, 19)) return "Fase de grupos";
   if (start < Date.UTC(2026, 6, 4)) return "Dieciseisavos de final";
@@ -178,63 +148,53 @@ function phaseForDate(start) {
   return "Final";
 }
 
-function apiTeamMatches(team, selectedTeams) {
-  const teamCode = String(team?.code || "").toUpperCase();
-  const teamName = normalize(team?.name);
-  return selectedTeams.some(
-    (selected) =>
-      teamCode === selected.code ||
-      selected.aliases.some((alias) => normalize(alias) === teamName)
+function fixtureMatchesSelection(fixture, selectedTeams) {
+  const names = [fixture.home?.name, fixture.away?.name].map(normalize);
+  return selectedTeams.some((team) =>
+    [team.name, team.code, ...(team.aliases || [])].some((alias) =>
+      names.includes(normalize(alias))
+    )
   );
 }
 
-function fixtureSummary(fixture) {
-  const home = localizeTeamName(fixture.teams?.home?.name);
-  const away = localizeTeamName(fixture.teams?.away?.name);
-  const status = fixture.fixture?.status?.short;
-  const homeGoals = fixture.goals?.home;
-  const awayGoals = fixture.goals?.away;
-  const hasScore =
-    Number.isFinite(homeGoals) &&
-    Number.isFinite(awayGoals) &&
-    !["NS", "TBD", "PST", "CANC"].includes(status);
+function createFixtureEvent(fixture) {
+  const start = Date.parse(fixture.commenceTime);
+  if (!Number.isFinite(start)) return null;
+  const end = start + 2 * 60 * 60 * 1000;
+  const dtStart = formatIcsDate(start);
+  const dtEnd = formatIcsDate(end);
+  const stamp = formatIcsDate(new Date());
+  if (!dtStart || !dtEnd || !stamp) return null;
 
-  return hasScore
-    ? `${home} ${homeGoals} - ${awayGoals} ${away}`
+  const home = localizeTeamName(fixture.home?.name);
+  const away = localizeTeamName(fixture.away?.name);
+  const goals = fixture.features?.goals || {};
+  const hasScore = goals.home != null && goals.away != null;
+  const summary = hasScore
+    ? `${home} ${goals.home}-${goals.away} ${away}`
     : `${home} - ${away}`;
-}
-
-function fixtureToIcsEvent(fixture) {
-  const start = Date.parse(fixture.fixture?.date);
-  if (!Number.isFinite(start)) return "";
-
-  const venue = fixture.fixture?.venue || {};
-  const location = [venue.name, venue.city].filter(Boolean).join(", ");
-  const rawStatus = fixture.fixture?.status?.long;
-  const status = MATCH_STATUS_ES.get(rawStatus) || rawStatus;
-  const description = [
-    translateRound(fixture.league?.round),
-    "Copa Mundial de la FIFA 2026",
-    status
-  ]
+  const round =
+    fixture.competition?.round ||
+    fixture.competition?.group ||
+    phaseForDate(start);
+  const description = `${round} · Copa Mundial de la FIFA 2026`;
+  const venue = fixture.features?.venue;
+  const location = [venue?.name, venue?.city, venue?.country]
     .filter(Boolean)
-    .join(" · ");
+    .join(", ");
 
   return [
     "BEGIN:VEVENT",
-    `UID:api-football-${fixture.fixture.id}@spain-mundial.vercel.app`,
-    `DTSTAMP:${formatIcsDate(Date.now())}`,
-    `DTSTART:${formatIcsDate(start)}`,
-    `DTEND:${formatIcsDate(start + MATCH_DURATION_MS)}`,
-    `SUMMARY:${escapeIcsText(fixtureSummary(fixture))}`,
+    `UID:balldontlie-${escapeIcsText(fixture.id)}@mundial-2026`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:${escapeIcsText(summary)}`,
     `DESCRIPTION:${escapeIcsText(description)}`,
-    location ? `LOCATION:${escapeIcsText(location)}` : "",
-    `STATUS:${fixture.fixture?.status?.short === "CANC" ? "CANCELLED" : "CONFIRMED"}`,
-    "TRANSP:OPAQUE",
+    location ? `LOCATION:${escapeIcsText(location)}` : null,
+    "STATUS:CONFIRMED",
     "END:VEVENT"
-  ]
-    .filter(Boolean)
-    .join("\r\n");
+  ].filter(Boolean).join("\r\n");
 }
 
 function createCalendar(events, selectedTeams, productId) {
@@ -256,59 +216,6 @@ function createCalendar(events, selectedTeams, productId) {
     "END:VCALENDAR",
     ""
   ].join("\r\n");
-}
-
-function fixturesToCalendar(fixtures, selectedTeams) {
-  const filtered = fixtures
-    .filter(
-      (fixture) =>
-        apiTeamMatches(fixture.teams?.home, selectedTeams) ||
-        apiTeamMatches(fixture.teams?.away, selectedTeams)
-    )
-    .sort(
-      (a, b) =>
-        Date.parse(a.fixture?.date || 0) - Date.parse(b.fixture?.date || 0)
-    );
-
-  return createCalendar(
-    filtered.map(fixtureToIcsEvent).filter(Boolean),
-    selectedTeams,
-    "-//Mundial 2026 Dashboard//API-Football//ES"
-  );
-}
-
-async function fetchApiFootballCalendar(apiKey, selectedTeams) {
-  const url = new URL(API_FOOTBALL_URL);
-  url.searchParams.set("league", WORLD_CUP_LEAGUE_ID);
-  url.searchParams.set("season", WORLD_CUP_SEASON);
-  url.searchParams.set("timezone", "UTC");
-
-  const apiResponse = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      "x-apisports-key": apiKey
-    }
-  });
-
-  if (!apiResponse.ok) {
-    throw new Error(`API-Football respondió con HTTP ${apiResponse.status}.`);
-  }
-
-  const payload = await apiResponse.json();
-  const errors = payload.errors;
-  const hasErrors = Array.isArray(errors)
-    ? errors.length > 0
-    : errors && Object.keys(errors).length > 0;
-
-  if (hasErrors) {
-    throw new Error(`API-Football devolvió un error: ${JSON.stringify(errors)}`);
-  }
-
-  if (!Array.isArray(payload.response)) {
-    throw new Error("La respuesta de API-Football no contiene partidos.");
-  }
-
-  return fixturesToCalendar(payload.response, selectedTeams);
 }
 
 function unfoldIcs(value) {
@@ -388,6 +295,40 @@ function filterFallbackCalendar(icsText, selectedTeams) {
   );
 }
 
+function calendarFromFixtures(fixtures, selectedTeams) {
+  const filtered = (fixtures || [])
+    .filter((fixture) => {
+      const start = Date.parse(fixture.commenceTime);
+      return (
+        Number.isFinite(start) &&
+        start >= TOURNAMENT_START &&
+        start < TOURNAMENT_END &&
+        fixtureMatchesSelection(fixture, selectedTeams)
+      );
+    })
+    .sort((a, b) => Date.parse(a.commenceTime) - Date.parse(b.commenceTime))
+    .map(createFixtureEvent)
+    .filter(Boolean);
+
+  return createCalendar(
+    filtered,
+    selectedTeams,
+    "-//Mundial 2026 Dashboard//balldontlie//ES"
+  );
+}
+
+async function fetchBallDontLieCalendar(selectedTeams) {
+  const config = loadConfig();
+  if (!config.ballDontLieApiKey) return null;
+
+  const provider = new BallDontLieFifaProvider({
+    apiKey: config.ballDontLieApiKey,
+    ...config.ballDontLie
+  });
+  const result = await provider.getFixtures();
+  return calendarFromFixtures(result.data, selectedTeams);
+}
+
 async function fetchFallbackCalendar(selectedTeams) {
   const upstreamResponse = await fetch(FALLBACK_FEED_URL, {
     headers: {
@@ -412,24 +353,18 @@ module.exports = async function handler(request, response) {
   const selectedTeams = selectedTeamsFromRequest(request);
 
   try {
-    let calendar;
-    let source = "ics-fallback";
-    const apiKey = process.env.API_FOOTBALL_KEY;
-
-    const seasonDataEnabled =
-      process.env.API_FOOTBALL_SEASON_DATA_ENABLED !== "false";
-
-    if (seasonDataEnabled && apiKey && Date.now() >= apiDisabledUntil) {
-      try {
-        calendar = await fetchApiFootballCalendar(apiKey, selectedTeams);
-        source = "api-football";
-      } catch (apiError) {
-        apiDisabledUntil = Date.now() + API_RETRY_DELAY_MS;
-        console.warn("API-Football no está disponible; se usará el respaldo ICS.", apiError);
-      }
+    let source = "balldontlie";
+    let calendar = null;
+    try {
+      calendar = await fetchBallDontLieCalendar(selectedTeams);
+    } catch (ballDontLieError) {
+      console.warn(
+        "No se pudo generar el calendario desde balldontlie; usando Fixtur.es.",
+        ballDontLieError.message
+      );
     }
-
     if (!calendar) {
+      source = "fixtur.es";
       calendar = await fetchFallbackCalendar(selectedTeams);
     }
 

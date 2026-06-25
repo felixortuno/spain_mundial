@@ -11,8 +11,8 @@ function queryValue(request, key) {
 
 function publicError(error) {
   const configurationErrors = new Set([
-    "MISSING_APISPORTS_KEY",
-    "MISSING_ODDS_API_KEY"
+    "MISSING_ODDS_API_KEY",
+    "MISSING_BALLDONTLIE_API_KEY"
   ]);
   return {
     status: configurationErrors.has(error.code) ? 503 : 502,

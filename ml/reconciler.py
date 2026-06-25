@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Empareja fixtures de API-Football con eventos de The Odds API."""
+"""Empareja fixtures con eventos de The Odds API."""
 
 from __future__ import annotations
 
@@ -111,7 +111,7 @@ class MatchSide:
 def from_football(fixture: dict) -> MatchSide:
     return MatchSide(
         raw=fixture,
-        source="api_football",
+        source="fixture",
         id=fixture.get("fixture_id"),
         home=fixture.get("home", ""),
         away=fixture.get("away", ""),
@@ -149,7 +149,7 @@ class MatchResult:
             "local": self.football.home,
             "visitante": self.football.away,
             "fuente_ids": {
-                "api_football_fixture": self.football.id,
+                "fixture": self.football.id,
                 "odds_api_event": self.odds.id,
             },
             "reconciliacion": {

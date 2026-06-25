@@ -2,7 +2,7 @@
 
 const { requireAnalysisAuth } = require("../lib/analysisAuth");
 const { loadConfig } = require("../lib/config");
-const { FootballProvider } = require("../lib/providers/footballProvider");
+const { BallDontLieFifaProvider } = require("../lib/providers/ballDontLieFifaProvider");
 const { FixturesIcsProvider } = require("../lib/providers/fixturesIcsProvider");
 const {
   aggregateFixtures,
@@ -13,8 +13,59 @@ const {
 const { collectWebStats } = require("../lib/webStats");
 
 const TIME_ZONE = "Europe/Madrid";
-const MAX_DAILY_PLAYER_FIXTURES = 8;
 const TOURNAMENT_FIXTURES = 104;
+
+function finiteNumber(value) {
+  if (value == null || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function teamNamesById(fixtures) {
+  const names = new Map();
+  for (const fixture of fixtures || []) {
+    if (fixture.home?.id != null) names.set(String(fixture.home.id), fixture.home.name);
+    if (fixture.away?.id != null) names.set(String(fixture.away.id), fixture.away.name);
+  }
+  return names;
+}
+
+function rosterLeader(rows, metric, namesByTeamId) {
+  const leader = [...(rows || [])]
+    .map((row) => ({
+      id: row.player?.id ?? null,
+      name: row.player?.name || "—",
+      team: namesByTeamId.get(String(row.team_id)) || row.team?.name || "—",
+      value: finiteNumber(row[metric]) || 0,
+      appearances: finiteNumber(row.appearances) || 0
+    }))
+    .filter((row) => row.value > 0)
+    .sort((a, b) =>
+      b.value - a.value ||
+      b.appearances - a.appearances ||
+      a.name.localeCompare(b.name)
+    )[0];
+  return leader || null;
+}
+
+async function collectBallDontLieStats(config) {
+  if (!config.ballDontLieApiKey) return null;
+
+  const provider = new BallDontLieFifaProvider({
+    apiKey: config.ballDontLieApiKey,
+    ...config.ballDontLie
+  });
+  const fixturesResult = await provider.getFixtures();
+  const rostersResult = await provider.getRosters().catch((error) => {
+    console.warn("[tournament-stats] rosters balldontlie no disponibles:", error.message);
+    return null;
+  });
+
+  return {
+    fixtures: fixturesResult.data,
+    rosters: rostersResult?.data || []
+  };
+}
 
 module.exports = async function handler(request, response) {
   if (request.method !== "GET" && request.method !== "HEAD") {
@@ -27,41 +78,30 @@ module.exports = async function handler(request, response) {
     return response.status(200).end();
   }
 
-  const config = loadConfig();
-  const provider = new FootballProvider({
-    apiKey: config.apiSportsKey,
-    ...config.football,
-    fixturesTtlMs: config.football.liveStatsTtlMs,
-    detailTtlMs: config.football.liveStatsTtlMs
-  });
-  const league = config.football.league;
-  const season = config.football.season;
   const today = localDate(new Date(), TIME_ZONE);
+  const config = loadConfig();
 
   let fixtures = [];
-  let source = "api-football";
+  let source = "web";
   let providerMessage = "";
-  let playerStatsAvailable = false;
+  let playerRows = [];
 
-  if (
-    config.apiSportsKey &&
-    config.football.seasonDataEnabled !== false
-  ) {
+  if (config.ballDontLieApiKey) {
     try {
-      const result = await provider.getFixtures({
-        league,
-        season,
-        timezone: TIME_ZONE
-      });
-      fixtures = result.data;
-      playerStatsAvailable = fixtures.length > 0;
-    } catch (error) {
-      console.warn("[tournament-stats] API-Football no disponible:", error.message);
+      const balldontlie = await collectBallDontLieStats(config);
+      if (balldontlie?.fixtures?.length) {
+        fixtures = balldontlie.fixtures;
+        playerRows = balldontlie.rosters;
+        source = "balldontlie";
+        providerMessage = playerRows.length
+          ? "Datos de partidos y líderes de jugadores desde balldontlie."
+          : "Datos de partidos desde balldontlie. Los líderes de jugadores no están disponibles con la respuesta actual.";
+      }
+    } catch (ballDontLieError) {
+      console.warn("[tournament-stats] balldontlie no disponible:", ballDontLieError.message);
     }
   }
 
-  // Fallback web (Wikipedia): cuando no hay API-Football, recolecta resultados
-  // de fuentes públicas y devuelve el contrato con fuentes/no_encontrados.
   if (!fixtures.length) {
     try {
       const web = await collectWebStats({
@@ -104,7 +144,7 @@ module.exports = async function handler(request, response) {
       fixtures = fallback.data;
       source = "fixtur.es";
       providerMessage =
-        "Datos de partidos mediante el feed de respaldo. Las estadísticas de jugadores requieren acceso API-Football 2026.";
+        "Datos de partidos mediante el feed de respaldo. Las estadísticas de jugadores no están disponibles por esta vía.";
     } catch (fallbackError) {
       console.error("[tournament-stats] respaldo ICS no disponible:", fallbackError);
       return response.status(502).json({
@@ -118,29 +158,7 @@ module.exports = async function handler(request, response) {
     timeZone: TIME_ZONE,
     expectedTotalFixtures: TOURNAMENT_FIXTURES
   });
-  let scorers = [];
-  let assists = [];
-  let goalkeeperPayloads = [];
-
-  if (playerStatsAvailable) {
-    const [scorersResult, assistsResult] = await Promise.allSettled([
-      provider.getTopScorers({ league, season }),
-      provider.getTopAssists({ league, season })
-    ]);
-    scorers = scorersResult.status === "fulfilled" ? scorersResult.value.data : [];
-    assists = assistsResult.status === "fulfilled" ? assistsResult.value.data : [];
-
-    const fixtureIds = aggregate.todayFixtureIds.slice(
-      0,
-      MAX_DAILY_PLAYER_FIXTURES
-    );
-    const goalkeeperResults = await Promise.allSettled(
-      fixtureIds.map((fixtureId) => provider.getFixturePlayers(fixtureId))
-    );
-    goalkeeperPayloads = goalkeeperResults
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => result.value.data);
-  }
+  const namesByTeamId = teamNamesById(fixtures);
 
   response.setHeader("Cache-Control", "private, max-age=0, must-revalidate");
   return response.status(200).json({
@@ -150,18 +168,22 @@ module.exports = async function handler(request, response) {
     summary: aggregate.summary,
     leaders: {
       ...aggregate.leaders,
-      topScorer: playerLeader(scorers, "goals"),
-      topAssist: playerLeader(assists, "assists"),
-      bestGoalkeeper: bestGoalkeeper(goalkeeperPayloads)
+      topScorer: playerRows.length
+        ? rosterLeader(playerRows, "goals", namesByTeamId)
+        : playerLeader([], "goals"),
+      topAssist: playerRows.length
+        ? rosterLeader(playerRows, "assists", namesByTeamId)
+        : playerLeader([], "assists"),
+      bestGoalkeeper: bestGoalkeeper([])
     },
     availability: {
-      playerStats: playerStatsAvailable,
+      playerStats: playerRows.length > 0,
       message: providerMessage
     },
     notes: {
       bestMatchToday: "Partido con más goles del día; en empate, prima el marcador más ajustado.",
       bestGoalkeeper: "Mejor valoración entre los porteros que jugaron hoy.",
-      goalkeeperFixturesLoaded: goalkeeperPayloads.length
+      goalkeeperFixturesLoaded: 0
     }
   });
 };

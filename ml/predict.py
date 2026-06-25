@@ -9,15 +9,9 @@ Modos de uso:
 2. CSV manual:
        python ml/predict.py --fixtures fixtures.csv
 
-3. Live — fetcha ambas APIs y reconcilia automáticamente:
-       python ml/predict.py --live \\
-           --api-football-key <KEY> \\
-           --odds-api-key <KEY> \\
-           [--days-ahead 2] \\
-           [--output picks.json]
-
-   Variables de entorno equivalentes (si no se pasan por flag):
-       API_FOOTBALL_KEY, ODDS_API_KEY
+3. Live:
+       Desactivado en este proyecto. Para producir picks reales, genera un CSV
+       de fixtures/cuotas y usa el modo manual, o publica PICKS_JSON en Vercel.
 
 ─────────────────────────────────────────────────────────────────────────────
 Columnas del CSV manual (modo 2):
@@ -394,39 +388,6 @@ _BK_PREFIX: dict[str, str] = {
 }
 
 
-def fetch_api_football(api_key: str, days_ahead: int = 2) -> list[dict]:
-    """
-    Devuelve fixtures del Mundial 2026 de los próximos `days_ahead` días.
-    Normaliza la respuesta al formato que espera from_football().
-    """
-    import urllib.request
-    from datetime import date, timedelta
-
-    today = date.today()
-    end = today + timedelta(days=days_ahead)
-    url = (
-        f"https://v3.football.api-sports.io/fixtures"
-        f"?league=1&season=2026"
-        f"&from={today.isoformat()}&to={end.isoformat()}"
-        f"&timezone=UTC"
-    )
-    req = urllib.request.Request(url, headers={"x-apisports-key": api_key})
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        payload = json.loads(resp.read())
-
-    fixtures = []
-    for item in payload.get("response", []):
-        fx = item.get("fixture", {})
-        teams = item.get("teams", {})
-        fixtures.append({
-            "fixture_id": fx.get("id"),
-            "home": teams.get("home", {}).get("name", ""),
-            "away": teams.get("away", {}).get("name", ""),
-            "kickoff_utc": fx.get("date", ""),
-        })
-    return fixtures
-
-
 def fetch_odds_api(api_key: str, sport: str = "soccer_fifa_world_cup") -> list[dict]:
     """
     Devuelve eventos h2h del Mundial desde The Odds API.
@@ -550,10 +511,7 @@ def main():
     parser.add_argument("--fixtures", type=str, default=None,
                         help="CSV con fixtures y cuotas (modo manual)")
     parser.add_argument("--live", action="store_true",
-                        help="Fetch en vivo desde API-Football + The Odds API")
-    parser.add_argument("--api-football-key", type=str,
-                        default=os.getenv("API_FOOTBALL_KEY"),
-                        help="API key de API-Football (o env API_FOOTBALL_KEY)")
+                        help="Modo live desactivado; usa --fixtures o PICKS_JSON")
     parser.add_argument("--odds-api-key", type=str,
                         default=os.getenv("ODDS_API_KEY"),
                         help="API key de The Odds API (o env ODDS_API_KEY)")
@@ -569,40 +527,8 @@ def main():
     df: pd.DataFrame | None = None
 
     if args.live:
-        if not args.api_football_key or not args.odds_api_key:
-            print("✗ --live requiere --api-football-key y --odds-api-key (o sus env vars).")
-            sys.exit(1)
-
-        try:
-            import sys as _sys
-            _sys.path.insert(0, str(ROOT))
-            from reconciler import reconcile, from_football, from_odds
-
-            print("Descargando fixtures de API-Football…")
-            fb_fixtures = fetch_api_football(args.api_football_key, args.days_ahead)
-            print(f"  {len(fb_fixtures)} fixtures encontrados")
-
-            print("Descargando cuotas de The Odds API…")
-            od_events = fetch_odds_api(args.odds_api_key)
-            # The Odds API devuelve event_id en "id" no en "event_id"
-            for ev in od_events:
-                ev.setdefault("event_id", ev.get("id"))
-            print(f"  {len(od_events)} eventos con cuotas")
-
-            matched, un_fb, un_od = reconcile(fb_fixtures, od_events,
-                                               football_adapter=from_football,
-                                               odds_adapter=from_odds)
-            _print_reconcile_report(matched, un_fb, un_od)
-
-            if not matched:
-                print("⚠ No se emparejó ningún partido. Comprueba claves y fechas.")
-                sys.exit(1)
-
-            df = reconciled_to_dataframe(matched)
-
-        except Exception as exc:
-            print(f"✗ Error en modo live: {exc}")
-            raise
+        print("✗ --live está desactivado. Usa --fixtures CSV o publica PICKS_JSON en Vercel.")
+        sys.exit(1)
 
     elif args.fixtures:
         df = pd.read_csv(args.fixtures)

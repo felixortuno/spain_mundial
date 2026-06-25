@@ -2,7 +2,6 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { FootballProvider } = require("../lib/providers/footballProvider");
 const { OddsProvider } = require("../lib/providers/oddsProvider");
 
 function jsonResponse(payload, headers = {}) {
@@ -11,38 +10,6 @@ function jsonResponse(payload, headers = {}) {
     headers: { "content-type": "application/json", ...headers }
   });
 }
-
-test("FootballProvider autentica por cabecera y normaliza fixtures", async () => {
-  let captured;
-  const provider = new FootballProvider({
-    apiKey: "secret-football",
-    baseUrl: "https://football.test",
-    fixturesTtlMs: 1000,
-    detailTtlMs: 1000,
-    staleTtlMs: 10000,
-    fetchImpl: async (url, options) => {
-      captured = { url: String(url), options };
-      return jsonResponse({
-        errors: [],
-        response: [{
-          fixture: { id: 7, date: "2026-06-15T16:00:00Z" },
-          league: { id: 1, name: "World Cup", season: 2026 },
-          teams: {
-            home: { id: 10, name: "Spain" },
-            away: { id: 20, name: "Cape Verde" }
-          }
-        }]
-      }, { "x-ratelimit-requests-remaining": "99" });
-    }
-  });
-
-  const result = await provider.getFixtures({ league: 1, season: 2026 });
-
-  assert.equal(captured.options.headers["x-apisports-key"], "secret-football");
-  assert.match(captured.url, /\/fixtures\?/);
-  assert.equal(result.data[0].home.name, "Spain");
-  assert.equal(result.metadata.rate.dailyRemaining, "99");
-});
 
 test("OddsProvider autentica por query, resuelve sport_key y normaliza cuotas", async () => {
   const urls = [];

@@ -9,13 +9,13 @@ const metadata = {
   metadata: { provider: "mock", rate: { remaining: "99" } }
 };
 
-test("orquesta catálogo, fixtures, cuotas, reconciliación y merge", async () => {
-  const footballProvider = {
+test("orquesta fixtures ICS, catálogo, cuotas, reconciliación y merge", async () => {
+  const fixtureProvider = {
     async getFixtures() {
       return {
         ...metadata,
         data: [{
-          source: "api-football",
+          source: "fixtur.es",
           id: "123",
           commenceTime: "2026-06-15T16:00:00Z",
           home: { id: 1, name: "Spain" },
@@ -23,18 +23,6 @@ test("orquesta catálogo, fixtures, cuotas, reconciliación y merge", async () =
           competition: { id: 1, name: "World Cup", season: 2026 },
           features: { form: { home: null, away: null } }
         }]
-      };
-    },
-    async enrichFixtures(fixtures) {
-      return {
-        fixtures: fixtures.map((fixture) => ({
-          ...fixture,
-          features: {
-            ...fixture.features,
-            form: { home: "WWDWW", away: "LDWWL" }
-          }
-        })),
-        requests: []
       };
     }
   };
@@ -75,12 +63,6 @@ test("orquesta catálogo, fixtures, cuotas, reconciliación y merge", async () =
     }
   };
   const config = {
-    football: {
-      league: "1",
-      season: "2026",
-      enrichment: "basic",
-      enrichmentLimit: 8
-    },
     odds: {
       sportKey: "",
       sportHints: ["World Cup"],
@@ -95,7 +77,7 @@ test("orquesta catálogo, fixtures, cuotas, reconciliación y merge", async () =
 
   const result = await buildUnifiedMatches({
     config,
-    footballProvider,
+    fixtureProvider,
     oddsProvider,
     logger: { warn() {} }
   });
@@ -103,34 +85,39 @@ test("orquesta catálogo, fixtures, cuotas, reconciliación y merge", async () =
   assert.equal(result.counts.reconciled, 1);
   assert.equal(result.matches[0].match_id_interno, "spain-cape-verde-2026-06-15");
   assert.equal(result.matches[0].fuente_ids.odds_api_event, "abc");
-  assert.equal(result.matches[0].features.form.home, "WWDWW");
+  assert.equal(result.matches[0].fuente_ids.fixture, "123");
+  assert.equal(result.matches[0].features.form.home, null);
   assert.equal(result.matches[0].reconciliacion.metodo, "alias");
   assert.equal(result.matches[0].reconciliacion.orientacion, "same");
+  assert.equal(result.competition.fixturesSource, "fixtur.es");
 });
 
-test("usa el feed ICS si API-Football rechaza la temporada", async () => {
-  const footballProvider = {
-    async getFixtures() {
-      throw new Error("Free plans do not have access to this season.");
-    },
-    async enrichFixtures() {
-      throw new Error("No debería enriquecer fixtures del fallback.");
-    }
-  };
-  const fixtureFallbackProvider = {
+test("filtra fixtures ICS por fecha antes de reconciliar", async () => {
+  const fixtureProvider = {
     async getFixtures() {
       return {
         cache: { status: "miss" },
         metadata: { provider: "fixtur.es", status: 200 },
-        data: [{
-          source: "fixtur.es",
-          id: "ics-1",
-          commenceTime: "2026-06-15T16:00:00Z",
-          home: { id: null, name: "Spain" },
-          away: { id: null, name: "Cape Verde" },
-          competition: { id: 1, name: "FIFA World Cup", season: 2026 },
-          features: { status: { short: "NS" }, goals: { home: null, away: null } }
-        }]
+        data: [
+          {
+            source: "fixtur.es",
+            id: "inside",
+            commenceTime: "2026-06-15T16:00:00Z",
+            home: { id: null, name: "Spain" },
+            away: { id: null, name: "Cape Verde" },
+            competition: { id: 1, name: "FIFA World Cup", season: 2026 },
+            features: { status: { short: "NS" }, goals: { home: null, away: null } }
+          },
+          {
+            source: "fixtur.es",
+            id: "outside",
+            commenceTime: "2026-06-18T16:00:00Z",
+            home: { id: null, name: "France" },
+            away: { id: null, name: "Brazil" },
+            competition: { id: 1, name: "FIFA World Cup", season: 2026 },
+            features: { status: { short: "NS" }, goals: { home: null, away: null } }
+          }
+        ]
       };
     }
   };
@@ -156,13 +143,6 @@ test("usa el feed ICS si API-Football rechaza la temporada", async () => {
     }
   };
   const config = {
-    apiSportsKey: "free-plan",
-    football: {
-      league: "1",
-      season: "2026",
-      enrichment: "basic",
-      enrichmentLimit: 8
-    },
     odds: {
       sportKey: "",
       sportHints: ["World Cup"],
@@ -177,23 +157,32 @@ test("usa el feed ICS si API-Football rechaza la temporada", async () => {
 
   const result = await buildUnifiedMatches({
     config,
-    footballProvider,
-    fixtureFallbackProvider,
+    fixtureProvider,
     oddsProvider,
+    from: "2026-06-15",
+    to: "2026-06-15",
     logger: { warn() {} }
   });
 
-  assert.equal(result.competition.fixturesSource, "fixtur.es");
+  assert.equal(result.counts.fixtures, 1);
   assert.equal(result.counts.reconciled, 1);
-  assert.equal(result.matches[0].features.status.short, "NS");
+  assert.equal(result.competition.fixturesSource, "fixtur.es");
 });
 
-test("omite API-Football si los datos de temporada están desactivados", async () => {
-  let footballCalls = 0;
-  const footballProvider = {
+test("usa balldontlie como primario y cae a proveedores de respaldo si falla", async () => {
+  const warnings = [];
+  const ballDontLieProvider = {
     async getFixtures() {
-      footballCalls += 1;
-      throw new Error("No debería consultar la temporada.");
+      throw new Error("GOAT tier required");
+    },
+    async resolveSportKey() {
+      return {
+        sport: { key: "balldontlie_fifa_worldcup", title: "FIFA World Cup" },
+        catalog: { ...metadata, data: [] }
+      };
+    },
+    async getOdds() {
+      throw new Error("odds tier required");
     }
   };
   const fixtureFallbackProvider = {
@@ -201,11 +190,19 @@ test("omite API-Football si los datos de temporada están desactivados", async (
       return {
         cache: { status: "miss" },
         metadata: { provider: "fixtur.es", status: 200 },
-        data: []
+        data: [{
+          source: "fixtur.es",
+          id: "fallback-fixture",
+          commenceTime: "2026-06-15T16:00:00Z",
+          home: { id: null, name: "Spain" },
+          away: { id: null, name: "Cape Verde" },
+          competition: { id: 1, name: "FIFA World Cup", season: 2026 },
+          features: { status: { short: "NS" }, goals: { home: null, away: null } }
+        }]
       };
     }
   };
-  const oddsProvider = {
+  const oddsFallbackProvider = {
     async resolveSportKey() {
       return {
         sport: { key: "soccer_fifa_world_cup", title: "FIFA World Cup" },
@@ -213,18 +210,23 @@ test("omite API-Football si los datos de temporada están desactivados", async (
       };
     },
     async getOdds() {
-      return { ...metadata, data: [] };
+      return {
+        ...metadata,
+        data: [{
+          source: "the-odds-api",
+          id: "fallback-odds",
+          commenceTime: "2026-06-15T16:00:00Z",
+          homeTeam: "Spain",
+          awayTeam: "Cape Verde",
+          bookmakers: []
+        }]
+      };
     }
   };
   const config = {
-    apiSportsKey: "free-plan",
-    football: {
-      league: "1",
-      season: "2026",
-      seasonDataEnabled: false,
-      enrichment: "none",
-      enrichmentLimit: 0
-    },
+    ballDontLieApiKey: "secret-bdl",
+    ballDontLie: {},
+    oddsApiKey: "secret-odds",
     odds: {
       sportKey: "",
       sportHints: ["World Cup"],
@@ -239,12 +241,17 @@ test("omite API-Football si los datos de temporada están desactivados", async (
 
   const result = await buildUnifiedMatches({
     config,
-    footballProvider,
+    ballDontLieProvider,
     fixtureFallbackProvider,
-    oddsProvider,
-    logger: { warn() {} }
+    oddsFallbackProvider,
+    logger: { warn: (...args) => warnings.push(args.join(" ")) }
   });
 
-  assert.equal(footballCalls, 0);
   assert.equal(result.competition.fixturesSource, "fixtur.es");
+  assert.equal(result.counts.reconciled, 1);
+  assert.equal(result.matches[0].fuente_ids.fixture, "fallback-fixture");
+  assert.equal(result.matches[0].fuente_ids.odds_api_event, "fallback-odds");
+  assert.equal(warnings.length, 2);
+  assert.match(warnings[0], /balldontlie fixtures/);
+  assert.match(warnings[1], /balldontlie odds/);
 });

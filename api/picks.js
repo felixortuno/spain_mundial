@@ -6,14 +6,14 @@
  *  1. MODELO ML  — si PICKS_JSON está en env vars (JSON generado por predict.py).
  *                  Máxima precisión: LightGBM calibrado + calibración isotónica.
  *
- *  2. MERCADO    — si API_FOOTBALL_KEY + ODDS_API_KEY están disponibles.
- *                  Usa probabilidades de Pinnacle (fair odds quitando margen)
- *                  como señal del modelo. Sin Python, corre en Node.
+ *  2. MERCADO    — si BALLDONTLIE_API_KEY/BDL_API_KEY u ODDS_API_KEY está
+ *                  disponible. Usa probabilidades fair quitando margen como
+ *                  señal del modelo y corre en Node, sin Python.
  *
  *  3. DEMO       — datos sintéticos con partidos reales del Mundial 2026.
  *
  * Flujo de producción con modelo Python:
- *   python ml/predict.py --live --api-football-key ... --odds-api-key ...
+ *   python ml/predict.py --odds-api-key ...
  *   vercel env add PICKS_JSON          # pega el JSON generado
  *   vercel --prod
  *
@@ -865,10 +865,12 @@ module.exports = async function handler(request, response) {
     }
   }
 
-  // ── Nivel 2: Live market (Pinnacle fair odds como señal) ───────────
-  const hasKeys =
-    (process.env.APISPORTS_KEY || process.env.API_FOOTBALL_KEY) &&
-    process.env.ODDS_API_KEY;
+  // ── Nivel 2: Live market (probabilidad fair del mercado como señal) ──
+  const hasKeys = Boolean(
+    process.env.BALLDONTLIE_API_KEY ||
+    process.env.BDL_API_KEY ||
+    process.env.ODDS_API_KEY
+  );
 
   if (hasKeys) {
     try {

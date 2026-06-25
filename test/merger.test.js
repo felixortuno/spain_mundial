@@ -50,7 +50,7 @@ test("calcula overround, probabilidad justa y mejor precio 1X2", () => {
     }
   });
 
-  assert.equal(merged.fuente_ids.api_football_fixture, "123");
+  assert.equal(merged.fuente_ids.fixture, "123");
   assert.equal(merged.cuotas.mejor_precio["1"].casa, "Beta");
   assert.equal(merged.cuotas.mejor_precio.X.casa, "Alpha");
   assert.ok(merged.cuotas.overround_por_casa.Alpha > 0);
@@ -59,7 +59,7 @@ test("calcula overround, probabilidad justa y mejor precio 1X2", () => {
   assert.ok(Math.abs(sum - 1) < 0.001);
 });
 
-test("conserva el 1X2 de API-Football si Odds API invierte la orientación", () => {
+test("conserva el 1X2 del fixture si Odds API invierte la orientación", () => {
   const merged = mergeMatch({
     football: {
       id: "456",
